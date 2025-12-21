@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Reset dasar */
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+/* Scroll normal */
+body {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
