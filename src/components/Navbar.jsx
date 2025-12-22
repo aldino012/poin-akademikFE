@@ -1,25 +1,32 @@
 "use client";
 
 import React, { useState } from "react";
-
-const handleLogout = async () => {
-  try {
-    await fetch("http://localhost:5050/api/auth/logout", {
-      method: "POST",
-      credentials: "include",
-    });
-
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("user");
-    window.location.href = "/auth";
-  } catch (err) {
-    console.log(err);
-  }
-};
+import api from "@/api/axios";
 
 export default function Navbar({ toggleSidebar, role = "default" }) {
   const [showTooltip, setShowTooltip] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      setLoading(true);
+
+      // 🔥 PANGGIL BACKEND RAILWAY LEWAT AXIOS
+      await api.post("/api/auth/logout");
+
+      // ❌ token TIDAK ada di localStorage (httpOnly cookie)
+      localStorage.removeItem("user_role");
+      localStorage.removeItem("user");
+
+      // redirect ke halaman login
+      window.location.href = "/auth";
+    } catch (err) {
+      console.error("Logout error:", err);
+      alert("Gagal logout, coba refresh halaman.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getTitle = () => {
     if (role === "admin") return "Dashboard Admin";
@@ -31,8 +38,7 @@ export default function Navbar({ toggleSidebar, role = "default" }) {
     <header className="flex items-center justify-between bg-white border-b px-3 py-2 shadow-sm sticky top-0 z-20">
       <div className="flex items-center space-x-2">
         <button
-          id="menuBtn"
-          className="md:hidden text-blue-700 focus:outline-none"
+          className="md:hidden text-blue-700"
           onClick={toggleSidebar}
         >
           <i className="fas fa-bars text-xl"></i>
@@ -44,21 +50,23 @@ export default function Navbar({ toggleSidebar, role = "default" }) {
         </h1>
       </div>
 
-      {/* Tombol Logout dengan Tooltip */}
-      <div className="relative flex items-center">
+      {/* Logout */}
+      <div className="relative">
         <button
           onClick={handleLogout}
+          disabled={loading}
           onMouseEnter={() => setShowTooltip(true)}
           onMouseLeave={() => setShowTooltip(false)}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-red-600 hover:bg-red-50 rounded-md transition-colors duration-200 border border-red-100 hover:border-red-200"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-red-600 hover:bg-red-50 rounded-md border border-red-100 hover:border-red-200 disabled:opacity-50"
         >
           <i className="fas fa-sign-out-alt text-xs"></i>
-          <span className="hidden sm:inline">Logout</span>
+          <span className="hidden sm:inline">
+            {loading ? "Logout..." : "Logout"}
+          </span>
         </button>
 
-        {/* Tooltip untuk mobile */}
         {showTooltip && (
-          <div className="absolute right-0 top-full mt-1 px-2 py-1 bg-gray-800 text-white text-xs rounded shadow-lg sm:hidden">
+          <div className="absolute right-0 top-full mt-1 px-2 py-1 bg-gray-800 text-white text-xs rounded shadow sm:hidden">
             Logout
           </div>
         )}
