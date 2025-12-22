@@ -11,14 +11,12 @@ export default function Navbar({ toggleSidebar, role = "default" }) {
     try {
       setLoading(true);
 
-      // 🔥 PANGGIL BACKEND RAILWAY LEWAT AXIOS
-      await api.post("/api/auth/logout");
+      // ✅ BENAR: TANPA /api
+      await api.post("/auth/logout");
 
-      // ❌ token TIDAK ada di localStorage (httpOnly cookie)
       localStorage.removeItem("user_role");
       localStorage.removeItem("user");
 
-      // redirect ke halaman login
       window.location.href = "/auth";
     } catch (err) {
       console.error("Logout error:", err);
