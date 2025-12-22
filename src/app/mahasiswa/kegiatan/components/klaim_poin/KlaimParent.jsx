@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
+import api from "@/api/axios"; // ✅ GANTI axios
 import { useToast } from "@/components/Toats";
 
 import TabsNav from "./TabsNav";
@@ -39,7 +39,7 @@ export default function KlaimParent({ isOpen, onClose }) {
   const [poinBadge, setPoinBadge] = useState(0);
   const [badgeClass, setBadgeClass] = useState("bg-gray-300 text-gray-900");
 
-  // Handle click outside modal
+  /* ================= CLICK OUTSIDE ================= */
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
@@ -58,12 +58,8 @@ export default function KlaimParent({ isOpen, onClose }) {
     };
   }, [isOpen, onClose]);
 
-  // Validasi form
+  /* ================= VALIDASI FORM ================= */
   useEffect(() => {
-    validateForm();
-  }, [formData]);
-
-  const validateForm = () => {
     const requiredFields = [
       formData.masterpoin_id,
       formData.rincian_acara,
@@ -77,57 +73,50 @@ export default function KlaimParent({ isOpen, onClose }) {
     );
 
     const isFileUploaded = formData.bukti_kegiatan !== null;
-
     setIsFormValid(isRequiredFilled && isFileUploaded);
-  };
+  }, [formData]);
 
-  // Fetch user
+  /* ================= FETCH USER ================= */
   const fetchUser = async () => {
     try {
-      const res = await axios.get("http://localhost:5050/api/auth/profile", {
-        withCredentials: true,
-      });
+      const res = await api.get("/api/auth/profile");
 
       const u = res.data.data;
       setUser(u);
 
-      const formattedName = (u.name || u.nama_mhs || "").toUpperCase();
-
       setFormData((prev) => ({
         ...prev,
         nim: u.nim,
-        nama: formattedName,
+        nama: (u.nama_mhs || u.nama || "").toUpperCase(),
         mahasiswa_id: u.id_mhs,
       }));
     } catch (err) {
-      console.log("ERR USER:", err);
+      console.error("ERR USER:", err);
     }
   };
 
-  // Fetch master poin
+  /* ================= FETCH MASTER POIN ================= */
   const fetchMasterPoin = async () => {
     try {
-      const res = await axios.get("http://localhost:5050/api/masterpoin", {
-        withCredentials: true,
-      });
-
+      const res = await api.get("/api/masterpoin");
       const data = Array.isArray(res.data) ? res.data : res.data.data;
       setMasterPoin(data || []);
     } catch (err) {
-      console.log("ERR MASTER POIN:", err);
+      console.error("ERR MASTER POIN:", err);
       setMasterPoin([]);
     }
   };
 
+  /* ================= LOAD SAAT MODAL BUKA ================= */
   useEffect(() => {
     if (!isOpen) return;
 
     setLoading(true);
     Promise.all([fetchUser(), fetchMasterPoin()])
-      .then(() => setLoading(false))
-      .catch(() => setLoading(false));
+      .finally(() => setLoading(false));
   }, [isOpen]);
 
+  /* ================= HELPER ================= */
   const getBadgeClass = (poin) => {
     if (poin >= 30) return setBadgeClass("bg-blue-600 text-white");
     if (poin >= 15) return setBadgeClass("bg-green-500 text-white");
@@ -136,71 +125,16 @@ export default function KlaimParent({ isOpen, onClose }) {
   };
 
   const handleInputChange = (field, value) => {
-    if (typeof value === "string") {
-      value = value.toUpperCase();
-    }
     setFormData((prev) => ({
       ...prev,
-      [field]: value,
+      [field]: typeof value === "string" ? value.toUpperCase() : value,
     }));
   };
 
   const handleDateChange = (date, field) => {
     if (!date) return;
-
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const formattedDate = `${year}-${month}-${day}`;
-
-    setFormData((prev) => ({
-      ...prev,
-      [field]: formattedDate,
-    }));
-  };
-
-  // Submit form
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!isFormValid) {
-      addToast({
-        message: "Harap lengkapi semua data yang diperlukan!",
-        type: "error",
-      });
-      return;
-    }
-
-    try {
-      const fd = new FormData();
-
-      fd.append("mahasiswa_id", formData.mahasiswa_id);
-      fd.append("masterpoin_id", formData.masterpoin_id);
-      fd.append("tanggal_pengajuan", formData.tanggal_pengajuan);
-      fd.append("rincian_acara", formData.rincian_acara);
-      fd.append("bukti_kegiatan", formData.bukti_kegiatan);
-      fd.append("periode_pengajuan", formData.periode_pengajuan);
-      fd.append("tingkat", formData.tingkat);
-      fd.append("tempat", formData.tempat);
-      fd.append("tanggal_pelaksanaan", formData.tanggal_pelaksanaan);
-      fd.append("mentor", formData.mentor);
-      fd.append("narasumber", formData.narasumber);
-      fd.append("poin", formData.poin);
-
-      const res = await axios.post("http://localhost:5050/api/klaim", fd, {
-        withCredentials: true,
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      addToast({ message: "Klaim poin berhasil diajukan!", type: "success" });
-      onClose();
-    } catch (err) {
-      console.log("ERR SUBMIT:", err.response?.data || err);
-      addToast({
-        message: err.response?.data?.message || "Gagal mengajukan klaim.",
-        type: "error",
-      });
-    }
+    const formatted = new Date(date).toISOString().split("T")[0];
+    setFormData((prev) => ({ ...prev, [field]: formatted }));
   };
 
   if (!isOpen) return null;
