@@ -10,15 +10,18 @@ export default function Pencapaian({ mahasiswa }) {
   const [loading, setLoading] = useState(true);
 
   // =====================================================
-  // FETCH DATA PENCAPAIAN BERDASARKAN id_mhs
+  // FETCH DATA PENCAPAIAN BERDASARKAN ID MAHASISWA
   // =====================================================
   useEffect(() => {
-    if (!mahasiswa || !mahasiswa.id_mhs) return;
+    if (!mahasiswa || !mahasiswa.id) {
+      setLoading(false); // ⬅️ WAJIB agar tidak infinite loading
+      return;
+    }
 
     const fetchPencapaian = async () => {
       try {
         const res = await api.get(
-          `/api/mahasiswa/cv/${mahasiswa.id_mhs}`
+          `/api/mahasiswa/cv/${mahasiswa.id}`
         );
 
         const data = res.data || {};
@@ -83,16 +86,13 @@ export default function Pencapaian({ mahasiswa }) {
 
       {/* ================= DESKTOP ================= */}
       <div className="hidden md:block relative">
-        {/* GARIS PANJANG */}
         {showLine && (
           <div className="absolute top-7 left-0 right-0 mx-12 border-t-2 border-dashed border-yellow-300"></div>
         )}
 
-        {/* ITEMS */}
         <div className="relative z-10 flex justify-center gap-24">
           {data.map((item) => (
             <div key={item.id} className="flex flex-col items-center">
-              {/* ICON */}
               <div className="relative">
                 <div className="w-14 h-14 rounded-full bg-yellow-500 flex items-center justify-center shadow border-4 border-white">
                   <i
@@ -106,7 +106,6 @@ export default function Pencapaian({ mahasiswa }) {
                 </span>
               </div>
 
-              {/* TEXT */}
               <div className="mt-3 text-center max-w-[160px]">
                 <p className="text-xs font-semibold text-gray-800 truncate">
                   {item.namaKegiatan}
@@ -128,7 +127,6 @@ export default function Pencapaian({ mahasiswa }) {
 
         {data.map((item) => (
           <div key={item.id} className="relative flex mb-6 last:mb-0">
-            {/* ICON */}
             <div className="relative z-10 mr-4">
               <div className="w-14 h-14 rounded-full bg-yellow-500 flex items-center justify-center shadow border-4 border-white">
                 <i
@@ -142,7 +140,6 @@ export default function Pencapaian({ mahasiswa }) {
               </span>
             </div>
 
-            {/* TEXT */}
             <div className="mt-1">
               <p className="text-xs font-semibold text-gray-800">
                 {item.namaKegiatan}
