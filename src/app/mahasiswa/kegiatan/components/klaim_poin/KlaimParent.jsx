@@ -149,10 +149,53 @@ export default function KlaimParent({ isOpen, onClose }) {
   };
 
   /* ================= 🔴 WAJIB ADA ================= */
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("SUBMIT OK", formData);
-  };
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!isFormValid) {
+    addToast({
+      message: "Lengkapi semua data dan upload bukti!",
+      type: "error",
+    });
+    return;
+  }
+
+  try {
+    const fd = new FormData();
+
+    fd.append("masterpoin_id", formData.masterpoin_id);
+    fd.append("periode_pengajuan", formData.periode_pengajuan);
+    fd.append("tanggal_pengajuan", formData.tanggal_pengajuan);
+    fd.append("rincian_acara", formData.rincian_acara);
+    fd.append("tingkat", formData.tingkat);
+    fd.append("tempat", formData.tempat);
+    fd.append("tanggal_pelaksanaan", formData.tanggal_pelaksanaan);
+    fd.append("mentor", formData.mentor);
+    fd.append("narasumber", formData.narasumber);
+    fd.append("bukti_kegiatan", formData.bukti_kegiatan);
+
+    const res = await api.post("/api/klaim", fd, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    addToast({
+      message: "Klaim poin berhasil diajukan",
+      type: "success",
+    });
+
+    onClose(); // tutup modal
+  } catch (err) {
+    console.error("ERR SUBMIT:", err);
+
+    addToast({
+      message:
+        err.response?.data?.message ||
+        "Gagal mengajukan klaim poin",
+      type: "error",
+    });
+  }
+};
+
 
   if (!isOpen) return null;
 
