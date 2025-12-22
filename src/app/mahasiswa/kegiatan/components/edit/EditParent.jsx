@@ -140,7 +140,6 @@ export default function EditParent({ onClose, claim, onUpdated }) {
       }
     });
 
-    // 🔥 FILE PASTI TERKIRIM
     if (form.bukti_kegiatan instanceof File) {
       formData.append("bukti_kegiatan", form.bukti_kegiatan);
     }
@@ -149,7 +148,7 @@ export default function EditParent({ onClose, claim, onUpdated }) {
     formData.append("catatan", form.catatan || "");
 
     try {
-      await api.put(`/api/klaim/${claim.id}`, formData, {
+      await api.put(`/klaim/${claim.id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 

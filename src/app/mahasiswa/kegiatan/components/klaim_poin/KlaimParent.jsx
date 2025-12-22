@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useKnowRef, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import api from "@/api/axios";
 import { useToast } from "@/components/Toats";
 
@@ -78,7 +78,7 @@ export default function KlaimParent({ isOpen, onClose }) {
   /* ================= FETCH USER ================= */
   const fetchUser = async () => {
     try {
-      const res = await api.get("/api/auth/profile");
+      const res = await api.get("/auth/profile");
       const u = res.data.data;
 
       setUser(u);
@@ -96,7 +96,7 @@ export default function KlaimParent({ isOpen, onClose }) {
   /* ================= FETCH MASTER POIN ================= */
   const fetchMasterPoin = async () => {
   try {
-    const res = await api.get("/api/masterpoin");
+    const res = await api.get("/masterpoin");
 
     let data = [];
 
@@ -127,6 +127,8 @@ export default function KlaimParent({ isOpen, onClose }) {
 
   /* ================= HELPER ================= */
   const getBadgeClass = (poin) => {
+    setPoinBadge(poin);
+
     if (poin >= 30) setBadgeClass("bg-blue-600 text-white");
     else if (poin >= 15) setBadgeClass("bg-green-500 text-white");
     else if (poin >= 5) setBadgeClass("bg-yellow-400 text-gray-900");
@@ -174,7 +176,7 @@ export default function KlaimParent({ isOpen, onClose }) {
     fd.append("narasumber", formData.narasumber);
     fd.append("bukti_kegiatan", formData.bukti_kegiatan);
 
-    const res = await api.post("/api/klaim", fd, {
+    const res = await api.post("/klaim", fd, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 

@@ -9,15 +9,12 @@ export default function TabsBukti({ kegiatan }) {
   // =====================================================
   // URL STREAM BUKTI (PRIVATE DRIVE VIA BACKEND)
   // =====================================================
-  const getStreamUrl = () => {
-    if (!kegiatan?.id) return null;
+ const getStreamUrl = () => {
+   if (!kegiatan?.id) return null;
 
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
-
-    // ⚠️ SESUAI ROUTE BACKEND
-    // app.use("/api/klaim", klaimKegiatanRoutes)
-    return `${baseUrl}/api/klaim/${kegiatan.id}/bukti`;
-  };
+   // ✅ LEWAT NEXT.JS PROXY
+   return `/api/proxy/api/klaim/${kegiatan.id}/bukti`;
+ };
 
   const handleOpenFile = (e) => {
     e.preventDefault();

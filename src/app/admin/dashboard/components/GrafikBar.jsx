@@ -23,7 +23,7 @@ export default function BarChartAngkatan() {
   useEffect(() => {
     const fetchAngkatan = async () => {
       try {
-        const res = await api.get("/api/mahasiswa");
+        const res = await api.get("/mahasiswa");
 
         // Ambil array mahasiswa
         const mahasiswa = res.data || [];

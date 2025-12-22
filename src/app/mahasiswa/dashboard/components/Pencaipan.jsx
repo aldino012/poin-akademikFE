@@ -13,16 +13,14 @@ export default function Pencapaian({ mahasiswa }) {
   // FETCH DATA PENCAPAIAN BERDASARKAN ID MAHASISWA
   // =====================================================
   useEffect(() => {
-    if (!mahasiswa || !mahasiswa.id) {
-      setLoading(false); // ⬅️ WAJIB agar tidak infinite loading
+    if (!mahasiswa || !mahasiswa.id_mhs) {
+      setLoading(false);
       return;
     }
 
     const fetchPencapaian = async () => {
       try {
-        const res = await api.get(
-          `/api/mahasiswa/cv/${mahasiswa.id}`
-        );
+        const res = await api.get(`/mahasiswa/cv/${mahasiswa.id_mhs}`);
 
         const data = res.data || {};
         setActivities(data.organisasi || []);

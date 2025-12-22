@@ -43,7 +43,7 @@ export default function KegiatanMhs() {
   // ==============================================
   const fetchClaims = async () => {
     try {
-      const res = await api.get("/api/klaim");
+      const res = await api.get("/klaim");
       const serverData = Array.isArray(res.data)
         ? res.data
         : res.data.data || [];
