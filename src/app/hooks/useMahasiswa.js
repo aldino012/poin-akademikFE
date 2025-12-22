@@ -1,30 +1,46 @@
 "use client";
+
 import { useState, useEffect } from "react";
+import api from "@/api/axios";
 
 export default function useMahasiswa() {
   const [mahasiswa, setMahasiswa] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchData() {
+    let isMounted = true;
+
+    const fetchMahasiswa = async () => {
       try {
-        const res = await fetch("http://localhost:5050/api/mahasiswa/me", {
-          credentials: "include",
-        });
+        const res = await api.get("/api/mahasiswa/me");
 
-        if (!res.ok) throw new Error("Gagal mengambil data mahasiswa");
-
-        const data = await res.json();
-        setMahasiswa(data.data);
+        /**
+         * Backend response:
+         * {
+         *   message: "...",
+         *   data: { ...mahasiswa }
+         * }
+         */
+        if (isMounted) {
+          setMahasiswa(res.data.data);
+        }
       } catch (err) {
-        console.error(err);
-        setMahasiswa(null);
+        console.error("Gagal mengambil data mahasiswa:", err);
+        if (isMounted) {
+          setMahasiswa(null);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-    }
+    };
 
-    fetchData();
+    fetchMahasiswa();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return { mahasiswa, loading };
