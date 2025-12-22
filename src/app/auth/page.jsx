@@ -23,11 +23,7 @@ export default function LoginPage() {
 
     try {
       // 🔥 PERBAIKAN PENTING (WAJIB UNTUK COOKIE JWT)
-      const res = await api.post(
-        "/api/auth/login",
-        formData,
-        { withCredentials: true } // ⬅️ JANGAN DIHAPUS
-      );
+      const res = await api.post("/auth/login", formData);
 
       const data = res.data;
 
