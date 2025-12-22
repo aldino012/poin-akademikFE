@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import LoadingOverlay from "@/components/LoadingOverlay";
+import api from "@/api/axios";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,42 +22,30 @@ export default function LoginPage() {
    setLoading(true);
 
    try {
-     const res = await fetch("http://localhost:5050/api/auth/login", {
-       method: "POST",
-       credentials: "include",
-       headers: { "Content-Type": "application/json" },
-       body: JSON.stringify(formData),
-     });
+     const res = await api.post("/api/auth/login", formData);
 
-     const data = await res.json();
+     const data = res.data;
 
-     // ⛔ Bukan error JS, cukup tampilkan error UI tanpa throw
-     if (!res.ok) {
-       setError(data.message || "Login gagal");
-       setLoading(false);
-       return;
-     }
-
-     // Simpan role di cookies
      if (data.role) {
        Cookies.set("user_role", data.role, { expires: 1 });
      }
 
-     // Redirect berdasarkan role
      if (data.role === "admin") {
        router.replace("/admin/dashboard");
      } else {
        router.replace("/mahasiswa/dashboard");
      }
    } catch (error) {
-     // Error NETWORK (server mati, koneksi putus)
-     setError("Tidak dapat terhubung ke server");
+     if (error.response) {
+       setError(error.response.data?.message || "Login gagal");
+     } else {
+       setError("Tidak dapat terhubung ke server");
+     }
      console.error("Login error:", error);
    } finally {
      setLoading(false);
    }
  };
-
 
   return (
     <>
