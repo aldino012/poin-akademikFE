@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import api from "@/api/axios"; // ✅ GANTI axios
+import React, { useState, useEffect, useKnowRef, useRef } from "react";
+import api from "@/api/axios";
 import { useToast } from "@/components/Toats";
 
 import TabsNav from "./TabsNav";
@@ -41,8 +41,8 @@ export default function KlaimParent({ isOpen, onClose }) {
 
   /* ================= CLICK OUTSIDE ================= */
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
+    const handleClickOutside = (e) => {
+      if (modalRef.current && !modalRef.current.contains(e.target)) {
         onClose();
       }
     };
@@ -69,21 +69,19 @@ export default function KlaimParent({ isOpen, onClose }) {
     ];
 
     const isRequiredFilled = requiredFields.every(
-      (field) => field && field.toString().trim() !== ""
+      (f) => f && f.toString().trim() !== ""
     );
 
-    const isFileUploaded = formData.bukti_kegiatan !== null;
-    setIsFormValid(isRequiredFilled && isFileUploaded);
+    setIsFormValid(isRequiredFilled && !!formData.bukti_kegiatan);
   }, [formData]);
 
   /* ================= FETCH USER ================= */
   const fetchUser = async () => {
     try {
       const res = await api.get("/api/auth/profile");
-
       const u = res.data.data;
-      setUser(u);
 
+      setUser(u);
       setFormData((prev) => ({
         ...prev,
         nim: u.nim,
@@ -99,8 +97,7 @@ export default function KlaimParent({ isOpen, onClose }) {
   const fetchMasterPoin = async () => {
     try {
       const res = await api.get("/api/masterpoin");
-      const data = Array.isArray(res.data) ? res.data : res.data.data;
-      setMasterPoin(data || []);
+      setMasterPoin(res.data?.data || []);
     } catch (err) {
       console.error("ERR MASTER POIN:", err);
       setMasterPoin([]);
@@ -118,10 +115,10 @@ export default function KlaimParent({ isOpen, onClose }) {
 
   /* ================= HELPER ================= */
   const getBadgeClass = (poin) => {
-    if (poin >= 30) return setBadgeClass("bg-blue-600 text-white");
-    if (poin >= 15) return setBadgeClass("bg-green-500 text-white");
-    if (poin >= 5) return setBadgeClass("bg-yellow-400 text-gray-900");
-    return setBadgeClass("bg-gray-300 text-gray-900");
+    if (poin >= 30) setBadgeClass("bg-blue-600 text-white");
+    else if (poin >= 15) setBadgeClass("bg-green-500 text-white");
+    else if (poin >= 5) setBadgeClass("bg-yellow-400 text-gray-900");
+    else setBadgeClass("bg-gray-300 text-gray-900");
   };
 
   const handleInputChange = (field, value) => {
@@ -133,11 +130,20 @@ export default function KlaimParent({ isOpen, onClose }) {
 
   const handleDateChange = (date, field) => {
     if (!date) return;
-    const formatted = new Date(date).toISOString().split("T")[0];
-    setFormData((prev) => ({ ...prev, [field]: formatted }));
+    setFormData((prev) => ({
+      ...prev,
+      [field]: new Date(date).toISOString().split("T")[0],
+    }));
+  };
+
+  /* ================= 🔴 WAJIB ADA ================= */
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("SUBMIT OK", formData);
   };
 
   if (!isOpen) return null;
+
 
   if (loading)
     return (
