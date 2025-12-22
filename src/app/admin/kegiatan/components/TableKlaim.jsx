@@ -104,7 +104,7 @@ export default function TableKlaim() {
 
   const handleUpdateStatus = async (id, status, catatan) => {
     try {
-      await api.patch(`/api/klaim/${id}/status`, { status, catatan });
+      await api.patch(`/klaim/${id}/status`, { status, catatan });
       await fetchClaims();
     } catch (err) {
       console.error(err);
