@@ -13,22 +13,24 @@ export default function Pencapaian({ mahasiswa }) {
   // FETCH DATA PENCAPAIAN BERDASARKAN ID MAHASISWA
   // =====================================================
   useEffect(() => {
-    if (!mahasiswa || !mahasiswa.id_mhs) {
+    if (!mahasiswa?.id_mhs) {
       setLoading(false);
       return;
     }
 
     const fetchPencapaian = async () => {
       try {
-        const res = await api.get(`/mahasiswa/cv/${mahasiswa.id_mhs}`);
+        const res = await api.get(
+          `/api/klaim/mahasiswa/${mahasiswa.id_mhs}?status=Disetujui`
+        );
 
-        // AMAN UNTUK SEMUA STRUKTUR
-        const payload = res.data?.data || res.data || {};
+        const rows = res.data?.data || [];
 
-        setActivities(payload.organisasi || payload.kegiatan || []);
-        setCompetitions(payload.prestasi || []);
+        setActivities(rows.filter((r) => r.kategori === "AKTIVITAS"));
+
+        setCompetitions(rows.filter((r) => r.kategori === "KOMPETISI"));
       } catch (err) {
-        console.error("Gagal memuat pencapaian:", err);
+        console.error(err);
         setActivities([]);
         setCompetitions([]);
       } finally {
