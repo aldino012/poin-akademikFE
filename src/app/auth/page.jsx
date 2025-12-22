@@ -16,36 +16,41 @@ export default function LoginPage() {
     setError(""); // Clear error when user starts typing
   };
 
- const handleSubmit = async (e) => {
-   e.preventDefault();
-   setError("");
-   setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-   try {
-     const res = await api.post("/api/auth/login", formData);
+    try {
+      // 🔥 PERBAIKAN PENTING (WAJIB UNTUK COOKIE JWT)
+      const res = await api.post(
+        "/api/auth/login",
+        formData,
+        { withCredentials: true } // ⬅️ JANGAN DIHAPUS
+      );
 
-     const data = res.data;
+      const data = res.data;
 
-     if (data.role) {
-       Cookies.set("user_role", data.role, { expires: 1 });
-     }
+      if (data.role) {
+        Cookies.set("user_role", data.role, { expires: 1 });
+      }
 
-     if (data.role === "admin") {
-       router.replace("/admin/dashboard");
-     } else {
-       router.replace("/mahasiswa/dashboard");
-     }
-   } catch (error) {
-     if (error.response) {
-       setError(error.response.data?.message || "Login gagal");
-     } else {
-       setError("Tidak dapat terhubung ke server");
-     }
-     console.error("Login error:", error);
-   } finally {
-     setLoading(false);
-   }
- };
+      if (data.role === "admin") {
+        router.replace("/admin/dashboard");
+      } else {
+        router.replace("/mahasiswa/dashboard");
+      }
+    } catch (error) {
+      if (error.response) {
+        setError(error.response.data?.message || "Login gagal");
+      } else {
+        setError("Tidak dapat terhubung ke server");
+      }
+      console.error("Login error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
