@@ -95,14 +95,26 @@ export default function KlaimParent({ isOpen, onClose }) {
 
   /* ================= FETCH MASTER POIN ================= */
   const fetchMasterPoin = async () => {
-    try {
-      const res = await api.get("/api/masterpoin");
-      setMasterPoin(res.data?.data || []);
-    } catch (err) {
-      console.error("ERR MASTER POIN:", err);
-      setMasterPoin([]);
+  try {
+    const res = await api.get("/api/masterpoin");
+
+    let data = [];
+
+    if (Array.isArray(res.data)) {
+      data = res.data;
+    } else if (Array.isArray(res.data?.data)) {
+      data = res.data.data;
+    } else if (Array.isArray(res.data?.data?.rows)) {
+      data = res.data.data.rows;
     }
-  };
+
+    console.log("MASTERPOIN FINAL:", data);
+    setMasterPoin(data);
+  } catch (err) {
+    console.error("ERR MASTER POIN:", err);
+    setMasterPoin([]);
+  }
+};
 
   /* ================= LOAD SAAT MODAL BUKA ================= */
   useEffect(() => {
