@@ -12,7 +12,7 @@ export default function useMahasiswa() {
 
     const fetchMahasiswa = async () => {
       try {
-        const res = await api.get("/api/mahasiswa/me");
+        const res = await api.get("mahasiswa/me");
 
         if (isMounted) {
           setMahasiswa(res.data.data);

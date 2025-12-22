@@ -46,7 +46,7 @@ export default function TableMhs() {
 
   const fetchMahasiswa = async () => {
     try {
-      const res = await api.get("/api/mahasiswa");
+      const res = await api.get("/mahasiswa");
 
       const sorted = [...res.data].sort(
         (a, b) => (Number(b.total_poin) || 0) - (Number(a.total_poin) || 0)
@@ -128,7 +128,7 @@ export default function TableMhs() {
       }
 
       const res = await api.put(
-        `/api/mahasiswa/${updatedStudent.id_mhs}`,
+        `/mahasiswa/${updatedStudent.id_mhs}`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
@@ -166,7 +166,7 @@ export default function TableMhs() {
   const handleDelete = async (student) => {
     if (!window.confirm(`Hapus mahasiswa "${student.nama_mhs}"?`)) return;
     try {
-      await api.delete(`/api/mahasiswa/${student.id_mhs}`);
+      await api.delete(`/mahasiswa/${student.id_mhs}`);
       setStudentsData((prev) =>
         prev
           .filter((s) => s.id_mhs !== student.id_mhs)
@@ -188,16 +188,16 @@ export default function TableMhs() {
   const handleOpenImport = () => {
     setExcelConfig({
       title: "Import Excel Mahasiswa",
-      importUrl: "/api/proxy/api/mahasiswa/import-excel",
-      exportUrl: "/api/proxy/api/mahasiswa/export-excel",
+      importUrl: "/api/proxy/mahasiswa/import-excel",
+      exportUrl: "/api/proxy/mahasiswa/export-excel",
     });
     setIsExcelOpen(true);
   };
 
   const handleOpenExport = async () => {
     try {
-     const res = await api.get("/api/proxy/api/mahasiswa/export-excel", {
-       responseType: "blob",
+      const res = await api.get("/mahasiswa/export-excel", {
+      responseType: "blob",
      });
 
       const url = window.URL.createObjectURL(new Blob([res.data]));
