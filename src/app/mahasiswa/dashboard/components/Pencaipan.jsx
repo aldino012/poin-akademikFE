@@ -8,29 +8,35 @@ export default function Pencapaian({ mahasiswa }) {
   const [activities, setActivities] = useState([]);
   const [competitions, setCompetitions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const mahasiswaId = mahasiswa?.id_mhs || mahasiswa?.id;
 
   // =====================================================
   // FETCH DATA PENCAPAIAN BERDASARKAN ID MAHASISWA
   // =====================================================
   useEffect(() => {
-    if (!mahasiswa?.id_mhs) {
+    const mahasiswaId = mahasiswa?.id_mhs || mahasiswa?.id;
+
+    if (!mahasiswaId) {
+      setActivities([]);
+      setCompetitions([]);
       setLoading(false);
       return;
     }
 
     const fetchPencapaian = async () => {
       try {
+        setLoading(true);
+
         const res = await api.get(
-          `/api/klaim/mahasiswa/${mahasiswa.id_mhs}?status=Disetujui`
+          `/api/klaim/mahasiswa/${mahasiswaId}?status=Disetujui`
         );
 
-        const rows = res.data?.data || [];
+        const rows = res.data?.data ?? [];
 
         setActivities(rows.filter((r) => r.kategori === "AKTIVITAS"));
-
         setCompetitions(rows.filter((r) => r.kategori === "KOMPETISI"));
       } catch (err) {
-        console.error(err);
+        console.error("Gagal fetch pencapaian:", err);
         setActivities([]);
         setCompetitions([]);
       } finally {
@@ -41,16 +47,20 @@ export default function Pencapaian({ mahasiswa }) {
     fetchPencapaian();
   }, [mahasiswa]);
 
+
   // =====================================================
   // LOADING STATE
   // =====================================================
-  if (loading) {
-    return (
-      <div className="bg-white rounded-3xl shadow-xl p-4 text-center text-gray-500 text-sm">
-        Loading pencapaian...
-      </div>
-    );
-  }
+if (!loading && data.length === 0) {
+  return (
+    <div className="bg-white rounded-3xl shadow-xl p-6 text-center">
+      <p className="text-sm text-gray-500">
+        Belum ada {mode === "activities" ? "aktivitas" : "kompetisi"} yang
+        disetujui.
+      </p>
+    </div>
+  );
+}
 
   const data = mode === "activities" ? activities : competitions;
   const showLine = data.length > 1;
