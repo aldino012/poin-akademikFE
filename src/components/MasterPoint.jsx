@@ -46,7 +46,7 @@ export default function MasterPoint({ role = "mahasiswa" }) {
   // Fetch data
   const fetchData = async () => {
     try {
-      const res = await api.get("/api/masterpoin");
+      const res = await api.get("/masterpoin");
 
       const mapped = res.data.map((item) =>
         toUpperObj({
@@ -76,7 +76,7 @@ export default function MasterPoint({ role = "mahasiswa" }) {
     try {
       setLoadingExport(true);
 
-      const response = await api.get("/api/masterpoin/export-excel", {
+      const response = await api.get("/masterpoin/export-excel", {
         responseType: "blob",
       });
 
@@ -158,7 +158,7 @@ export default function MasterPoint({ role = "mahasiswa" }) {
         bobot_poin: parseInt(newData.bobot_poin, 10),
       };
 
-      const res = await api.post("/api/masterpoin", payload);
+      const res = await api.post("/masterpoin", payload);
 
       setKegiatan((prev) => [
         ...prev,
@@ -193,7 +193,7 @@ export default function MasterPoint({ role = "mahasiswa" }) {
         bobot_poin: parseInt(updatedData.bobot_poin, 10),
       };
 
-      const res = await api.put(`/api/masterpoin/${updatedData.id}`, payload);
+      const res = await api.put(`/masterpoin/${updatedData.id}`, payload);
 
       setKegiatan((prev) =>
         prev.map((item) =>
@@ -243,7 +243,7 @@ export default function MasterPoint({ role = "mahasiswa" }) {
       type: "danger",
       onConfirm: async () => {
         try {
-          await api.delete(`/api/masterpoin/${item.id}`);
+          await api.delete(`/masterpoin/${item.id}`);
           setKegiatan((prev) => prev.filter((i) => i.id !== item.id));
           addToast({ message: "Data berhasil dihapus", type: "success" });
         } catch (error) {
@@ -306,8 +306,8 @@ export default function MasterPoint({ role = "mahasiswa" }) {
               onClick={() => {
                 setImportConfig({
                   title: "Import Excel Master Poin",
-                  importUrl: "/api/masterpoin/import-excel",
-                  exportUrl: "/api/masterpoin/export-excel",
+                  importUrl: "/masterpoin/import-excel",
+                  exportUrl: "/masterpoin/export-excel",
                 });
                 setIsImportOpen(true);
               }}
