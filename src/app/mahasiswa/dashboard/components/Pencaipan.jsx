@@ -8,14 +8,13 @@ export default function Pencapaian({ mahasiswa }) {
   const [activities, setActivities] = useState([]);
   const [competitions, setCompetitions] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const mahasiswaId = mahasiswa?.id_mhs || mahasiswa?.id;
 
   // =====================================================
-  // FETCH DATA PENCAPAIAN BERDASARKAN ID MAHASISWA
+  // FETCH DATA PENCAPAIAN
   // =====================================================
   useEffect(() => {
-    const mahasiswaId = mahasiswa?.id_mhs || mahasiswa?.id;
-
     if (!mahasiswaId) {
       setActivities([]);
       setCompetitions([]);
@@ -45,26 +44,42 @@ export default function Pencapaian({ mahasiswa }) {
     };
 
     fetchPencapaian();
-  }, [mahasiswa]);
+  }, [mahasiswaId]);
 
+  // =====================================================
+  // DERIVED STATE (HARUS DI ATAS)
+  // =====================================================
+  const data = mode === "activities" ? activities : competitions;
+  const showLine = data.length > 1;
 
   // =====================================================
   // LOADING STATE
   // =====================================================
-if (!loading && data.length === 0) {
-  return (
-    <div className="bg-white rounded-3xl shadow-xl p-6 text-center">
-      <p className="text-sm text-gray-500">
-        Belum ada {mode === "activities" ? "aktivitas" : "kompetisi"} yang
-        disetujui.
-      </p>
-    </div>
-  );
-}
+  if (loading) {
+    return (
+      <div className="bg-white rounded-3xl shadow-xl p-4 text-center text-gray-500 text-sm">
+        Loading pencapaian...
+      </div>
+    );
+  }
 
-  const data = mode === "activities" ? activities : competitions;
-  const showLine = data.length > 1;
+  // =====================================================
+  // EMPTY STATE
+  // =====================================================
+  if (!loading && data.length === 0) {
+    return (
+      <div className="bg-white rounded-3xl shadow-xl p-6 text-center">
+        <p className="text-sm text-gray-500">
+          Belum ada {mode === "activities" ? "aktivitas" : "kompetisi"} yang
+          disetujui.
+        </p>
+      </div>
+    );
+  }
 
+  // =====================================================
+  // RENDER
+  // =====================================================
   return (
     <div className="bg-white rounded-3xl shadow-xl p-6">
       {/* SWITCH */}
@@ -111,7 +126,7 @@ if (!loading && data.length === 0) {
                     className={`fas ${
                       mode === "activities" ? "fa-running" : "fa-medal"
                     } text-white`}
-                  ></i>
+                  />
                 </div>
                 <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs font-bold px-1.5 rounded-full">
                   +{item.poin}
@@ -143,7 +158,7 @@ if (!loading && data.length === 0) {
                   className={`fas ${
                     mode === "activities" ? "fa-running" : "fa-medal"
                   } text-white`}
-                ></i>
+                />
               </div>
               <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs font-bold px-1.5 rounded-full">
                 +{item.poin}
