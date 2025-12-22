@@ -1,42 +1,21 @@
 import axios from "axios";
-import Cookies from "js-cookie";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
-  withCredentials: true, // wajib kalau pakai cookie auth
+  withCredentials: true, // ✅ WAJIB untuk cookie auth
 });
 
-/**
- * Request interceptor
- * - Pasang Authorization header JIKA token ada
- * - Aman walau backend pakai httpOnly cookie
- */
-api.interceptors.request.use(
-  (config) => {
-    const token = Cookies.get("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+// ❌ JANGAN pakai request interceptor untuk token
+// ❌ JANGAN baca Cookies.get("token")
+// ❌ JANGAN set Authorization header manual
 
-/**
- * Response interceptor
- * - Handle 401 (unauthorized)
- * - Aman untuk Next.js (cek window)
- */
+// Response interceptor (AMAN, TIDAK MAKSA REDIRECT)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (
-      error.response &&
-      error.response.status === 401 &&
-      typeof window !== "undefined"
-    ) {
-      Cookies.remove("token");
-      window.location.href = "/auth";
+    // optional: logging saja
+    if (error.response?.status === 401) {
+      console.warn("⚠️ Unauthorized (401)");
     }
     return Promise.reject(error);
   }
