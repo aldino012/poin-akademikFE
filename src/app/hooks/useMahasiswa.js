@@ -14,13 +14,6 @@ export default function useMahasiswa() {
       try {
         const res = await api.get("/api/mahasiswa/me");
 
-        /**
-         * Backend response:
-         * {
-         *   message: "...",
-         *   data: { ...mahasiswa }
-         * }
-         */
         if (isMounted) {
           setMahasiswa(res.data.data);
         }
@@ -45,5 +38,3 @@ export default function useMahasiswa() {
 
   return { mahasiswa, loading };
 }
-
-
