@@ -3,30 +3,42 @@
 import React, { useEffect, useState } from "react";
 import api from "@/api/axios";
 
-export default function Pencapaian() {
+export default function Pencapaian({ mahasiswa }) {
   const [mode, setMode] = useState("activities");
   const [activities, setActivities] = useState([]);
   const [competitions, setCompetitions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [mahasiswaId, setMahasiswaId] = useState(null);
 
+  // =====================================================
+  // FETCH DATA PENCAPAIAN BERDASARKAN id_mhs
+  // =====================================================
   useEffect(() => {
-    api.get("/api/mahasiswa/me").then((res) => {
-      setMahasiswaId(res.data.data.id);
-    });
-  }, []);
+    if (!mahasiswa || !mahasiswa.id_mhs) return;
 
-  useEffect(() => {
-    if (!mahasiswaId) return;
+    const fetchPencapaian = async () => {
+      try {
+        const res = await api.get(
+          `/api/mahasiswa/cv/${mahasiswa.id_mhs}`
+        );
 
-    api.get(`/api/mahasiswa/cv/${mahasiswaId}`).then((res) => {
-      const data = res.data;
-      setActivities(data.organisasi || []);
-      setCompetitions(data.prestasi || []);
-      setLoading(false);
-    });
-  }, [mahasiswaId]);
+        const data = res.data || {};
+        setActivities(data.organisasi || []);
+        setCompetitions(data.prestasi || []);
+      } catch (err) {
+        console.error("Gagal memuat pencapaian:", err);
+        setActivities([]);
+        setCompetitions([]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchPencapaian();
+  }, [mahasiswa]);
+
+  // =====================================================
+  // LOADING STATE
+  // =====================================================
   if (loading) {
     return (
       <div className="bg-white rounded-3xl shadow-xl p-4 text-center text-gray-500 text-sm">
@@ -71,7 +83,7 @@ export default function Pencapaian() {
 
       {/* ================= DESKTOP ================= */}
       <div className="hidden md:block relative">
-        {/* GARIS PANJANG (SATU KALI) */}
+        {/* GARIS PANJANG */}
         {showLine && (
           <div className="absolute top-7 left-0 right-0 mx-12 border-t-2 border-dashed border-yellow-300"></div>
         )}
@@ -99,7 +111,9 @@ export default function Pencapaian() {
                 <p className="text-xs font-semibold text-gray-800 truncate">
                   {item.namaKegiatan}
                 </p>
-                <p className="text-[11px] text-gray-500">{item.tanggal}</p>
+                <p className="text-[11px] text-gray-500">
+                  {item.tanggal}
+                </p>
               </div>
             </div>
           ))}
@@ -133,7 +147,9 @@ export default function Pencapaian() {
               <p className="text-xs font-semibold text-gray-800">
                 {item.namaKegiatan}
               </p>
-              <p className="text-[11px] text-gray-500">{item.tanggal}</p>
+              <p className="text-[11px] text-gray-500">
+                {item.tanggal}
+              </p>
             </div>
           </div>
         ))}
