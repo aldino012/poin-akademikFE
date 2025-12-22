@@ -6,16 +6,17 @@ export default function KopHeaderCV({ biodata }) {
   if (!biodata) return null;
 
   const { nama_mhs, email, tlp_saya, foto_file_id } = biodata;
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+  // ✅ WAJIB: lewat Next.js proxy
   const baseFotoUrl = foto_file_id
-    ? `${API_URL}/api/mahasiswa/foto/${foto_file_id}`
+    ? `/api/proxy/api/mahasiswa/foto/${foto_file_id}`
     : null;
 
   const [fotoSrc, setFotoSrc] = useState(baseFotoUrl);
 
   useEffect(() => {
     if (baseFotoUrl) {
+      // cache buster supaya foto update
       setFotoSrc(`${baseFotoUrl}?t=${Date.now()}`);
     }
   }, [baseFotoUrl]);

@@ -124,7 +124,7 @@ export default function Tambah({ isOpen, onClose, onSubmit }) {
         fd.append("foto", form.foto);
       }
 
-      const res = await api.post("/api/mahasiswa", fd, {
+      const res = await api.post("/mahasiswa", fd, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });

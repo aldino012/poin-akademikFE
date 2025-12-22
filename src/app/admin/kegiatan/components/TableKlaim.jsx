@@ -45,7 +45,7 @@ export default function TableKlaim() {
 
   const fetchClaims = async () => {
     try {
-      const res = await api.get("/api/klaim");
+      const res = await api.get("/klaim");
       let data = res.data.data || [];
 
       // SORT BERDASARKAN PRIORITAS

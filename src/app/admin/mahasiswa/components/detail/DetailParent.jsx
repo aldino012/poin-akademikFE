@@ -8,6 +8,7 @@ import TabsBiodata from "./TabsBiodata";
 import TabsKegiatan from "./TabsKegiatan";
 import TabsKontak from "./TabsKontak";
 import TabsLainnya from "./TabsLainnya";
+import api from "@/api/axios";
 
 export default function DetailParent({ isOpen, onClose, student }) {
   const [activeTab, setActiveTab] = useState("biodata");
@@ -29,18 +30,15 @@ export default function DetailParent({ isOpen, onClose, student }) {
         const id = student?.id_mhs || student?.id;
         if (!id) return;
 
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/mahasiswa/kegiatan/${id}`
-        );
+        const res = await api.get(`/mahasiswa/kegiatan/${id}`);
 
-        if (res.ok) {
-          const data = await res.json();
-          setKegiatanData({
-            organisasi: data.organisasi || [],
-            prestasi: data.prestasi || [],
-            kegiatan: data.kegiatan || [],
-          });
-        }
+        const data = res.data;
+
+        setKegiatanData({
+          organisasi: data.organisasi || [],
+          prestasi: data.prestasi || [],
+          kegiatan: data.kegiatan || [],
+        });
       } catch (error) {
         console.error("Gagal memuat data kegiatan:", error);
       }
@@ -50,6 +48,7 @@ export default function DetailParent({ isOpen, onClose, student }) {
       fetchKegiatan();
     }
   }, [isOpen, student, activeTab]);
+
 
   // =======================
   // CLOSE DARI LUAR MODAL

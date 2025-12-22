@@ -188,17 +188,17 @@ export default function TableMhs() {
   const handleOpenImport = () => {
     setExcelConfig({
       title: "Import Excel Mahasiswa",
-      importUrl: "/api/mahasiswa/import-excel",
-      exportUrl: "/api/mahasiswa/export-excel",
+      importUrl: "/api/proxy/api/mahasiswa/import-excel",
+      exportUrl: "/api/proxy/api/mahasiswa/export-excel",
     });
     setIsExcelOpen(true);
   };
 
   const handleOpenExport = async () => {
     try {
-      const res = await api.get("/api/mahasiswa/export-excel", {
-        responseType: "blob",
-      });
+     const res = await api.get("/api/proxy/api/mahasiswa/export-excel", {
+       responseType: "blob",
+     });
 
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement("a");

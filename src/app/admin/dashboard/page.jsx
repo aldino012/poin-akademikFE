@@ -21,23 +21,22 @@ export default function AdminPage() {
     const fetchDashboard = async () => {
       try {
         // ================================
-        // Ambil data mahasiswa
+        // ✅ Ambil data mahasiswa (BENAR)
         // ================================
-        const resMhs = await api.get("/api/mahasiswa");
+        const resMhs = await api.get("/mahasiswa");
         const totalMahasiswa = resMhs.data.length;
 
         // ================================
-        // Ambil data kegiatan (klaim)
+        // ✅ Ambil data kegiatan (BENAR)
         // ================================
-       const resKegiatan = await api.get("/api/klaim");
-       const kegiatan = resKegiatan.data.data || []; // FIX 🔥
+        const resKegiatan = await api.get("/klaim");
+        const kegiatan = resKegiatan.data.data || [];
 
-       const totalKegiatan = kegiatan.length;
-       const pendingKegiatan = kegiatan.filter(
-         (item) => item.status === "pending"
-       ).length;
+        const totalKegiatan = kegiatan.length;
+        const pendingKegiatan = kegiatan.filter(
+          (item) => item.status === "pending"
+        ).length;
 
-        // Simpan ke state
         setStats({
           totalMahasiswa,
           totalKegiatan,
@@ -46,7 +45,6 @@ export default function AdminPage() {
       } catch (err) {
         console.error("Gagal fetch dashboard admin:", err);
       } finally {
-        // Tambah sedikit delay supaya animasi memuat terlihat smooth
         setTimeout(() => setLoading(false), 400);
       }
     };

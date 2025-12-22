@@ -125,7 +125,7 @@ export default function TableDesktop({
                   <img
                     src={
                       student.foto_file_id
-                        ? `${API_URL}/api/mahasiswa/foto/${
+                        ? `/api/proxy/api/mahasiswa/foto/${
                             student.foto_file_id
                           }?t=${student.updated_at || Date.now()}`
                         : `https://ui-avatars.com/api/?name=${encodeURIComponent(
