@@ -22,9 +22,11 @@ export default function Pencapaian({ mahasiswa }) {
       try {
         const res = await api.get(`/mahasiswa/cv/${mahasiswa.id_mhs}`);
 
-        const data = res.data || {};
-        setActivities(data.organisasi || []);
-        setCompetitions(data.prestasi || []);
+        // AMAN UNTUK SEMUA STRUKTUR
+        const payload = res.data?.data || res.data || {};
+
+        setActivities(payload.organisasi || payload.kegiatan || []);
+        setCompetitions(payload.prestasi || []);
       } catch (err) {
         console.error("Gagal memuat pencapaian:", err);
         setActivities([]);
@@ -108,9 +110,7 @@ export default function Pencapaian({ mahasiswa }) {
                 <p className="text-xs font-semibold text-gray-800 truncate">
                   {item.namaKegiatan}
                 </p>
-                <p className="text-[11px] text-gray-500">
-                  {item.tanggal}
-                </p>
+                <p className="text-[11px] text-gray-500">{item.tanggal}</p>
               </div>
             </div>
           ))}
@@ -142,9 +142,7 @@ export default function Pencapaian({ mahasiswa }) {
               <p className="text-xs font-semibold text-gray-800">
                 {item.namaKegiatan}
               </p>
-              <p className="text-[11px] text-gray-500">
-                {item.tanggal}
-              </p>
+              <p className="text-[11px] text-gray-500">{item.tanggal}</p>
             </div>
           </div>
         ))}
