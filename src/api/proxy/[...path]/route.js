@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 const BACKEND_URL = "https://poin-akademikbe-production.up.railway.app";
 
 // ==========================
-// HELPER: forward request
+// HELPER: proxy request
 // ==========================
 async function proxyRequest(req, method, params) {
   const path = params.path.join("/");
@@ -11,15 +11,16 @@ async function proxyRequest(req, method, params) {
 
   const headers = new Headers();
 
-  // forward cookies (INI KUNCI MOBILE)
+  // forward cookie (INI KUNCI AUTH MOBILE)
   const cookie = req.headers.get("cookie");
   if (cookie) {
     headers.set("cookie", cookie);
   }
 
-  // forward content type
-  if (req.headers.get("content-type")) {
-    headers.set("content-type", req.headers.get("content-type"));
+  // forward content-type
+  const contentType = req.headers.get("content-type");
+  if (contentType) {
+    headers.set("content-type", contentType);
   }
 
   const options = {
@@ -28,16 +29,15 @@ async function proxyRequest(req, method, params) {
     credentials: "include",
   };
 
-  // body hanya untuk non-GET
+  // body untuk non-GET
   if (method !== "GET" && method !== "HEAD") {
     options.body = await req.text();
   }
 
   const backendRes = await fetch(url, options);
+  const body = await backendRes.text();
 
-  const resBody = await backendRes.text();
-
-  const response = new NextResponse(resBody, {
+  const response = new NextResponse(body, {
     status: backendRes.status,
   });
 
@@ -53,6 +53,19 @@ async function proxyRequest(req, method, params) {
 // ==========================
 // HTTP METHODS
 // ==========================
+export async function OPTIONS() {
+  // 🔥 INI WAJIB agar browser mau lanjut POST
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      "Access-Control-Allow-Credentials": "true",
+    },
+  });
+}
+
 export async function GET(req, ctx) {
   return proxyRequest(req, "GET", ctx.params);
 }
