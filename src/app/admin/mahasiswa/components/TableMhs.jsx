@@ -97,7 +97,7 @@ export default function TableMhs() {
       addToast({ message: "Mahasiswa berhasil ditambahkan", type: "success" });
       closeTambah();
 
-      // 🔥 ambil ulang dari backend (order_index terbaru)
+      // 🔥 WAJIB: ambil ulang dari backend
       fetchMahasiswa();
     } catch (error) {
       console.error(error);

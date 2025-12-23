@@ -129,8 +129,8 @@ export default function Tambah({ isOpen, onClose, onSubmit }) {
         withCredentials: true,
       });
 
-      onSubmit(res.data);
-      onClose();
+     onSubmit(); // cukup trigger refresh
+     onClose();
 
       // ===============================
       // RESET FORM
