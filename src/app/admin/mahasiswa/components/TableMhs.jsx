@@ -188,8 +188,8 @@ export default function TableMhs() {
   const handleOpenImport = () => {
     setExcelConfig({
       title: "Import Excel Mahasiswa",
-      importUrl: "/api/proxy/mahasiswa/import-excel",
-      exportUrl: "/api/proxy/mahasiswa/export-excel",
+      importUrl: "/mahasiswa/import-excel",
+      exportUrl: "/mahasiswa/export-excel",
     });
     setIsExcelOpen(true);
   };
