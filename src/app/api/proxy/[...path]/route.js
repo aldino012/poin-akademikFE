@@ -29,12 +29,12 @@ async function proxy(req, method, params) {
   };
 
   if (method !== "GET" && method !== "HEAD") {
-    // 🔥 multipart/form-data (upload)
+    // 🔥 UPLOAD FILE
     if (contentType.includes("multipart/form-data")) {
+      headers.set("content-type", contentType); // 🔥 INI KUNCI TERAKHIR
       options.body = await req.arrayBuffer();
-      // ❌ JANGAN set content-type
     }
-    // 🔥 JSON / x-www-form-urlencoded (login, dll)
+    // 🔥 JSON / login / normal POST
     else {
       headers.set("content-type", contentType);
       options.body = await req.text();
