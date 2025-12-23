@@ -8,13 +8,23 @@ export async function OPTIONS() {
   return new NextResponse(null, { status: 204 });
 }
 
+function resolveBackendUrl(path) {
+  // 🔥 route TANPA /api (khusus pencapaian mahasiswa)
+  if (path.startsWith("mahasiswa/") && path.endsWith("/kegiatan")) {
+    return `${BACKEND_URL}/${path}`;
+  }
+
+  // 🔥 DEFAULT: route pakai /api
+  return `${BACKEND_URL}/api/${path}`;
+}
+
 async function proxy(req, method, params) {
   const path = params.path.join("/");
- const url = `${BACKEND_URL}/${path}`;
+  const url = resolveBackendUrl(path);
 
   const headers = new Headers();
 
-  // 🔐 forward cookie
+  // forward cookie
   const cookie = req.headers.get("cookie");
   if (cookie) {
     headers.set("cookie", cookie);
@@ -29,13 +39,10 @@ async function proxy(req, method, params) {
   };
 
   if (method !== "GET" && method !== "HEAD") {
-    // 🔥 UPLOAD FILE
     if (contentType.includes("multipart/form-data")) {
-      headers.set("content-type", contentType); // 🔥 INI KUNCI TERAKHIR
+      headers.set("content-type", contentType);
       options.body = await req.arrayBuffer();
-    }
-    // 🔥 JSON / login / normal POST
-    else {
+    } else {
       headers.set("content-type", contentType);
       options.body = await req.text();
     }
