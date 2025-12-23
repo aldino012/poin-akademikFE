@@ -13,7 +13,20 @@ export default function Pencapaian({ mahasiswa }) {
   const mahasiswaId = mahasiswa?.id_mhs || mahasiswa?.id;
 
   // =====================================================
-  // FETCH DATA PENCAPAIAN (SESUAI BACKEND BARU)
+  // NORMALIZER (KUNCI UTAMA 🔑)
+  // =====================================================
+  const normalize = (items = []) =>
+    items.map((i) => ({
+      id: i.id,
+      namaKegiatan: i.nama_kegiatan || i.nama || "-",
+      tanggal: i.createdAt
+        ? new Date(i.createdAt).toLocaleDateString("id-ID")
+        : "-",
+      poin: Number(i.poin || i.jumlah_poin || 0),
+    }));
+
+  // =====================================================
+  // FETCH DATA PENCAPAIAN (SESUAI BACKEND)
   // =====================================================
   useEffect(() => {
     if (!mahasiswaId) {
@@ -27,7 +40,7 @@ export default function Pencapaian({ mahasiswa }) {
       try {
         setLoading(true);
 
-        // ✅ ENDPOINT YANG BENAR
+        // ✅ ENDPOINT BENAR
         const res = await api.get(`/mahasiswa/${mahasiswaId}/kegiatan`);
 
         /**
@@ -35,13 +48,13 @@ export default function Pencapaian({ mahasiswa }) {
          * {
          *   message: "OK",
          *   organisasi: [],
-         *   prestasi: [],
-         *   kegiatan: []
+         *   prestasi: []
          * }
          */
 
-        setActivities(res.data?.organisasi || []);
-        setCompetitions(res.data?.prestasi || []);
+        // 🔥 NORMALISASI DATA DI SINI
+        setActivities(normalize(res.data?.organisasi));
+        setCompetitions(normalize(res.data?.prestasi));
       } catch (err) {
         console.error("Gagal fetch pencapaian:", err);
         setActivities([]);
