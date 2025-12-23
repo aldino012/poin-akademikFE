@@ -1,42 +1,33 @@
 import { NextResponse } from "next/server";
 
-// ⚠️ WAJIB: pakai Node runtime (bukan Edge)
+// ⚠️ WAJIB: Node runtime (bukan Edge)
 export const runtime = "nodejs";
 
-// URL backend Railway (JANGAN pakai /api di sini)
+// URL backend Railway (TANPA /api di akhir)
 const BACKEND_URL = "https://poin-akademikbe-production.up.railway.app";
 
 // =================================================
 // OPTIONS (PRE-FLIGHT)
 // =================================================
 export async function OPTIONS() {
-  // Cukup balas 204, jangan set header aneh
   return new NextResponse(null, { status: 204 });
 }
 
 // =================================================
-// PROXY HANDLER
+// PROXY HANDLER (AMAN UNTUK UPLOAD FILE)
 // =================================================
 async function proxy(req, method, params) {
-  // Tangkap sisa path setelah /api/proxy
-  // contoh: /api/proxy/auth/login -> auth/login
+  // contoh: /api/proxy/mahasiswa/import-excel
+  // path = mahasiswa/import-excel
   const path = params.path.join("/");
-
-  // Tambahkan /api karena backend pakai prefix /api
   const url = `${BACKEND_URL}/api/${path}`;
 
   const headers = new Headers();
 
-  // Forward cookie (INI KUNCI AUTH MOBILE)
+  // 🔥 PENTING: forward cookie auth saja
   const cookie = req.headers.get("cookie");
   if (cookie) {
     headers.set("cookie", cookie);
-  }
-
-  // Forward content-type
-  const contentType = req.headers.get("content-type");
-  if (contentType) {
-    headers.set("content-type", contentType);
   }
 
   const options = {
@@ -45,21 +36,22 @@ async function proxy(req, method, params) {
     credentials: "include",
   };
 
-  // Kirim body untuk non-GET
+  // 🔥 KUNCI UTAMA: gunakan arrayBuffer untuk multipart
   if (method !== "GET" && method !== "HEAD") {
-    options.body = await req.text();
+    options.body = await req.arrayBuffer();
   }
 
   // Request ke backend
   const backendRes = await fetch(url, options);
-  const body = await backendRes.text();
 
-  // Balas ke client
+  // 🔥 balikan body sebagai binary juga
+  const body = await backendRes.arrayBuffer();
+
   const res = new NextResponse(body, {
     status: backendRes.status,
   });
 
-  // Forward Set-Cookie dari backend
+  // Forward set-cookie jika ada
   const setCookie = backendRes.headers.get("set-cookie");
   if (setCookie) {
     res.headers.set("set-cookie", setCookie);
@@ -69,7 +61,7 @@ async function proxy(req, method, params) {
 }
 
 // =================================================
-// HTTP METHODS (WAJIB ADA SEMUA)
+// HTTP METHODS
 // =================================================
 export async function GET(req, ctx) {
   return proxy(req, "GET", ctx.params);
