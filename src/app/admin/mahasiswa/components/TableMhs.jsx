@@ -48,11 +48,8 @@ export default function TableMhs() {
     try {
       const res = await api.get("/mahasiswa");
 
-      const sorted = [...res.data].sort(
-        (a, b) => (Number(b.total_poin) || 0) - (Number(a.total_poin) || 0)
-      );
-
-      setStudentsData(sorted);
+      // 🔥 BIARKAN BACKEND YANG NGATUR URUTAN
+      setStudentsData(res.data);
     } catch (error) {
       console.error(error);
       addToast({ message: "Gagal memuat data mahasiswa", type: "error" });
@@ -95,11 +92,12 @@ export default function TableMhs() {
   // ==========================
   // CRUD
   // ==========================
-  const handleTambah = async (newStudent) => {
+  const handleTambah = async () => {
     try {
-      setStudentsData((prev) => [newStudent, ...prev]);
       addToast({ message: "Mahasiswa berhasil ditambahkan", type: "success" });
       closeTambah();
+
+      // 🔥 ambil ulang dari backend (order_index terbaru)
       fetchMahasiswa();
     } catch (error) {
       console.error(error);
@@ -169,14 +167,7 @@ export default function TableMhs() {
     if (!window.confirm(`Hapus mahasiswa "${student.nama_mhs}"?`)) return;
     try {
       await api.delete(`/mahasiswa/${student.id_mhs}`);
-      setStudentsData((prev) =>
-        prev
-          .filter((s) => s.id_mhs !== student.id_mhs)
-          .sort(
-            (a, b) => (Number(b.total_poin) || 0) - (Number(a.total_poin) || 0)
-          )
-      );
-
+     setStudentsData((prev) => prev.filter((s) => s.id_mhs !== student.id_mhs));
       addToast({ message: "Mahasiswa berhasil dihapus", type: "success" });
     } catch (error) {
       console.error(error);
