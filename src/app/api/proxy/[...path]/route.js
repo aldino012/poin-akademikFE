@@ -4,27 +4,25 @@ export const runtime = "nodejs";
 
 const BACKEND_URL = "https://poin-akademikbe-production.up.railway.app";
 
+// ==============================
+// CORS PREFLIGHT
+// ==============================
 export async function OPTIONS() {
   return new NextResponse(null, { status: 204 });
 }
 
-function resolveBackendUrl(path) {
-  // 🔥 route TANPA /api (khusus pencapaian mahasiswa)
-  if (path.startsWith("mahasiswa/") && path.endsWith("/kegiatan")) {
-    return `${BACKEND_URL}/${path}`;
-  }
-
-  // 🔥 DEFAULT: route pakai /api
-  return `${BACKEND_URL}/api/${path}`;
-}
-
+// ==============================
+// PROXY CORE
+// ==============================
 async function proxy(req, method, params) {
   const path = params.path.join("/");
-  const url = resolveBackendUrl(path);
+
+  // 🔥 KUNCI UTAMA: SELALU /api
+  const url = `${BACKEND_URL}/api/${path}`;
 
   const headers = new Headers();
 
-  // forward cookie
+  // 🔐 forward cookie (login session)
   const cookie = req.headers.get("cookie");
   if (cookie) {
     headers.set("cookie", cookie);
@@ -38,16 +36,24 @@ async function proxy(req, method, params) {
     credentials: "include",
   };
 
+  // ==============================
+  // BODY HANDLING
+  // ==============================
   if (method !== "GET" && method !== "HEAD") {
     if (contentType.includes("multipart/form-data")) {
+      // 🔥 FILE UPLOAD
       headers.set("content-type", contentType);
       options.body = await req.arrayBuffer();
     } else {
+      // 🔥 JSON / LOGIN / NORMAL POST
       headers.set("content-type", contentType);
       options.body = await req.text();
     }
   }
 
+  // ==============================
+  // FETCH TO BACKEND
+  // ==============================
   const backendRes = await fetch(url, options);
   const body = await backendRes.arrayBuffer();
 
@@ -55,6 +61,7 @@ async function proxy(req, method, params) {
     status: backendRes.status,
   });
 
+  // 🔐 forward set-cookie dari backend
   const setCookie = backendRes.headers.get("set-cookie");
   if (setCookie) {
     res.headers.set("set-cookie", setCookie);
@@ -63,6 +70,9 @@ async function proxy(req, method, params) {
   return res;
 }
 
+// ==============================
+// HTTP METHODS
+// ==============================
 export async function GET(req, ctx) {
   return proxy(req, "GET", ctx.params);
 }
