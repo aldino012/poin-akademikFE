@@ -40,21 +40,15 @@ export default function Pencapaian({ mahasiswa }) {
       try {
         setLoading(true);
 
-        // ✅ ENDPOINT BENAR
-        const res = await api.get(`/mahasiswa/${mahasiswaId}/kegiatan`);
+        const res = await api.get(
+          `/klaim/mahasiswa/${mahasiswaId}?status=Disetujui`
+        );
 
-        /**
-         * Backend response:
-         * {
-         *   message: "OK",
-         *   organisasi: [],
-         *   prestasi: []
-         * }
-         */
+        const rows = res.data?.data || [];
 
-        // 🔥 NORMALISASI DATA DI SINI
-        setActivities(normalize(res.data?.organisasi));
-        setCompetitions(normalize(res.data?.prestasi));
+        setActivities(rows.filter((r) => r.kategori === "AKTIVITAS"));
+
+        setCompetitions(rows.filter((r) => r.kategori === "KOMPETISI"));
       } catch (err) {
         console.error("Gagal fetch pencapaian:", err);
         setActivities([]);
