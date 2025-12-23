@@ -10,8 +10,7 @@ export async function OPTIONS() {
 
 async function proxy(req, method, params) {
   const path = params.path.join("/");
-  const url = `${BACKEND_URL}/${path}`;
-
+  const url = `${BACKEND_URL}/api/${path}`;
 
   const headers = new Headers();
 
