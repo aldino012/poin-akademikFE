@@ -9,10 +9,11 @@ export default function Pencapaian({ mahasiswa }) {
   const [competitions, setCompetitions] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // 🔥 pastikan ID valid
   const mahasiswaId = mahasiswa?.id_mhs || mahasiswa?.id;
 
   // =====================================================
-  // FETCH DATA PENCAPAIAN
+  // FETCH DATA PENCAPAIAN (SESUAI BACKEND BARU)
   // =====================================================
   useEffect(() => {
     if (!mahasiswaId) {
@@ -26,14 +27,21 @@ export default function Pencapaian({ mahasiswa }) {
       try {
         setLoading(true);
 
-        const res = await api.get(
-          `/api/klaim/mahasiswa/${mahasiswaId}?status=Disetujui`
-        );
+        // ✅ ENDPOINT YANG BENAR
+        const res = await api.get(`/mahasiswa/${mahasiswaId}/kegiatan`);
 
-        const rows = res.data?.data ?? [];
+        /**
+         * Backend response:
+         * {
+         *   message: "OK",
+         *   organisasi: [],
+         *   prestasi: [],
+         *   kegiatan: []
+         * }
+         */
 
-        setActivities(rows.filter((r) => r.kategori === "AKTIVITAS"));
-        setCompetitions(rows.filter((r) => r.kategori === "KOMPETISI"));
+        setActivities(res.data?.organisasi || []);
+        setCompetitions(res.data?.prestasi || []);
       } catch (err) {
         console.error("Gagal fetch pencapaian:", err);
         setActivities([]);
@@ -47,7 +55,7 @@ export default function Pencapaian({ mahasiswa }) {
   }, [mahasiswaId]);
 
   // =====================================================
-  // DERIVED STATE (HARUS DI ATAS)
+  // DERIVED STATE
   // =====================================================
   const data = mode === "activities" ? activities : competitions;
   const showLine = data.length > 1;
