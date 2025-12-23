@@ -74,8 +74,8 @@ export default function EditMainForm({ isOpen, onClose, student, onSubmit }) {
 
     // ✅ PREVIEW FOTO (AMAN + CACHE BUSTING CLIENT-ONLY)
     if (student.foto_file_id) {
-     const baseUrl = `/api/proxy/api/mahasiswa/foto/${student.foto_file_id}`;
-     setPreview(`${baseUrl}?t=${Date.now()}`);
+      const baseUrl = `/api/proxy/mahasiswa/foto/${student.foto_file_id}`;
+      setPreview(`${baseUrl}?t=${Date.now()}`);
     } else {
       setPreview(
         `https://ui-avatars.com/api/?name=${encodeURIComponent(

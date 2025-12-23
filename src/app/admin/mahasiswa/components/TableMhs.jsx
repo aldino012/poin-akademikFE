@@ -135,13 +135,15 @@ export default function TableMhs() {
 
       const updated = res.data.mahasiswa; // 🔥 INI KUNCI UTAMA
 
-      setStudentsData((prev) =>
-        prev
-          .map((s) => (s.id_mhs === updated.id_mhs ? updated : s))
-          .sort(
-            (a, b) => (Number(b.total_poin) || 0) - (Number(a.total_poin) || 0)
-          )
-      );
+      setStudentsData((prev) => {
+        const index = prev.findIndex((s) => s.id_mhs === updated.id_mhs);
+
+        if (index === -1) return prev;
+
+        const newData = [...prev];
+        newData[index] = updated; // 🔥 ganti data di posisi lama
+        return newData;
+      });
 
       addToast({
         message: "Data mahasiswa berhasil diperbarui",
