@@ -26,7 +26,6 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
   const kegiatan = claim || {};
   const dbStatus = claim?.status;
 
-
   const finalAdmin = ["Disetujui", "Ditolak"];
   const statusEditable = !finalAdmin.includes(dbStatus);
 
@@ -141,10 +140,7 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
         </div>
 
         {!isMobile && (
-          <iframe
-            src={pdfUrl}
-            className="w-full h-[420px] border rounded-lg"
-          />
+          <iframe src={pdfUrl} className="w-full h-[420px] border rounded-lg" />
         )}
 
         {isMobile && (
@@ -158,6 +154,43 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
 
   /* =================== CATATAN CHANGE =================== */
   const handleCatatanChange = (e) => setCatatan(e.target.value.toUpperCase());
+
+  /* =================== SAVE STATUS =================== */
+  const handleSave = async () => {
+    const statusSame = status === dbStatus;
+
+    if (statusSame) {
+      addToast({ message: "Status tidak berubah.", type: "warning" });
+      return;
+    }
+
+    if ((status === "Revisi" || status === "Ditolak") && !catatan.trim()) {
+      addToast({
+        message: "Catatan wajib diisi untuk status Revisi atau Ditolak!",
+        type: "error",
+      });
+      return;
+    }
+
+    try {
+      setSaving(true);
+      await onSaveStatus(claim.id, status, catatan);
+
+      addToast({
+        message: `Status berhasil diperbarui menjadi "${status}"`,
+        type: "success",
+      });
+
+      onClose();
+    } catch (err) {
+      addToast({
+        message: "Gagal memperbarui status!",
+        type: "error",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   /* =================== RENDER =================== */
   return (
