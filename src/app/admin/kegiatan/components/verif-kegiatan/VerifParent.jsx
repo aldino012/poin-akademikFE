@@ -26,6 +26,46 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
   const kegiatan = claim || {};
   const dbStatus = claim?.status;
 
+
+  const finalAdmin = ["Disetujui", "Ditolak"];
+  const statusEditable = !finalAdmin.includes(dbStatus);
+
+  const validTransitions = {
+    Diajukan: ["Revisi", "Disetujui", "Ditolak"],
+    "Diajukan ulang": ["Revisi", "Disetujui", "Ditolak"],
+    Revisi: ["Disetujui", "Ditolak"],
+    Ditolak: ["Revisi"],
+    Disetujui: [],
+  };
+
+  const statusAllowed = validTransitions[dbStatus] || [];
+
+  const statusAll = [
+    {
+      label: "Revisi",
+      value: "Revisi",
+      color: "bg-amber-100 text-amber-700 border border-amber-200",
+    },
+    {
+      label: "Disetujui",
+      value: "Disetujui",
+      color: "bg-green-100 text-green-700 border border-green-200",
+    },
+    {
+      label: "Ditolak",
+      value: "Ditolak",
+      color: "bg-red-100 text-red-700 border border-red-200",
+    },
+  ];
+
+  const statusOptions = statusAll.filter((s) =>
+    statusAllowed.includes(s.value)
+  );
+
+  const selectedColor =
+    statusAll.find((opt) => opt.value === status)?.color ||
+    "bg-gray-100 text-gray-700";
+
   /* =================== RESPONSIVE DETECTION =================== */
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
