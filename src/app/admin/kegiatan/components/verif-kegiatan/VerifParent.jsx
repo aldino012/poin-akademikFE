@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import { useToast } from "@/components/Toats";
-import api from "@/api/axios"; // 🔥 WAJIB: axios yang bawa token
 
 import NavTabs from "./NavTabs";
 import TabsInfo from "./TabsInfo";
@@ -19,13 +18,22 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
   const [catatan, setCatatan] = useState("");
   const [saving, setSaving] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [pdfUrl, setPdfUrl] = useState(null); // 🔥 blob url
 
   const mahasiswa = claim?.mahasiswa || {};
   const master = claim?.masterPoin || {};
   const kegiatan = claim || {};
   const dbStatus = claim?.status;
 
+  /* =================== RESPONSIVE DETECTION =================== */
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  /* =================== STATUS LOGIC =================== */
   const finalAdmin = ["Disetujui", "Ditolak"];
   const statusEditable = !finalAdmin.includes(dbStatus);
 
@@ -65,95 +73,34 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
     statusAll.find((opt) => opt.value === status)?.color ||
     "bg-gray-100 text-gray-700";
 
-  /* =================== RESPONSIVE DETECTION =================== */
+  /* =================== CLICK OUTSIDE =================== */
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
-
-  /* =================== FETCH PDF (JWT SAFE) =================== */
-  useEffect(() => {
-    if (!isOpen || activeTab !== "bukti" || !kegiatan?.id) return;
-
-    let objectUrl = null;
-
-    const fetchPdf = async () => {
-      try {
-        setPdfError(false);
-
-        const res = await api.get(`/klaim/${kegiatan.id}/bukti`, {
-          responseType: "blob", // 🔥 KUNCI UTAMA
-        });
-
-        const blob = new Blob([res.data], {
-          type: res.headers["content-type"] || "application/pdf",
-        });
-
-        objectUrl = URL.createObjectURL(blob);
-        setPdfUrl(objectUrl);
-      } catch (err) {
-        console.error("Gagal load bukti:", err);
-        setPdfError(true);
-      }
+    const handleClickOutside = (e) => {
+      if (modalRef.current && !modalRef.current.contains(e.target)) onClose();
     };
 
-    fetchPdf();
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = "hidden";
+    }
 
     return () => {
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
-      setPdfUrl(null);
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = "unset";
     };
-  }, [isOpen, activeTab, kegiatan?.id]);
+  }, [isOpen]);
 
-  /* =================== FILE PREVIEW =================== */
-  const renderBuktiKegiatan = () => {
-    if (pdfError) {
-      return (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-          <p className="text-sm text-red-600">
-            Gagal memuat bukti kegiatan (token / akses).
-          </p>
-        </div>
-      );
+  /* =================== SYNC STATUS =================== */
+  useEffect(() => {
+    if (isOpen && claim) {
+      setStatus(claim.status);
+      setCatatan(claim.catatan_revisi || "");
+      setPdfError(false);
+      setActiveTab("informasi");
     }
+  }, [isOpen, claim]);
 
-    if (!pdfUrl) {
-      return (
-        <div className="bg-gray-50 border rounded-lg p-6 text-center">
-          <p className="text-sm text-gray-500">Memuat bukti kegiatan…</p>
-        </div>
-      );
-    }
-
-    return (
-      <div className="space-y-4">
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
-          <p className="text-sm font-semibold text-gray-800">
-            Bukti Kegiatan (Protected)
-          </p>
-          <p className="text-xs text-gray-500">
-            Diambil aman via token (Google Drive Stream)
-          </p>
-        </div>
-
-        {!isMobile && (
-          <iframe src={pdfUrl} className="w-full h-[420px] border rounded-lg" />
-        )}
-
-        {isMobile && (
-          <p className="text-sm text-gray-500 text-center">
-            Preview tersedia di desktop
-          </p>
-        )}
-      </div>
-    );
-  };
-
-  /* =================== CATATAN CHANGE =================== */
-  const handleCatatanChange = (e) => setCatatan(e.target.value.toUpperCase());
+  if (!isOpen || !claim) return null;
 
   /* =================== SAVE STATUS =================== */
   const handleSave = async () => {
@@ -183,14 +130,97 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
 
       onClose();
     } catch (err) {
-      addToast({
-        message: "Gagal memperbarui status!",
-        type: "error",
-      });
+      addToast({ message: "Gagal memperbarui status!", type: "error" });
     } finally {
       setSaving(false);
     }
   };
+
+  /* =================== FILE URL =================== */
+  const getFileUrl = (filename) => {
+    if (!filename) return null;
+    const base = process.env.NEXT_PUBLIC_API_URL;
+
+    if (filename.startsWith("http")) return filename;
+    if (filename.startsWith("/")) return base + filename;
+
+    return `${base}/uploads/${filename}`;
+  };
+
+  /* =================== FILE PREVIEW =================== */
+  const renderBuktiKegiatan = () => {
+    const klaimId = kegiatan.id;
+
+    if (!klaimId) {
+      return (
+        <div className="bg-gray-50 border rounded-lg p-6 text-center">
+          <p className="text-sm text-gray-500">Tidak ada bukti kegiatan</p>
+        </div>
+      );
+    }
+
+    const base = process.env.NEXT_PUBLIC_API_URL;
+    const url = `${base}/klaim/${klaimId}/bukti`;
+
+    const handleOpenInNewTab = () => {
+      window.open(url, "_blank", "noopener,noreferrer");
+    };
+
+    const handleDownload = () => {
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `bukti-klaim-${klaimId}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    return (
+      <div className="space-y-4">
+        {/* INFO */}
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
+          <div className="flex items-center gap-3">
+            <div className="bg-white p-2 rounded-lg shadow-sm border">
+              <i className="fas fa-file text-blue-600 text-xl"></i>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-gray-800">
+                Bukti Kegiatan
+              </p>
+              <p className="text-xs text-gray-500">
+                File tersimpan aman (Google Drive)
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-2 mt-4">
+            <button
+              onClick={handleOpenInNewTab}
+              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
+            >
+              <i className="fas fa-external-link-alt mr-2"></i>
+              Buka
+            </button>
+          </div>
+        </div>
+
+        {/* PREVIEW */}
+        {!isMobile && (
+          <iframe src={url} className="w-full h-[420px] border rounded-lg" />
+        )}
+
+        {isMobile && (
+          <p className="text-sm text-gray-500 text-center">
+            Preview tersedia di desktop
+          </p>
+        )}
+      </div>
+    );
+  };
+
+
+  /* =================== CATATAN CHANGE =================== */
+  const handleCatatanChange = (e) => setCatatan(e.target.value.toUpperCase());
 
   /* =================== RENDER =================== */
   return (
