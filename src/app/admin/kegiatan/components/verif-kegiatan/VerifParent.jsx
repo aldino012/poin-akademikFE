@@ -136,17 +136,6 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
     }
   };
 
-  /* =================== FILE URL =================== */
-  const getFileUrl = (filename) => {
-    if (!filename) return null;
-    const base = process.env.NEXT_PUBLIC_API_URL;
-
-    if (filename.startsWith("http")) return filename;
-    if (filename.startsWith("/")) return base + filename;
-
-    return `${base}/uploads/${filename}`;
-  };
-
   /* =================== FILE PREVIEW =================== */
   const renderBuktiKegiatan = () => {
     const klaimId = kegiatan.id;
@@ -160,7 +149,7 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
     }
 
     const base = process.env.NEXT_PUBLIC_API_URL;
-    const url = `${base}/klaim/${klaimId}/bukti`;
+    const url = `${base}/api/klaim/${klaimId}/bukti`; // 🔥 FIX ENDPOINT
 
     const handleOpenInNewTab = () => {
       window.open(url, "_blank", "noopener,noreferrer");
@@ -217,7 +206,6 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
       </div>
     );
   };
-
 
   /* =================== CATATAN CHANGE =================== */
   const handleCatatanChange = (e) => setCatatan(e.target.value.toUpperCase());
