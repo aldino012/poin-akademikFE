@@ -21,6 +21,22 @@ export default function DetailParent({ isOpen, onClose, student }) {
 
   const modalRef = useRef(null);
 
+  // ==================================================
+  // 🔥 NORMALIZER (KUNCI FIX DETAIL KEGIATAN)
+  // ==================================================
+  const normalizeKegiatan = (items = []) =>
+    items.map((i) => ({
+      id: i.id,
+      namaKegiatan: i.nama_kegiatan, // 🔑 snake_case → camelCase
+      tanggal: i.tanggal,
+      poin: Number(i.poin || 0),
+
+      // optional (biar TabsKegiatan aman)
+      posisi: i.posisi || "-",
+      jenis: i.jenis || "-",
+      tingkat: i.tingkat || "-",
+    }));
+
   // =======================
   // FETCH DATA KEGIATAN
   // =======================
@@ -31,13 +47,12 @@ export default function DetailParent({ isOpen, onClose, student }) {
         if (!id) return;
 
         const res = await api.get(`/mahasiswa/kegiatan/${id}`);
-
         const data = res.data;
 
         setKegiatanData({
-          organisasi: data.organisasi || [],
-          prestasi: data.prestasi || [],
-          kegiatan: data.data || [], // 🔥 PAKAI data
+          organisasi: normalizeKegiatan(data.organisasi || []),
+          prestasi: normalizeKegiatan(data.prestasi || []),
+          kegiatan: normalizeKegiatan(data.data || []), // 🔥 SEMUA
         });
       } catch (error) {
         console.error("Gagal memuat data kegiatan:", error);
@@ -48,7 +63,6 @@ export default function DetailParent({ isOpen, onClose, student }) {
       fetchKegiatan();
     }
   }, [isOpen, student, activeTab]);
-
 
   // =======================
   // CLOSE DARI LUAR MODAL
@@ -72,7 +86,6 @@ export default function DetailParent({ isOpen, onClose, student }) {
   }, [isOpen, onClose]);
 
   if (!isOpen || !student) return null;
-
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black/50">
       <div
