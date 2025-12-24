@@ -37,7 +37,7 @@ export default function DetailParent({ isOpen, onClose, student }) {
         setKegiatanData({
           organisasi: data.organisasi || [],
           prestasi: data.prestasi || [],
-          kegiatan: data.kegiatan || [],
+          kegiatan: data.data || [], // 🔥 PAKAI data
         });
       } catch (error) {
         console.error("Gagal memuat data kegiatan:", error);
