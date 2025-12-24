@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import { useToast } from "@/components/Toats";
+import api from "@/api/axios"; // 🔥 WAJIB: axios yang bawa token
 
 import NavTabs from "./NavTabs";
 import TabsInfo from "./TabsInfo";
@@ -18,6 +19,7 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
   const [catatan, setCatatan] = useState("");
   const [saving, setSaving] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState(null); // 🔥 blob url
 
   const mahasiswa = claim?.mahasiswa || {};
   const master = claim?.masterPoin || {};
@@ -33,169 +35,76 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  /* =================== STATUS LOGIC =================== */
-  const finalAdmin = ["Disetujui", "Ditolak"];
-  const statusEditable = !finalAdmin.includes(dbStatus);
-
-  const validTransitions = {
-    Diajukan: ["Revisi", "Disetujui", "Ditolak"],
-    "Diajukan ulang": ["Revisi", "Disetujui", "Ditolak"],
-    Revisi: ["Disetujui", "Ditolak"],
-    Ditolak: ["Revisi"],
-    Disetujui: [],
-  };
-
-  const statusAllowed = validTransitions[dbStatus] || [];
-
-  const statusAll = [
-    {
-      label: "Revisi",
-      value: "Revisi",
-      color: "bg-amber-100 text-amber-700 border border-amber-200",
-    },
-    {
-      label: "Disetujui",
-      value: "Disetujui",
-      color: "bg-green-100 text-green-700 border border-green-200",
-    },
-    {
-      label: "Ditolak",
-      value: "Ditolak",
-      color: "bg-red-100 text-red-700 border border-red-200",
-    },
-  ];
-
-  const statusOptions = statusAll.filter((s) =>
-    statusAllowed.includes(s.value)
-  );
-
-  const selectedColor =
-    statusAll.find((opt) => opt.value === status)?.color ||
-    "bg-gray-100 text-gray-700";
-
-  /* =================== CLICK OUTSIDE =================== */
+  /* =================== FETCH PDF (JWT SAFE) =================== */
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (modalRef.current && !modalRef.current.contains(e.target)) onClose();
+    if (!isOpen || activeTab !== "bukti" || !kegiatan?.id) return;
+
+    let objectUrl = null;
+
+    const fetchPdf = async () => {
+      try {
+        setPdfError(false);
+
+        const res = await api.get(`/klaim/${kegiatan.id}/bukti`, {
+          responseType: "blob", // 🔥 KUNCI UTAMA
+        });
+
+        const blob = new Blob([res.data], {
+          type: res.headers["content-type"] || "application/pdf",
+        });
+
+        objectUrl = URL.createObjectURL(blob);
+        setPdfUrl(objectUrl);
+      } catch (err) {
+        console.error("Gagal load bukti:", err);
+        setPdfError(true);
+      }
     };
 
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.body.style.overflow = "hidden";
-    }
+    fetchPdf();
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.body.style.overflow = "unset";
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      setPdfUrl(null);
     };
-  }, [isOpen]);
-
-  /* =================== SYNC STATUS =================== */
-  useEffect(() => {
-    if (isOpen && claim) {
-      setStatus(claim.status);
-      setCatatan(claim.catatan_revisi || "");
-      setPdfError(false);
-      setActiveTab("informasi");
-    }
-  }, [isOpen, claim]);
-
-  if (!isOpen || !claim) return null;
-
-  /* =================== SAVE STATUS =================== */
-  const handleSave = async () => {
-    const statusSame = status === dbStatus;
-
-    if (statusSame) {
-      addToast({ message: "Status tidak berubah.", type: "warning" });
-      return;
-    }
-
-    if ((status === "Revisi" || status === "Ditolak") && !catatan.trim()) {
-      addToast({
-        message: "Catatan wajib diisi untuk status Revisi atau Ditolak!",
-        type: "error",
-      });
-      return;
-    }
-
-    try {
-      setSaving(true);
-      await onSaveStatus(claim.id, status, catatan);
-
-      addToast({
-        message: `Status berhasil diperbarui menjadi "${status}"`,
-        type: "success",
-      });
-
-      onClose();
-    } catch (err) {
-      addToast({ message: "Gagal memperbarui status!", type: "error" });
-    } finally {
-      setSaving(false);
-    }
-  };
+  }, [isOpen, activeTab, kegiatan?.id]);
 
   /* =================== FILE PREVIEW =================== */
   const renderBuktiKegiatan = () => {
-    const klaimId = kegiatan.id;
-
-    if (!klaimId) {
+    if (pdfError) {
       return (
-        <div className="bg-gray-50 border rounded-lg p-6 text-center">
-          <p className="text-sm text-gray-500">Tidak ada bukti kegiatan</p>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+          <p className="text-sm text-red-600">
+            Gagal memuat bukti kegiatan (token / akses).
+          </p>
         </div>
       );
     }
 
-    const base = process.env.NEXT_PUBLIC_API_URL;
-    const url = `${base}/api/klaim/${klaimId}/bukti`; // 🔥 FIX ENDPOINT
-
-    const handleOpenInNewTab = () => {
-      window.open(url, "_blank", "noopener,noreferrer");
-    };
-
-    const handleDownload = () => {
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `bukti-klaim-${klaimId}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    };
+    if (!pdfUrl) {
+      return (
+        <div className="bg-gray-50 border rounded-lg p-6 text-center">
+          <p className="text-sm text-gray-500">Memuat bukti kegiatan…</p>
+        </div>
+      );
+    }
 
     return (
       <div className="space-y-4">
-        {/* INFO */}
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
-          <div className="flex items-center gap-3">
-            <div className="bg-white p-2 rounded-lg shadow-sm border">
-              <i className="fas fa-file text-blue-600 text-xl"></i>
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-gray-800">
-                Bukti Kegiatan
-              </p>
-              <p className="text-xs text-gray-500">
-                File tersimpan aman (Google Drive)
-              </p>
-            </div>
-          </div>
-
-          <div className="flex gap-2 mt-4">
-            <button
-              onClick={handleOpenInNewTab}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
-            >
-              <i className="fas fa-external-link-alt mr-2"></i>
-              Buka
-            </button>
-          </div>
+          <p className="text-sm font-semibold text-gray-800">
+            Bukti Kegiatan (Protected)
+          </p>
+          <p className="text-xs text-gray-500">
+            Diambil aman via token (Google Drive Stream)
+          </p>
         </div>
 
-        {/* PREVIEW */}
         {!isMobile && (
-          <iframe src={url} className="w-full h-[420px] border rounded-lg" />
+          <iframe
+            src={pdfUrl}
+            className="w-full h-[420px] border rounded-lg"
+          />
         )}
 
         {isMobile && (
