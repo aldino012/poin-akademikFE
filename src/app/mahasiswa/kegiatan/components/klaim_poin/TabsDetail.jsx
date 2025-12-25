@@ -5,6 +5,24 @@ import PropTypes from "prop-types";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
+/**
+ * Custom Input DatePicker
+ * Supaya tinggi & style SAMA dengan input lain
+ */
+const DateInput = React.forwardRef(({ value, onClick, placeholder }, ref) => (
+  <input
+    ref={ref}
+    type="text"
+    value={value || ""}
+    onClick={onClick}
+    readOnly
+    placeholder={placeholder}
+    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
+  />
+));
+
+DateInput.displayName = "DateInput";
+
 export default function TabsDetail({
   formData,
   handleDateChange,
@@ -25,15 +43,13 @@ export default function TabsDetail({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Tanggal Pengajuan
             </label>
-            <div className="relative">
-              <input
-                type="date"
-                value={formData.tanggal_pengajuan}
-                readOnly
-                disabled
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-gray-100 text-gray-900 text-sm cursor-not-allowed"
-              />
-            </div>
+            <input
+              type="date"
+              value={formData.tanggal_pengajuan}
+              readOnly
+              disabled
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-gray-100 text-gray-900 text-sm cursor-not-allowed"
+            />
             <p className="text-xs text-gray-500 mt-1">
               Tanggal pengajuan diisi otomatis dengan tanggal hari ini
             </p>
@@ -44,27 +60,26 @@ export default function TabsDetail({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Tanggal Pelaksanaan
             </label>
-            <div className="relative">
-              <DatePicker
-                selected={
-                  formData.tanggal_pelaksanaan
-                    ? new Date(formData.tanggal_pelaksanaan)
-                    : null
-                }
-                onChange={(date) =>
-                  handleDateChange(date, "tanggal_pelaksanaan")
-                }
-                dateFormat="yyyy-MM-dd"
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                required
-                showYearDropdown
-                showMonthDropdown
-                dropdownMode="select"
-                placeholderText="Pilih tanggal pelaksanaan"
-                isClearable
-                clearButtonClassName="after:content-['×'] after:text-lg after:text-gray-500 hover:after:text-red-500"
-              />
-            </div>
+
+            <DatePicker
+              selected={
+                formData.tanggal_pelaksanaan
+                  ? new Date(formData.tanggal_pelaksanaan)
+                  : null
+              }
+              onChange={(date) => handleDateChange(date, "tanggal_pelaksanaan")}
+              dateFormat="yyyy-MM-dd"
+              showMonthDropdown
+              showYearDropdown
+              dropdownMode="select"
+              customInput={
+                <DateInput placeholder="Pilih tanggal pelaksanaan" />
+              }
+              wrapperClassName="w-full"
+              popperClassName="z-50"
+              required
+            />
+
             <p className="text-xs text-gray-500 mt-1">
               Pilih tanggal pelaksanaan kegiatan
             </p>
