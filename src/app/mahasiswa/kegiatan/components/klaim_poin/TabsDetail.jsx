@@ -46,7 +46,13 @@ export default function TabsDetail({
               onChange={(e) =>
                 handleDateChange(e.target.value, "tanggal_pelaksanaan")
               }
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                [&::-webkit-calendar-picker-indicator]:bg-gray-900 
+                [&::-webkit-calendar-picker-indicator]:p-1 
+                [&::-webkit-calendar-picker-indicator]:rounded 
+                [&::-webkit-calendar-picker-indicator]:cursor-pointer
+                [&::-webkit-calendar-picker-indicator]:filter-none
+                dark:[&::-webkit-calendar-picker-indicator]:invert-0"
               required
             />
             <p className="text-xs text-gray-500 mt-1">
