@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from "react";
 import api from "@/api/axios";
 
-import TableToolbar from "./TableToolbar";
-import TableDesktop from "./TableDesktop";
-import TableMobile from "./TableMobile";
+import TableToolbar from "./table_mhs/TableToolbar";
+import TableDesktop from "./table_mhs/TableDesktop";
+import TableMobile from "./table_mhs/TableMobile";
 import TablePagination from "@/components/Pagianation";
 
 import DetailModal from "./detail/DetailParent";
