@@ -46,23 +46,8 @@ export default function TabsDetail({
               onChange={(e) =>
                 handleDateChange(e.target.value, "tanggal_pelaksanaan")
               }
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               required
-              className="
-                w-full px-3 py-2.5
-                border border-gray-300 rounded-lg shadow-sm
-                bg-white text-gray-900 text-sm
-                focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-
-                /* HILANGKAN BACKGROUND HITAM ICON */
-                [&::-webkit-calendar-picker-indicator]:bg-transparent
-                [&::-webkit-calendar-picker-indicator]:p-0
-                [&::-webkit-calendar-picker-indicator]:border-0
-                [&::-webkit-calendar-picker-indicator]:shadow-none
-                [&::-webkit-calendar-picker-indicator]:opacity-70
-                [&::-webkit-calendar-picker-indicator]:cursor-pointer
-                [&::-webkit-calendar-picker-indicator]:filter-none
-                [&::-webkit-calendar-picker-indicator]:hover:opacity-100
-              "
             />
             <p className="text-xs text-gray-500 mt-1">
               Pilih tanggal pelaksanaan kegiatan
@@ -79,6 +64,7 @@ export default function TabsDetail({
         </h4>
 
         <div className="space-y-4">
+          {/* Tempat */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Tempat
@@ -93,6 +79,7 @@ export default function TabsDetail({
             />
           </div>
 
+          {/* Tingkat */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Tingkat
@@ -112,6 +99,7 @@ export default function TabsDetail({
             </select>
           </div>
 
+          {/* Mentor */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Mentor
@@ -125,6 +113,7 @@ export default function TabsDetail({
             />
           </div>
 
+          {/* Narasumber */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Narasumber
