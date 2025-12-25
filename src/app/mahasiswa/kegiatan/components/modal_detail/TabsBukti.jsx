@@ -12,8 +12,7 @@ export default function TabsBukti({ kegiatan }) {
  const getStreamUrl = () => {
    if (!kegiatan?.id) return null;
 
-   // ✅ LEWAT NEXT.JS PROXY
-   return `/api/proxy/api/klaim/${kegiatan.id}/bukti`;
+   return `/api/proxy/klaim/${kegiatan.id}/bukti`;
  };
 
   const handleOpenFile = (e) => {
