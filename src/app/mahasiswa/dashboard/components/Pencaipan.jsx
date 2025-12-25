@@ -12,7 +12,7 @@ export default function Pencapaian({ mahasiswa }) {
   const mahasiswaId = mahasiswa?.id_mhs || mahasiswa?.id;
 
   // =====================================================
-  // 🔑 NORMALIZER (TANPA UBAH STYLE)
+  // NORMALIZER
   // =====================================================
   const normalize = (items = []) =>
     items.map((i) => ({
@@ -23,7 +23,7 @@ export default function Pencapaian({ mahasiswa }) {
     }));
 
   // =====================================================
-  // FETCH DATA PENCAPAIAN (ENDPOINT BARU)
+  // FETCH DATA
   // =====================================================
   useEffect(() => {
     if (!mahasiswaId) {
@@ -36,11 +36,7 @@ export default function Pencapaian({ mahasiswa }) {
     const fetchPencapaian = async () => {
       try {
         setLoading(true);
-
-        // 🔥 ENDPOINT YANG BENAR
         const res = await api.get(`/mahasiswa/kegiatan/${mahasiswaId}`);
-
-        // 🔥 BACKEND SUDAH MEMISAHKAN
         setActivities(normalize(res.data?.organisasi || []));
         setCompetitions(normalize(res.data?.prestasi || []));
       } catch (err) {
@@ -56,7 +52,7 @@ export default function Pencapaian({ mahasiswa }) {
   }, [mahasiswaId]);
 
   // =====================================================
-  // DERIVED STATE (HARUS DI ATAS)
+  // DERIVED
   // =====================================================
   const data = mode === "activities" ? activities : competitions;
   const showLine = data.length > 1;
@@ -73,25 +69,11 @@ export default function Pencapaian({ mahasiswa }) {
   }
 
   // =====================================================
-  // EMPTY STATE
-  // =====================================================
-  if (!loading && data.length === 0) {
-    return (
-      <div className="bg-white rounded-3xl shadow-xl p-6 text-center">
-        <p className="text-sm text-gray-500">
-          Belum ada {mode === "activities" ? "aktivitas" : "kompetisi"} yang
-          disetujui.
-        </p>
-      </div>
-    );
-  }
-
-  // =====================================================
-  // RENDER (STYLE ASLI — TIDAK DIUBAH)
+  // RENDER UTAMA (SWITCH SELALU ADA)
   // =====================================================
   return (
     <div className="bg-white rounded-3xl shadow-xl p-6">
-      {/* SWITCH */}
+      {/* ================= SWITCH ================= */}
       <div className="flex justify-center gap-2 mb-4">
         <button
           onClick={() => setMode("activities")}
@@ -120,16 +102,59 @@ export default function Pencapaian({ mahasiswa }) {
         {mode === "activities" ? "Kegiatan Terbaru" : "Kompetisi Terbaru"}
       </h2>
 
-      {/* ================= DESKTOP ================= */}
-      <div className="hidden md:block relative">
-        {showLine && (
-          <div className="absolute top-7 left-0 right-0 mx-12 border-t-2 border-dashed border-yellow-300"></div>
-        )}
+      {/* ================= EMPTY STATE ================= */}
+      {data.length === 0 && (
+        <div className="text-center text-sm text-gray-500 py-6">
+          Belum ada {mode === "activities" ? "aktivitas" : "kompetisi"} yang
+          disetujui.
+        </div>
+      )}
 
-        <div className="relative z-10 flex justify-center gap-24">
+      {/* ================= DESKTOP ================= */}
+      {data.length > 0 && (
+        <div className="hidden md:block relative">
+          {showLine && (
+            <div className="absolute top-7 left-0 right-0 mx-12 border-t-2 border-dashed border-yellow-300"></div>
+          )}
+
+          <div className="relative z-10 flex justify-center gap-24">
+            {data.map((item) => (
+              <div key={item.id} className="flex flex-col items-center">
+                <div className="relative">
+                  <div className="w-14 h-14 rounded-full bg-yellow-500 flex items-center justify-center shadow border-4 border-white">
+                    <i
+                      className={`fas ${
+                        mode === "activities" ? "fa-running" : "fa-medal"
+                      } text-white`}
+                    />
+                  </div>
+                  <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs font-bold px-1.5 rounded-full">
+                    +{item.poin}
+                  </span>
+                </div>
+
+                <div className="mt-3 text-center max-w-[160px]">
+                  <p className="text-xs font-semibold text-gray-800 truncate">
+                    {item.namaKegiatan}
+                  </p>
+                  <p className="text-[11px] text-gray-500">{item.tanggal}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ================= MOBILE ================= */}
+      {data.length > 0 && (
+        <div className="md:hidden relative">
+          {showLine && (
+            <div className="absolute left-7 top-14 bottom-0 w-px border-l-2 border-dashed border-yellow-300"></div>
+          )}
+
           {data.map((item) => (
-            <div key={item.id} className="flex flex-col items-center">
-              <div className="relative">
+            <div key={item.id} className="relative flex mb-6 last:mb-0">
+              <div className="relative z-10 mr-4">
                 <div className="w-14 h-14 rounded-full bg-yellow-500 flex items-center justify-center shadow border-4 border-white">
                   <i
                     className={`fas ${
@@ -142,8 +167,8 @@ export default function Pencapaian({ mahasiswa }) {
                 </span>
               </div>
 
-              <div className="mt-3 text-center max-w-[160px]">
-                <p className="text-xs font-semibold text-gray-800 truncate">
+              <div className="mt-1">
+                <p className="text-xs font-semibold text-gray-800">
                   {item.namaKegiatan}
                 </p>
                 <p className="text-[11px] text-gray-500">{item.tanggal}</p>
@@ -151,38 +176,7 @@ export default function Pencapaian({ mahasiswa }) {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* ================= MOBILE ================= */}
-      <div className="md:hidden relative">
-        {showLine && (
-          <div className="absolute left-7 top-14 bottom-0 w-px border-l-2 border-dashed border-yellow-300"></div>
-        )}
-
-        {data.map((item) => (
-          <div key={item.id} className="relative flex mb-6 last:mb-0">
-            <div className="relative z-10 mr-4">
-              <div className="w-14 h-14 rounded-full bg-yellow-500 flex items-center justify-center shadow border-4 border-white">
-                <i
-                  className={`fas ${
-                    mode === "activities" ? "fa-running" : "fa-medal"
-                  } text-white`}
-                />
-              </div>
-              <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs font-bold px-1.5 rounded-full">
-                +{item.poin}
-              </span>
-            </div>
-
-            <div className="mt-1">
-              <p className="text-xs font-semibold text-gray-800">
-                {item.namaKegiatan}
-              </p>
-              <p className="text-[11px] text-gray-500">{item.tanggal}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+      )}
     </div>
   );
 }
