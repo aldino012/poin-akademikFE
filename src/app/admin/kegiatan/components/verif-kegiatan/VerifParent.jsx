@@ -160,7 +160,7 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
     }
 
     const base = process.env.NEXT_PUBLIC_API_URL;
-    const url = `${base}/klaim/${klaimId}/bukti`;
+    const url = `/api/proxy/klaim/${klaimId}/bukti`;
 
     const handleOpenInNewTab = () => {
       window.open(url, "_blank", "noopener,noreferrer");
