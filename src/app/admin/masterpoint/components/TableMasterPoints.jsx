@@ -3,7 +3,7 @@
 import React from "react";
 
 // 🔥 LOGIC
-import useMasterPoint from "./hooks/UseMasterPoint";
+import useMasterPoint from "./hooks/UseMasterPoint.js";
 
 // 🎨 VIEW
 import MasterPointView from "./MasterPointView";

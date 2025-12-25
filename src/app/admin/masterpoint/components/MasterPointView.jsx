@@ -3,10 +3,10 @@
 import React from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
-import TableMasterPoints from "./TableMasterPoints";
-import CardMaster from "./";
+import TableMasterPoints from "./TableDesktop";
+import CardMaster from "./TableMobile";
 import Pagination from "@/components/Pagianation";
-import InfoBobotPoin from "./InfoBobotPoin";
+import InfoBobotPoin from "./InfoBobotPoint";
 
 import ModalTambahPoin from "./tambah/TambahPoint";
 import ModalEditPoin from "./edit/EditPoint";
