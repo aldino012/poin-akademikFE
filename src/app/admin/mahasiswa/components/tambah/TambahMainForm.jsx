@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import api from "@/api/axios";
+import api from "@/app/api/axios";
 import { useToast } from "@/components/Toats";
 
 import TabsNav from "./TabsNav";
@@ -129,8 +129,8 @@ export default function Tambah({ isOpen, onClose, onSubmit }) {
         withCredentials: true,
       });
 
-     onSubmit(); // cukup trigger refresh
-     onClose();
+      onSubmit(); // cukup trigger refresh
+      onClose();
 
       // ===============================
       // RESET FORM

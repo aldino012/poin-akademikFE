@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import api from "@/api/axios";
+import api from "@/app/api/axios";
 
 export default function Pencapaian({ mahasiswa }) {
   const [mode, setMode] = useState("activities");

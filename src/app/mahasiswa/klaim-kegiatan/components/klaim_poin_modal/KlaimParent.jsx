@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import api from "@/api/axios";
+import api from "@/app/api/axios";
 import { useToast } from "@/components/Toats";
 
 import TabsNav from "./TabsNav";
@@ -96,34 +96,35 @@ export default function KlaimParent({ isOpen, onClose }) {
 
   /* ================= FETCH MASTER POIN ================= */
   const fetchMasterPoin = async () => {
-  try {
-    const res = await api.get("/masterpoin");
+    try {
+      const res = await api.get("/masterpoin");
 
-    let data = [];
+      let data = [];
 
-    if (Array.isArray(res.data)) {
-      data = res.data;
-    } else if (Array.isArray(res.data?.data)) {
-      data = res.data.data;
-    } else if (Array.isArray(res.data?.data?.rows)) {
-      data = res.data.data.rows;
+      if (Array.isArray(res.data)) {
+        data = res.data;
+      } else if (Array.isArray(res.data?.data)) {
+        data = res.data.data;
+      } else if (Array.isArray(res.data?.data?.rows)) {
+        data = res.data.data.rows;
+      }
+
+      console.log("MASTERPOIN FINAL:", data);
+      setMasterPoin(data);
+    } catch (err) {
+      console.error("ERR MASTER POIN:", err);
+      setMasterPoin([]);
     }
-
-    console.log("MASTERPOIN FINAL:", data);
-    setMasterPoin(data);
-  } catch (err) {
-    console.error("ERR MASTER POIN:", err);
-    setMasterPoin([]);
-  }
-};
+  };
 
   /* ================= LOAD SAAT MODAL BUKA ================= */
   useEffect(() => {
     if (!isOpen) return;
 
     setLoading(true);
-    Promise.all([fetchUser(), fetchMasterPoin()])
-      .finally(() => setLoading(false));
+    Promise.all([fetchUser(), fetchMasterPoin()]).finally(() =>
+      setLoading(false)
+    );
   }, [isOpen]);
 
   /* ================= HELPER ================= */
@@ -198,9 +199,7 @@ export default function KlaimParent({ isOpen, onClose }) {
     }
   };
 
-
   if (!isOpen) return null;
-
 
   if (loading)
     return (

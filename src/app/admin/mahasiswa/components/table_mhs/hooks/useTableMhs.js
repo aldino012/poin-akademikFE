@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import api from "@/api/axios";
+import api from "@/app/api/axios";
 import { useToast } from "@/components/Toats";
 import usePaginationFilter from "@/app/hooks/usePaginationFilter";
 

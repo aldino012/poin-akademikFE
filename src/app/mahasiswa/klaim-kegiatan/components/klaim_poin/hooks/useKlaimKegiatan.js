@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import api from "@/api/axios";
+import api from "@/app/api/axios";
 import usePaginationFilter from "@/app/hooks/usePaginationFilter";
 
 export default function useKlaimKegiatan() {

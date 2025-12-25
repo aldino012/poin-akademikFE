@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import api from "@/api/axios";
+import api from "@/app/api/axios";
 
 // IMPORT TAB COMPONENTS
 import TabsNav from "./TabsNav";

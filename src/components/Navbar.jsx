@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import api from "@/api/axios";
+import api from "@/app/api/axios";
 
 export default function Navbar({ toggleSidebar, role = "default" }) {
   const [showTooltip, setShowTooltip] = useState(false);
@@ -35,10 +35,7 @@ export default function Navbar({ toggleSidebar, role = "default" }) {
   return (
     <header className="flex items-center justify-between bg-white border-b px-3 py-2 shadow-sm sticky top-0 z-20">
       <div className="flex items-center space-x-2">
-        <button
-          className="md:hidden text-blue-700"
-          onClick={toggleSidebar}
-        >
+        <button className="md:hidden text-blue-700" onClick={toggleSidebar}>
           <i className="fas fa-bars text-xl"></i>
         </button>
 

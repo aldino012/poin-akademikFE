@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Cards from "./components/Cards";
 import BarChartAngkatan from "./components/GrafikBar";
 import PieChartKegiatan from "./components/GrafikChart";
-import api from "@/api/axios";
+import api from "@/app/api/axios";
 
 export default function AdminPage() {
   const [loading, setLoading] = useState(true);

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import LoadingOverlay from "@/components/LoadingOverlay";
-import api from "@/api/axios";
+import api from "@/app/api/axios";
 
 export default function LoginPage() {
   const router = useRouter();

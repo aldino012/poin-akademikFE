@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import api from "@/api/axios";
+import api from "@/app/api/axios";
 
 // Components
 import TableDesktop from "./klaim_poin/TableDesktop";
