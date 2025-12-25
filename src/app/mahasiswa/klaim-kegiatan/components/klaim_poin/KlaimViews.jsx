@@ -74,17 +74,16 @@ export default function KlaimViews({
               placeholder="Cari kegiatan..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="
-                pl-9 pr-4 py-2.5
-                border border-gray-300 rounded-lg
-                text-sm w-full
-                focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                focus:outline-none
-                bg-white text-gray-800
-                placeholder-gray-500
-                transition-all duration-200
-                shadow-sm
-              "
+              className={`pl-9 pr-4 py-2.5
+              border border-gray-300 rounded-lg
+              text-sm w-full
+              focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+              focus:outline-none
+              bg-white text-gray-800
+              placeholder-gray-500
+              transition-all duration-200
+              shadow-sm
+            `}
             />
             <i className="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
 
