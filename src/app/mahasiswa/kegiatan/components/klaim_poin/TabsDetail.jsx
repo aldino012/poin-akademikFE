@@ -5,24 +5,6 @@ import PropTypes from "prop-types";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-/**
- * Custom Input DatePicker
- * Supaya tinggi & style SAMA dengan input lain
- */
-const DateInput = React.forwardRef(({ value, onClick, placeholder }, ref) => (
-  <input
-    ref={ref}
-    type="text"
-    value={value || ""}
-    onClick={onClick}
-    readOnly
-    placeholder={placeholder}
-    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
-  />
-));
-
-DateInput.displayName = "DateInput";
-
 export default function TabsDetail({
   formData,
   handleDateChange,
@@ -72,10 +54,10 @@ export default function TabsDetail({
               showMonthDropdown
               showYearDropdown
               dropdownMode="select"
-              customInput={
-                <DateInput placeholder="Pilih tanggal pelaksanaan" />
-              }
-              wrapperClassName="w-full"
+              showIcon
+              placeholderText="Pilih tanggal pelaksanaan"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              calendarIconClassname="text-gray-500"
               popperClassName="z-50"
               required
             />
