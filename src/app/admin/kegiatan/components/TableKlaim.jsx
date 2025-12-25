@@ -4,9 +4,9 @@ import React, { useState, useEffect, useCallback } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import api from "@/api/axios";
 
-import TableToolbar from "./TableToolbar";
-import TableDesktop from "./TableDesktop";
-import TableMobile from "./TableMobile";
+import TableToolbar from "./table_verif/TableToolbar";
+import TableDesktop from "./table_verif/TableDesktop";
+import TableMobile from "./table_verif/TableMobile";
 import TablePagination from "@/components/Pagianation";
 import DetailKlaimModal from "./verif-kegiatan/VerifParent";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import TableKlaim from "./components/TableKlaim";
+import TableKlaim from "./components/table_verif/TableVerif";
 
 export default function KegiatanPage() {
   return (
