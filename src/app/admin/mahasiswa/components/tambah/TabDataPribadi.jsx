@@ -3,6 +3,7 @@ import React, { useState } from "react";
 export default function TabDataPribadi({ form, handleChange, errors = {} }) {
   const [suggestions, setSuggestions] = useState([]);
   const [showSug, setShowSug] = useState(false);
+  const [fotoError, setFotoError] = useState("");
 
   // Domain yang kamu inginkan
   const emailDomains = [
@@ -16,14 +17,75 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
     "@live.com",
   ];
 
-  // Auto-suggest email
-  const handleEmailChange = (e) => {
+  // Validasi NIM (8-12 digit)
+  const validateNIM = (e) => {
     const value = e.target.value;
 
-    handleChange(e); // panggil handler asli
+    // Hanya angka
+    const numericValue = value.replace(/\D/g, "");
+
+    // Update form
+    handleChange({
+      target: { name: "nim", value: numericValue },
+    });
+  };
+
+  // Validasi Angkatan (hanya angka tahun)
+  const validateAngkatan = (e) => {
+    const value = e.target.value;
+
+    // Hanya angka
+    const numericValue = value.replace(/\D/g, "");
+
+    // Batasi maksimal 4 digit (tahun)
+    const limitedValue = numericValue.slice(0, 4);
+
+    // Update form
+    handleChange({
+      target: { name: "angkatan", value: limitedValue },
+    });
+  };
+
+  // Validasi Foto
+  const handleFotoChange = (e) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      // Validasi ukuran file (maksimal 1MB)
+      if (file.size > 1024 * 1024) {
+        // 1MB dalam bytes
+        setFotoError("Ukuran file maksimal 1MB");
+        handleChange({
+          target: { name: "foto", value: "" },
+        });
+        e.target.value = ""; // Reset input file
+        return;
+      }
+
+      // Validasi tipe file
+      if (!file.type.startsWith("image/")) {
+        setFotoError("File harus berupa gambar");
+        handleChange({
+          target: { name: "foto", value: "" },
+        });
+        e.target.value = "";
+        return;
+      }
+
+      setFotoError("");
+    }
+
+    handleChange(e);
+  };
+
+  // Auto-suggest email di dalam input
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    handleChange(e);
 
     // Jika belum ada "@", jangan tampilkan sugesti
     if (!value.includes("@")) {
+      setSuggestions([]);
       setShowSug(false);
       return;
     }
@@ -52,6 +114,7 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
     handleChange({
       target: { name: "email", value: newEmail },
     });
+    setSuggestions([]);
     setShowSug(false);
   };
 
@@ -67,22 +130,38 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
           type="text"
           name="nim"
           value={form.nim}
-          onChange={handleChange}
+          onChange={validateNIM}
           className={`
-                w-full px-3 py-2 rounded-lg shadow-sm text-sm  bg-white text-gray-900
-                ${
-                  errors.nim
-                    ? "border border-red-500 focus:ring-red-500"
-                    : "border border-gray-300 focus:ring-blue-500"
-                }
-            `}
+            w-full px-3 py-2 rounded-lg shadow-sm text-sm bg-white text-gray-900
+            ${
+              errors.nim
+                ? "border border-red-500 focus:ring-red-500"
+                : "border border-gray-300 focus:ring-blue-500"
+            }
+          `}
+          placeholder="Contoh: 12345678"
+          maxLength="12"
         />
-        {errors.nim && (
-          <p className="text-xs text-red-600 mt-1">
-            <i className="fas fa-exclamation-circle mr-1"></i>
-            {errors.nim}
+        <div className="flex justify-between">
+          {errors.nim ? (
+            <p className="text-xs text-red-600 mt-1">
+              <i className="fas fa-exclamation-circle mr-1"></i>
+              {errors.nim}
+            </p>
+          ) : (
+            <p className="text-xs text-gray-500 mt-1">
+              <i className="fas fa-info-circle mr-1"></i>
+              {form.nim.length < 8
+                ? `Minimal 8 digit (${form.nim.length}/8)`
+                : form.nim.length > 12
+                ? `Maksimal 12 digit`
+                : `${form.nim.length} digit`}
+            </p>
+          )}
+          <p className="text-xs text-gray-500 mt-1">
+            {form.nim.length > 0 && `${form.nim.length} digit`}
           </p>
-        )}
+        </div>
       </div>
 
       {/* Nama */}
@@ -98,15 +177,15 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
           onChange={handleChange}
           autoComplete="off"
           className={`
-    w-full px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
-    ${
-      errors.nama_mhs
-        ? "border border-red-500 focus:ring-red-500"
-        : "border border-gray-300 focus:ring-blue-500"
-    }
-    transition-colors uppercase-input
-  `}
-          placeholder="Masukkan nama lengkap"
+            w-full px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
+            ${
+              errors.nama_mhs
+                ? "border border-red-500 focus:ring-red-500"
+                : "border border-gray-300 focus:ring-blue-500"
+            }
+            transition-colors uppercase-input
+          `}
+          placeholder="Contoh: ANDI SANTOSO"
           style={{ textTransform: "uppercase" }}
         />
         {errors.nama_mhs && (
@@ -128,15 +207,16 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
           value={form.prodi}
           onChange={handleChange}
           className={`
-                w-full px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
-                ${
-                  errors.prodi
-                    ? "border border-red-500 focus:ring-red-500"
-                    : "border border-gray-300 focus:ring-blue-500"
-                }
-                transition-colors
-            `}
+            w-full px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
+            ${
+              errors.prodi
+                ? "border border-red-500 focus:ring-red-500"
+                : "border border-gray-300 focus:ring-blue-500"
+            }
+            transition-colors
+          `}
         >
+          <option value="">Pilih Prodi</option>
           <option value="S1">S1</option>
           <option value="D3">D3</option>
         </select>
@@ -158,16 +238,18 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
           type="text"
           name="angkatan"
           value={form.angkatan}
-          onChange={handleChange}
+          onChange={validateAngkatan}
           className={`
-                w-full px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
-                ${
-                  errors.angkatan
-                    ? "border border-red-500 focus:ring-red-500"
-                    : "border border-gray-300 focus:ring-blue-500"
-                }
-                transition-colors uppercase-input
-            `}
+            w-full px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
+            ${
+              errors.angkatan
+                ? "border border-red-500 focus:ring-red-500"
+                : "border border-gray-300 focus:ring-blue-500"
+            }
+            transition-colors
+          `}
+          placeholder="Contoh: 2023"
+          maxLength="4"
         />
         {errors.angkatan && (
           <p className="text-xs text-red-600 mt-1">
@@ -189,14 +271,15 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
           value={form.tempat_lahir}
           onChange={handleChange}
           className={`
-                w-full px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
-                ${
-                  errors.tempat_lahir
-                    ? "border border-red-500 focus:ring-red-500"
-                    : "border border-gray-300 focus:ring-blue-500"
-                }
-                transition-colors uppercase-input
-            `}
+            w-full px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
+            ${
+              errors.tempat_lahir
+                ? "border border-red-500 focus:ring-red-500"
+                : "border border-gray-300 focus:ring-blue-500"
+            }
+            transition-colors
+          `}
+          placeholder="Contoh: JAKARTA"
         />
         {errors.tempat_lahir && (
           <p className="text-xs text-red-600 mt-1">
@@ -212,21 +295,27 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
           <i className="fas fa-birthday-cake mr-1 text-blue-600"></i>
           Tanggal Lahir
         </label>
-        <input
-          type="date"
-          name="tgl_lahir"
-          value={form.tgl_lahir}
-          onChange={handleChange}
-          className={`
-      w-full px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
-      ${
-        errors.tgl_lahir
-          ? "border border-red-500 focus:ring-red-500"
-          : "border border-gray-300 focus:ring-blue-500"
-      }
-      transition-colors
-    `}
-        />
+        <div className="relative">
+          <input
+            type="date"
+            name="tgl_lahir"
+            value={form.tgl_lahir}
+            onChange={handleChange}
+            className={`
+              w-full px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
+              ${
+                errors.tgl_lahir
+                  ? "border border-red-500 focus:ring-red-500"
+                  : "border border-gray-300 focus:ring-blue-500"
+              }
+              transition-colors appearance-none
+            `}
+            placeholder="Pilih tanggal lahir"
+          />
+          <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+            <i className="fas fa-calendar text-gray-900"></i>
+          </div>
+        </div>
         {errors.tgl_lahir && (
           <p className="text-xs text-red-600 mt-1">
             <i className="fas fa-exclamation-circle mr-1"></i>
@@ -241,40 +330,43 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
           <i className="fas fa-envelope mr-1 text-blue-600"></i>
           Email
         </label>
-        <input
-          type="email"
-          name="email"
-          value={form.email}
-          onChange={handleEmailChange}
-          autoComplete="off"
-          className={`
-                w-full px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
-                ${
-                  errors.angkatan
-                    ? "border border-red-500 focus:ring-red-500"
-                    : "border border-gray-300 focus:ring-blue-500"
-                }
-                transition-colors uppercase-input
+        <div className="relative">
+          <input
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleEmailChange}
+            autoComplete="off"
+            className={`
+              w-full px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
+              ${
+                errors.email
+                  ? "border border-red-500 focus:ring-red-500"
+                  : "border border-gray-300 focus:ring-blue-500"
+              }
+              transition-colors pr-8
             `}
-          placeholder="email@example.com"
-        />
+            placeholder="Contoh: nama@email.com"
+          />
 
-        {/* Dropdown Suggestion */}
-        {showSug && (
-          <ul className="absolute z-50 bg-white w-full border border-gray-300 rounded-lg shadow-md mt-1 text-sm">
-            {suggestions.map((domain, idx) => (
-              <li
-                key={idx}
-                className="px-3 py-2 hover:bg-blue-50 cursor-pointer flex items-center"
-                onClick={() => applySuggestion(domain)}
-              >
-                <i className="fas fa-at text-blue-600 mr-2"></i>
-                {form.email.split("@")[0]}
-                {domain}
-              </li>
-            ))}
-          </ul>
-        )}
+          {/* Email suggestions di dalam input */}
+          {showSug && suggestions.length > 0 && (
+            <div className="absolute bottom-0 left-0 right-0 transform translate-y-full bg-white border border-gray-300 rounded-lg shadow-md z-10 mt-1">
+              {suggestions.map((domain, idx) => (
+                <div
+                  key={idx}
+                  className="px-3 py-2 hover:bg-blue-50 cursor-pointer flex items-center text-sm"
+                  onClick={() => applySuggestion(domain)}
+                >
+                  <span className="text-gray-600">
+                    {form.email.split("@")[0]}
+                  </span>
+                  <span className="text-blue-600 font-medium">{domain}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
         {errors.email && (
           <p className="text-xs text-red-600 mt-1">
             <i className="fas fa-exclamation-circle mr-1"></i>
@@ -289,26 +381,71 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
           <i className="fas fa-camera mr-1 text-blue-600"></i>
           Foto Profil
         </label>
-        <input
-          type="file"
-          name="foto"
-          onChange={handleChange}
-          autoComplete="off"
-          className={`w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors
+        <div className="space-y-2">
+          <div
+            className={`
+            relative border-2 border-dashed rounded-lg p-4 text-center
             ${
-              errors.angkatan
-                ? "border border-red-500 focus:ring-red-500"
-                : "border border-gray-300 focus:ring-blue-500"
+              errors.foto || fotoError
+                ? "border-red-300 bg-red-50"
+                : "border-gray-300 bg-gray-50 hover:bg-gray-100"
             }
-            `}
-          accept="image/*"
-        />
-        {errors.foto && (
-          <p className="text-xs text-red-600 mt-1">
-            <i className="fas fa-exclamation-circle mr-1"></i>
-            {errors.foto}
-          </p>
-        )}
+            transition-colors
+          `}
+          >
+            <input
+              type="file"
+              name="foto"
+              onChange={handleFotoChange}
+              autoComplete="off"
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              accept="image/*"
+            />
+            <div className="space-y-2">
+              <div className="flex flex-col items-center justify-center">
+                <i
+                  className={`fas fa-cloud-upload-alt text-2xl mb-2 ${
+                    errors.foto || fotoError ? "text-red-500" : "text-blue-500"
+                  }`}
+                ></i>
+                <p className="text-sm text-gray-700">
+                  <span className="font-medium text-blue-600">
+                    Klik untuk upload
+                  </span>{" "}
+                  atau drag and drop
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Format: JPG, PNG (Maksimal 1MB)
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {form.foto && typeof form.foto === "string" && form.foto !== "" && (
+            <div className="flex items-center justify-between p-2 bg-green-50 border border-green-200 rounded">
+              <div className="flex items-center">
+                <i className="fas fa-check-circle text-green-500 mr-2"></i>
+                <span className="text-sm text-gray-700">File terpilih</span>
+              </div>
+              <button
+                type="button"
+                onClick={() =>
+                  handleChange({ target: { name: "foto", value: "" } })
+                }
+                className="text-red-500 hover:text-red-700 text-sm"
+              >
+                <i className="fas fa-times mr-1"></i> Hapus
+              </button>
+            </div>
+          )}
+
+          {(errors.foto || fotoError) && (
+            <p className="text-xs text-red-600">
+              <i className="fas fa-exclamation-circle mr-1"></i>
+              {fotoError || errors.foto}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
