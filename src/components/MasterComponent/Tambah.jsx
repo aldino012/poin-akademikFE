@@ -211,7 +211,7 @@ export default function ModalTambahPoin({ isOpen, onClose, onSave }) {
               style={{ textTransform: "uppercase" }}
             />
             <p className="text-xs text-gray-500 mt-1">
-              4 karakter huruf kapital dan angka
+              3 karakter huruf kapital dan 1 angka
             </p>
           </div>
 
