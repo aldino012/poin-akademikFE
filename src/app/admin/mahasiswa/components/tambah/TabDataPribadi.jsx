@@ -118,6 +118,19 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
     setShowSug(false);
   };
 
+  // Hapus file foto
+  const handleRemoveFoto = () => {
+    handleChange({
+      target: { name: "foto", value: "" },
+    });
+    setFotoError("");
+    // Reset input file
+    const fileInput = document.querySelector('input[name="foto"]');
+    if (fileInput) {
+      fileInput.value = "";
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {/* NIM */}
@@ -375,22 +388,44 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
         )}
       </div>
 
-      {/* Foto */}
+      {/* Foto - Upload Biasa */}
       <div className="md:col-span-2">
         <label className="block text-sm font-medium text-gray-700 mb-2">
           <i className="fas fa-camera mr-1 text-blue-600"></i>
           Foto Profil
         </label>
-        <div className="space-y-2">
+
+        {/* Info Ukuran File */}
+        <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-start">
+            <i className="fas fa-info-circle text-blue-500 mt-0.5 mr-2"></i>
+            <div className="text-xs text-gray-700">
+              <p className="font-medium mb-1">Ketentuan upload foto:</p>
+              <ul className="list-disc pl-4 space-y-1">
+                <li>
+                  Ukuran file maksimal{" "}
+                  <span className="font-semibold">1 MB</span>
+                </li>
+                <li>
+                  Format file:{" "}
+                  <span className="font-semibold">JPG, JPEG, PNG</span>
+                </li>
+                <li>Foto harus jelas dan dapat dikenali</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Input File Biasa */}
+        <div className="space-y-3">
           <div
             className={`
-            relative border-2 border-dashed rounded-lg p-4 text-center
+            w-full px-3 py-2 rounded-lg shadow-sm text-sm bg-white
             ${
               errors.foto || fotoError
-                ? "border-red-300 bg-red-50"
-                : "border-gray-300 bg-gray-50 hover:bg-gray-100"
+                ? "border border-red-500 focus:ring-red-500"
+                : "border border-gray-300 focus:ring-blue-500"
             }
-            transition-colors
           `}
           >
             <input
@@ -398,52 +433,46 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
               name="foto"
               onChange={handleFotoChange}
               autoComplete="off"
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              accept="image/*"
+              className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors"
+              accept=".jpg,.jpeg,.png"
             />
-            <div className="space-y-2">
-              <div className="flex flex-col items-center justify-center">
-                <i
-                  className={`fas fa-cloud-upload-alt text-2xl mb-2 ${
-                    errors.foto || fotoError ? "text-red-500" : "text-blue-500"
-                  }`}
-                ></i>
-                <p className="text-sm text-gray-700">
-                  <span className="font-medium text-blue-600">
-                    Klik untuk upload
-                  </span>{" "}
-                  atau drag and drop
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Format: JPG, PNG (Maksimal 1MB)
-                </p>
-              </div>
-            </div>
           </div>
 
-          {form.foto && typeof form.foto === "string" && form.foto !== "" && (
-            <div className="flex items-center justify-between p-2 bg-green-50 border border-green-200 rounded">
-              <div className="flex items-center">
-                <i className="fas fa-check-circle text-green-500 mr-2"></i>
-                <span className="text-sm text-gray-700">File terpilih</span>
+          {/* Tampilan file yang dipilih */}
+          {form.foto && (
+            <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="bg-green-100 p-2 rounded">
+                  <i className="fas fa-check-circle text-green-500 text-lg"></i>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-700">
+                    {typeof form.foto === "object"
+                      ? form.foto.name
+                      : "File foto terpilih"}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    <i className="fas fa-check mr-1"></i>
+                    File sesuai dengan ketentuan
+                  </p>
+                </div>
               </div>
               <button
                 type="button"
-                onClick={() =>
-                  handleChange({ target: { name: "foto", value: "" } })
-                }
-                className="text-red-500 hover:text-red-700 text-sm"
+                onClick={handleRemoveFoto}
+                className="text-red-500 hover:text-red-700 text-sm flex items-center"
               >
-                <i className="fas fa-times mr-1"></i> Hapus
+                <i className="fas fa-trash mr-1"></i> Hapus
               </button>
             </div>
           )}
 
+          {/* Pesan Error */}
           {(errors.foto || fotoError) && (
-            <p className="text-xs text-red-600">
-              <i className="fas fa-exclamation-circle mr-1"></i>
-              {fotoError || errors.foto}
-            </p>
+            <div className="flex items-start p-3 bg-red-50 border border-red-200 rounded-lg">
+              <i className="fas fa-exclamation-triangle text-red-500 mt-0.5 mr-2"></i>
+              <p className="text-sm text-red-600">{fotoError || errors.foto}</p>
+            </div>
           )}
         </div>
       </div>
