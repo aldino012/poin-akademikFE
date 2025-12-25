@@ -78,18 +78,6 @@ export default function TabsBukti({
                 <i className="fas fa-history mr-2"></i>
                 Bukti Saat Ini
               </h5>
-
-              <div className="flex items-center gap-2">
-                <i className="fas fa-cloud text-amber-600"></i>
-                <a
-                  href={`${process.env.NEXT_PUBLIC_API_URL}/api/klaim/${claim.id}/bukti`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-800 text-sm underline"
-                >
-                  Lihat Bukti (Google Drive)
-                </a>
-              </div>
             </div>
           )}
 
