@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import MasterPoint from "../../../components/MasterPoint"; // komponen utama tabel
+import MasterPoint from "@/app/admin/masterpoint/components/table_master/TableMasterPoints"; // komponen utama tabel
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 export default function MasterPointMahasiswaPage() {

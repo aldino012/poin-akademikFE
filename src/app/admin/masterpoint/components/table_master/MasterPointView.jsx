@@ -8,9 +8,9 @@ import CardMaster from "./TableMobile";
 import Pagination from "@/components/Pagianation";
 import InfoBobotPoin from "./InfoBobotPoint";
 
-import ModalTambahPoin from "./tambah/TambahPoint";
-import ModalEditPoin from "./edit/EditPoint";
-import ModalExcel from "./modal_excel/ModalExcel";
+import ModalTambahPoin from "../tambah/TambahPoint";
+import ModalEditPoin from "../edit/EditPoint";
+import ModalExcel from "../modal_excel/ModalExcel";
 
 export default function MasterPointView({
   // role

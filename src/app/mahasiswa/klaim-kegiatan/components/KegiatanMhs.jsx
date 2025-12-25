@@ -4,12 +4,12 @@ import { createPortal } from "react-dom";
 import api from "@/api/axios";
 
 // Components
-import TableDesktop from "./TableDesktop";
+import TableDesktop from "./klaim_poin/TableDesktop";
 import EditKegiatanModal from "./edit/EditParent";
-import TableMobile from "./TableMobile";
+import TableMobile from "./klaim_poin/TableMobile";
 import TablePagination from "@/components/Pagianation";
 import ModalDetail from "./modal_detail/DetailParent";
-import ModalPoin from "./klaim_poin/KlaimParent";
+import ModalPoin from "./klaim_poin_modal/KlaimParent";
 
 // 🔥 import hook terbaru
 import usePaginationFilter from "@/app/hooks/usePaginationFilter";

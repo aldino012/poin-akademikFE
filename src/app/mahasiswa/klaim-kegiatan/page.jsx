@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import TableKegiatanMhs from "./components/KegiatanMhs";
+import TableKegiatanMhs from "./components/klaim_poin/TableKlaimPoint";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 export default function KegiatanPage() {
