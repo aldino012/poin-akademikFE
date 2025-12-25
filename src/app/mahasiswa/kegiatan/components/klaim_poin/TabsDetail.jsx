@@ -25,13 +25,18 @@ export default function TabsDetail({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Tanggal Pengajuan
             </label>
-            <input
-              type="date"
-              value={formData.tanggal_pengajuan}
-              readOnly
-              disabled
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-gray-100 text-gray-900 text-sm cursor-not-allowed"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                value={formData.tanggal_pengajuan}
+                readOnly
+                disabled
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-gray-100 text-gray-900 text-sm cursor-not-allowed"
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <i className="fas fa-calendar text-gray-900"></i>
+              </div>
+            </div>
             <p className="text-xs text-gray-500 mt-1">
               Tanggal pengajuan diisi otomatis dengan tanggal hari ini
             </p>
@@ -42,18 +47,32 @@ export default function TabsDetail({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Tanggal Pelaksanaan
             </label>
-            <DatePicker
-              selected={
-                formData.tanggal_pelaksanaan
-                  ? new Date(formData.tanggal_pelaksanaan)
-                  : null
-              }
-              onChange={(date) => handleDateChange(date, "tanggal_pelaksanaan")}
-              dateFormat="yyyy-MM-dd"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-              minDate={new Date()}
-            />
+            <div className="relative">
+              <DatePicker
+                selected={
+                  formData.tanggal_pelaksanaan
+                    ? new Date(formData.tanggal_pelaksanaan)
+                    : null
+                }
+                onChange={(date) =>
+                  handleDateChange(date, "tanggal_pelaksanaan")
+                }
+                dateFormat="yyyy-MM-dd"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholderText="Pilih tanggal pelaksanaan"
+                isClearable
+                showMonthDropdown
+                showYearDropdown
+                dropdownMode="select"
+                required
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <i className="fas fa-calendar text-gray-900"></i>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Pilih tanggal pelaksanaan kegiatan
+            </p>
           </div>
         </div>
       </div>
@@ -78,6 +97,7 @@ export default function TabsDetail({
               placeholder="Masukkan tempat kegiatan"
               className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors uppercase"
               required
+              style={{ textTransform: "uppercase" }}
             />
           </div>
 
@@ -114,6 +134,7 @@ export default function TabsDetail({
               onChange={(e) => handleInputChange("mentor", e.target.value)}
               placeholder="Nama mentor (jika ada)"
               className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors uppercase"
+              style={{ textTransform: "uppercase" }}
             />
           </div>
 
@@ -128,6 +149,7 @@ export default function TabsDetail({
               onChange={(e) => handleInputChange("narasumber", e.target.value)}
               placeholder="Nama narasumber (jika ada)"
               className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors uppercase"
+              style={{ textTransform: "uppercase" }}
             />
           </div>
         </div>
@@ -147,6 +169,7 @@ export default function TabsDetail({
           placeholder="JELASKAN DETAIL KEGIATAN YANG DIIKUTI..."
           className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none uppercase"
           required
+          style={{ textTransform: "uppercase" }}
         />
       </div>
     </div>
