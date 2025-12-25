@@ -152,12 +152,15 @@ export default function TableMhsView({
           MODAL EXCEL
       ========================== */}
       <ModalExcel
-        isOpen={isExcelOpen}
-        onClose={() => setIsExcelOpen(false)}
-        title={excelConfig.title}
-        importUrl={excelConfig.importUrl}
-        exportUrl={excelConfig.exportUrl}
-        onImported={() => setIsExcelOpen(false)}
+        isOpen={tableMhs.isExcelOpen}
+        onClose={() => tableMhs.setIsExcelOpen(false)}
+        title={tableMhs.excelConfig.title}
+        importUrl={tableMhs.excelConfig.importUrl}
+        exportUrl={tableMhs.excelConfig.exportUrl}
+        onImported={() => {
+          tableMhs.fetchMahasiswa(); // 
+          tableMhs.setIsExcelOpen(false);
+        }}
       />
     </div>
   );
