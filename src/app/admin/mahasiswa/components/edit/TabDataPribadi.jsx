@@ -2,6 +2,8 @@ import React, { useState } from "react";
 
 export default function TabDataPribadi({ form, handleChange }) {
   const [showSuggest, setShowSuggest] = useState(false);
+  const [nimError, setNimError] = useState("");
+  const [angkatanError, setAngkatanError] = useState("");
 
   const emailDomains = [
     "@gmail.com",
@@ -16,7 +18,7 @@ export default function TabDataPribadi({ form, handleChange }) {
 
   /** --- UPPERCASE HANDLER --- */
   const toUpperExceptEmail = (name, value) => {
-    const skip = ["email", "tgl_lahir", "prodi", "nim"];
+    const skip = ["email", "tgl_lahir", "prodi", "nim", "angkatan"];
     if (skip.includes(name)) return value;
     return value.toUpperCase();
   };
@@ -24,13 +26,43 @@ export default function TabDataPribadi({ form, handleChange }) {
   /** --- NIM FILTER (HANYA ANGKA) --- */
   const filterNIM = (value) => value.replace(/[^0-9]/g, "");
 
+  /** --- ANGKATAN FILTER (HANYA ANGKA) --- */
+  const filterAngkatan = (value) => value.replace(/[^0-9]/g, "");
+
   const handleLocalChange = (e) => {
     const { name, value } = e.target;
 
-    // khusus NIM → numeric only
+    // khusus NIM → numeric only + validasi digit
     if (name === "nim") {
       const numeric = filterNIM(value);
+
+      // Validasi panjang digit
+      if (numeric.length < 8 && numeric.length > 0) {
+        setNimError(`NIM minimal 8 digit (${numeric.length}/8)`);
+      } else if (numeric.length > 12) {
+        setNimError("NIM maksimal 12 digit");
+      } else {
+        setNimError("");
+      }
+
       handleChange({ target: { name, value: numeric } });
+      return;
+    }
+
+    // khusus Angkatan → numeric only + validasi tahun
+    if (name === "angkatan") {
+      const numeric = filterAngkatan(value);
+
+      // Validasi panjang (4 digit untuk tahun)
+      if (numeric.length > 0 && numeric.length !== 4) {
+        setAngkatanError("Angkatan harus 4 digit (tahun)");
+      } else {
+        setAngkatanError("");
+      }
+
+      // Batasi maksimal 4 digit
+      const limitedValue = numeric.slice(0, 4);
+      handleChange({ target: { name, value: limitedValue } });
       return;
     }
 
@@ -69,6 +101,31 @@ export default function TabDataPribadi({ form, handleChange }) {
       "ArrowRight",
       "ArrowUp",
       "ArrowDown",
+      "Home",
+      "End",
+    ];
+    if (allow.includes(e.key)) return;
+    if (!/^\d$/.test(e.key)) e.preventDefault();
+  };
+
+  /** --- Prevent paste non numeric pada Angkatan --- */
+  const handlePasteAngkatan = (e) => {
+    const text = e.clipboardData.getData("text");
+    if (!/^\d+$/.test(text)) e.preventDefault();
+  };
+
+  /** --- Prevent non numeric keyboard for Angkatan --- */
+  const handleKeyDownAngkatan = (e) => {
+    const allow = [
+      "Backspace",
+      "Delete",
+      "Tab",
+      "ArrowLeft",
+      "ArrowRight",
+      "ArrowUp",
+      "ArrowDown",
+      "Home",
+      "End",
     ];
     if (allow.includes(e.key)) return;
     if (!/^\d$/.test(e.key)) e.preventDefault();
@@ -102,10 +159,37 @@ export default function TabDataPribadi({ form, handleChange }) {
           onKeyDown={handleKeyDownNIM}
           onPaste={handlePasteNIM}
           autoComplete="off"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-white 
-          text-gray-900 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors"
-          placeholder="Hanya angka"
+          maxLength="12"
+          className={`w-full px-3 py-2 border rounded-lg shadow-sm bg-white 
+            text-gray-900 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors
+            ${nimError ? "border-red-500" : "border-gray-300"}`}
+          placeholder="Contoh: 12345678"
         />
+        <div className="flex justify-between mt-1">
+          {nimError ? (
+            <p className="text-xs text-red-600 flex items-center">
+              <i className="fas fa-exclamation-circle mr-1"></i>
+              {nimError}
+            </p>
+          ) : form.nim ? (
+            <p className="text-xs text-gray-500 flex items-center">
+              <i className="fas fa-info-circle mr-1"></i>
+              {form.nim.length < 8
+                ? `Minimal 8 digit (${form.nim.length}/8)`
+                : form.nim.length > 12
+                ? `Maksimal 12 digit`
+                : `${form.nim.length} digit (valid)`}
+            </p>
+          ) : (
+            <p className="text-xs text-gray-500 flex items-center">
+              <i className="fas fa-info-circle mr-1"></i>
+              Masukkan 8-12 digit angka
+            </p>
+          )}
+          {form.nim && (
+            <p className="text-xs text-gray-500">{form.nim.length}/12 digit</p>
+          )}
+        </div>
       </div>
 
       {/* Nama Mahasiswa */}
@@ -121,7 +205,9 @@ export default function TabDataPribadi({ form, handleChange }) {
           onChange={handleLocalChange}
           autoComplete="off"
           className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-white 
-          text-gray-900 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors"
+          text-gray-900 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors uppercase-input"
+          placeholder="Contoh: ANDI SANTOSO"
+          style={{ textTransform: "uppercase" }}
         />
       </div>
 
@@ -139,6 +225,7 @@ export default function TabDataPribadi({ form, handleChange }) {
           className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-white 
           text-gray-900 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors"
         >
+          <option value="">Pilih Prodi</option>
           <option value="S1">S1</option>
           <option value="D3">D3</option>
         </select>
@@ -155,10 +242,40 @@ export default function TabDataPribadi({ form, handleChange }) {
           name="angkatan"
           value={form.angkatan}
           onChange={handleLocalChange}
+          onKeyDown={handleKeyDownAngkatan}
+          onPaste={handlePasteAngkatan}
           autoComplete="off"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-white 
-          text-gray-900 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors"
+          maxLength="4"
+          className={`w-full px-3 py-2 border rounded-lg shadow-sm bg-white 
+            text-gray-900 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors
+            ${angkatanError ? "border-red-500" : "border-gray-300"}`}
+          placeholder="Contoh: 2023"
         />
+        <div className="flex justify-between mt-1">
+          {angkatanError ? (
+            <p className="text-xs text-red-600 flex items-center">
+              <i className="fas fa-exclamation-circle mr-1"></i>
+              {angkatanError}
+            </p>
+          ) : form.angkatan ? (
+            <p className="text-xs text-gray-500 flex items-center">
+              <i className="fas fa-info-circle mr-1"></i>
+              {form.angkatan.length === 4
+                ? "Format tahun valid"
+                : `${form.angkatan.length}/4 digit`}
+            </p>
+          ) : (
+            <p className="text-xs text-gray-500 flex items-center">
+              <i className="fas fa-info-circle mr-1"></i>
+              Masukkan 4 digit tahun
+            </p>
+          )}
+          {form.angkatan && (
+            <p className="text-xs text-gray-500">
+              {form.angkatan.length}/4 digit
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Tempat Lahir */}
@@ -174,7 +291,9 @@ export default function TabDataPribadi({ form, handleChange }) {
           onChange={handleLocalChange}
           autoComplete="off"
           className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-white 
-          text-gray-900 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors"
+          text-gray-900 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors uppercase-input"
+          placeholder="Contoh: JAKARTA"
+          style={{ textTransform: "uppercase" }}
         />
       </div>
 
@@ -184,15 +303,21 @@ export default function TabDataPribadi({ form, handleChange }) {
           <i className="fas fa-birthday-cake mr-1 text-amber-600"></i>
           Tanggal Lahir
         </label>
-        <input
-          type="date"
-          name="tgl_lahir"
-          value={form.tgl_lahir}
-          onChange={handleLocalChange}
-          autoComplete="off"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-white 
-          text-gray-900 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors [color-scheme:light]"
-        />
+        <div className="relative">
+          <input
+            type="date"
+            name="tgl_lahir"
+            value={form.tgl_lahir}
+            onChange={handleLocalChange}
+            autoComplete="off"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-white 
+            text-gray-900 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors [color-scheme:light] pr-10"
+            placeholder="Pilih tanggal lahir"
+          />
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <i className="fas fa-calendar text-gray-900"></i>
+          </div>
+        </div>
       </div>
 
       {/* Email + Suggest */}
@@ -210,25 +335,36 @@ export default function TabDataPribadi({ form, handleChange }) {
           autoComplete="off"
           className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-white 
           text-gray-900 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors lowercase-input"
-          placeholder="email@example.com"
+          placeholder="Contoh: nama@email.com"
         />
 
         {/* Suggest Box */}
-        {showSuggest && (
-          <ul className="absolute z-50 top-full left-0 w-full bg-white border border-gray-300 rounded-lg shadow">
+        {showSuggest && form.email.includes("@") && (
+          <div className="absolute z-50 top-full left-0 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1">
+            <div className="px-3 py-2 border-b border-gray-200 bg-gray-50">
+              <p className="text-xs text-gray-600 font-medium">Pilih domain:</p>
+            </div>
             {emailDomains
-              .filter((d) => d.includes(form.email.split("@")[1] || ""))
+              .filter((d) => {
+                const currentDomain = form.email.split("@")[1] || "";
+                return d.toLowerCase().includes(currentDomain.toLowerCase());
+              })
               .map((domain, idx) => (
-                <li
+                <div
                   key={idx}
                   onClick={() => applyEmailSuggestion(domain)}
-                  className="px-3 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100"
+                  className="px-3 py-2 text-sm text-gray-700 cursor-pointer hover:bg-amber-50 border-b border-gray-100 last:border-b-0"
                 >
-                  {form.email.split("@")[0]}
-                  {domain}
-                </li>
+                  <div className="flex items-center">
+                    <i className="fas fa-at text-amber-500 mr-2 text-xs"></i>
+                    <span className="font-medium">
+                      {form.email.split("@")[0]}
+                    </span>
+                    <span className="text-amber-600">{domain}</span>
+                  </div>
+                </div>
               ))}
-          </ul>
+          </div>
         )}
       </div>
 
@@ -246,6 +382,7 @@ export default function TabDataPribadi({ form, handleChange }) {
           disabled
           className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm 
           bg-gray-100 text-gray-900 text-sm cursor-not-allowed"
+          placeholder="0"
         />
       </div>
 
@@ -264,6 +401,7 @@ export default function TabDataPribadi({ form, handleChange }) {
           autoComplete="off"
           className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm 
           bg-white text-gray-900 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors"
+          placeholder="Masukkan target poin"
         />
       </div>
     </div>
