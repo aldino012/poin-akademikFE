@@ -12,14 +12,16 @@ export default function TabsBiodata({ student }) {
             <img
               src={
                 student.foto_file_id
-                  ? `${process.env.NEXT_PUBLIC_API_URL}/api/mahasiswa/foto/${
-                      student.foto_file_id
-                    }?t=${student.updated_at || Date.now()}`
+                  ? `/api/proxy/mahasiswa/foto/${student.foto_file_id}?t=${
+                      student.updated_at || Date.now()
+                    }`
                   : `https://ui-avatars.com/api/?name=${encodeURIComponent(
                       student.nama_mhs
                     )}&background=3B82F6&color=fff`
               }
               alt={student.nama_mhs}
+              loading="lazy"
+              decoding="async"
               className="w-32 h-32 rounded-2xl object-cover border-4 border-white shadow-lg"
               onError={(e) => {
                 e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(

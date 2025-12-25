@@ -127,13 +127,15 @@ export default function TableDesktop({
                       student.foto_file_id
                         ? `/api/proxy/mahasiswa/foto/${
                             student.foto_file_id
-                          }?t=${student.updated_at || Date.now()}`
+                          }?t=${student.updated_at || student.id_mhs}`
                         : `https://ui-avatars.com/api/?name=${encodeURIComponent(
                             student.nama_mhs
                           )}`
                     }
                     alt="Foto Mahasiswa"
-                    className="w-12 h-12 object-cover rounded-full"
+                    loading="lazy"
+                    decoding="async"
+                    className="w-12 h-12 object-cover rounded-full bg-gray-200"
                     onError={(e) => {
                       e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
                         student.nama_mhs

@@ -31,6 +31,7 @@ export default function EditMainForm({ isOpen, onClose, student, onSubmit }) {
   const [activeTab, setActiveTab] = useState("data-pribadi");
   const [loading, setLoading] = useState(false);
   const modalRef = useRef(null);
+  const previewBlobRef = useRef(null);
 
   // ================= CLICK OUTSIDE =================
   useEffect(() => {
@@ -85,6 +86,20 @@ export default function EditMainForm({ isOpen, onClose, student, onSubmit }) {
     }
   }, [student, isOpen]);
 
+
+  useEffect(() => {
+    if (!isOpen) {
+      // reset preview saat modal ditutup
+      setPreview(null);
+
+      // bersihkan blob URL kalau ada
+      if (previewBlobRef.current) {
+        URL.revokeObjectURL(previewBlobRef.current);
+        previewBlobRef.current = null;
+      }
+    }
+  }, [isOpen]);
+
   // ================= HANDLE INPUT =================
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -112,8 +127,16 @@ export default function EditMainForm({ isOpen, onClose, student, onSubmit }) {
       foto: file,
     }));
 
+    // 🔥 REVOKE PREVIEW LAMA
+    if (previewBlobRef.current) {
+      URL.revokeObjectURL(previewBlobRef.current);
+      previewBlobRef.current = null;
+    }
+
     if (file) {
-      setPreview(URL.createObjectURL(file));
+      const objectUrl = URL.createObjectURL(file);
+      previewBlobRef.current = objectUrl;
+      setPreview(objectUrl);
     }
   };
 
@@ -170,7 +193,12 @@ export default function EditMainForm({ isOpen, onClose, student, onSubmit }) {
             {/* FOTO */}
             <div className="flex flex-col items-center mb-4">
               <img
-                src={preview}
+                src={
+                  preview ||
+                  `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                    form.nama_mhs || "User"
+                  )}`
+                }
                 alt="Preview Foto"
                 className="w-24 h-24 rounded-full object-cover border-4 border-amber-100 shadow-sm mb-3"
               />
