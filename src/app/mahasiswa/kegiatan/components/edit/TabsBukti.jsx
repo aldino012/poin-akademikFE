@@ -70,18 +70,6 @@ export default function TabsBukti({
           </div>
 
           {/* ===============================
-              PREVIEW BUKTI LAMA (DRIVE)
-             =============================== */}
-          {claim?.bukti_file_id && !form.bukti_kegiatan && (
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-              <h5 className="font-medium text-amber-800 mb-2 flex items-center text-sm">
-                <i className="fas fa-history mr-2"></i>
-                Bukti Saat Ini
-              </h5>
-            </div>
-          )}
-
-          {/* ===============================
               PREVIEW FILE BARU
              =============================== */}
           {form.bukti_kegiatan instanceof File && (
