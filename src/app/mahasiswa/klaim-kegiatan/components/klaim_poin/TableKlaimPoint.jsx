@@ -3,10 +3,10 @@
 import React from "react";
 
 // 🔥 LOGIC
-import useKlaimKegiatan from "./klaim_poin/hooks/useKlaimKegiatan";
+import useKlaimKegiatan from "./hooks/useKlaimKegiatan";
 
 // 🎨 VIEW
-import KlaimViews from "./klaim_poin/KlaimViews";
+import KlaimViews from "./KlaimViews";
 
 export default function KegiatanMhs() {
   // ==========================

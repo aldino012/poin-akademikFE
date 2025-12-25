@@ -75,47 +75,47 @@ export default function ModalImportExcel({
     }
   };
 
-  const handleImport = async () => {
-    if (!file) {
-      addToast({
-        message: "Silakan pilih file Excel terlebih dahulu",
-        type: "error",
-      });
-      return;
-    }
+const handleImport = async () => {
+  if (!file) {
+    addToast({
+      message: "Silakan pilih file Excel terlebih dahulu",
+      type: "error",
+    });
+    return;
+  }
 
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const formData = new FormData();
-      formData.append("file", file);
+    const formData = new FormData();
+    formData.append("file", file);
 
-      // 🔥 CUKUP INI SAJA
-      const res = await api.post(importUrl, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+    // 🔥 CUKUP INI SAJA
+    const res = await api.post(importUrl, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
 
-      addToast({
-        message: res.data.message || "Import data berhasil!",
-        type: "success",
-      });
+    addToast({
+      message: res.data.message || "Import data berhasil!",
+      type: "success",
+    });
 
-      onImported();
-      onClose();
-    } catch (error) {
-      console.error("Import error:", error);
-      addToast({
-        message:
-          error.response?.data?.message ||
-          "Terjadi kesalahan saat mengimport data",
-        type: "error",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    onImported();
+    onClose();
+  } catch (error) {
+    console.error("Import error:", error);
+    addToast({
+      message:
+        error.response?.data?.message ||
+        "Terjadi kesalahan saat mengimport data",
+      type: "error",
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleRemoveFile = () => {
     setFile(null);

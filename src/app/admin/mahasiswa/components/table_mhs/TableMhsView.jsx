@@ -10,7 +10,7 @@ import TablePagination from "@/components/Pagianation";
 import DetailModal from "../detail/DetailParent";
 import ModalTambahMhs from "../tambah/TambahMainForm";
 import ModalEdit from "../edit/EditMainForm";
-import ModalExcel from "@/components/MasterComponent/ModalExcel";
+import ModalExcel from "@/components/ModalExcel";
 
 export default function TableMhsView({
   // data

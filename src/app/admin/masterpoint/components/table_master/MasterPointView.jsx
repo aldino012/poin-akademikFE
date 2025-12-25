@@ -10,7 +10,7 @@ import InfoBobotPoin from "./InfoBobotPoint";
 
 import ModalTambahPoin from "../tambah/TambahPoint";
 import ModalEditPoin from "../edit/EditPoint";
-import ModalExcel from "../modal_excel/ModalExcel";
+import ModalExcel from "@/components/ModalExcel";
 
 export default function MasterPointView({
   // role
