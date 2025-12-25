@@ -291,7 +291,7 @@ export default function PieChartKegiatan() {
                 fill="#8884d8"
                 dataKey="value"
                 label={renderCustomizedLabel}
-                isAnimationActive={true}
+                isAnimationActive={false}
                 animationDuration={1200}
                 animationEasing="ease-out"
                 startAngle={90}
