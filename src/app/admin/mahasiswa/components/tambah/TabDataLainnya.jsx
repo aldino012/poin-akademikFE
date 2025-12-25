@@ -23,6 +23,48 @@ export default function TabDataLainnya({
     setAsalSekolahList(asalSekolahData.items || []);
   }, []);
 
+  // Validasi Tahun Lulus (hanya angka, maksimal 4 digit)
+  const validateTahunLulus = (e) => {
+    const value = e.target.value;
+
+    // Hanya angka
+    const numericValue = value.replace(/\D/g, "");
+
+    // Batasi maksimal 4 digit (tahun)
+    const limitedValue = numericValue.slice(0, 4);
+
+    // Update form
+    handleChange({
+      target: { name: "thn_lulus", value: limitedValue },
+    });
+  };
+
+  // Validasi Telepon Saya (hanya angka)
+  const validateTeleponSaya = (e) => {
+    const value = e.target.value;
+
+    // Hanya angka
+    const numericValue = value.replace(/\D/g, "");
+
+    // Update form
+    handleChange({
+      target: { name: "tlp_saya", value: numericValue },
+    });
+  };
+
+  // Validasi Telepon Rumah (hanya angka)
+  const validateTeleponRumah = (e) => {
+    const value = e.target.value;
+
+    // Hanya angka
+    const numericValue = value.replace(/\D/g, "");
+
+    // Update form
+    handleChange({
+      target: { name: "tlp_rumah", value: numericValue },
+    });
+  };
+
   const tambahPekerjaan = () => {
     if (!newPekerjaan.trim()) return;
 
@@ -65,7 +107,7 @@ export default function TabDataLainnya({
               className={`
                 w-full px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
                 ${
-                  errors.angkatan
+                  errors.pekerjaan
                     ? "border border-red-500 focus:ring-red-500"
                     : "border border-gray-300 focus:ring-blue-500"
                 }
@@ -84,7 +126,7 @@ export default function TabDataLainnya({
             <button
               type="button"
               onClick={() => setShowPekerjaanModal(true)}
-              className="px-3 py-2 bg-blue-600 text-white rounded-lg shadow text-sm hover:bg-blue-700"
+              className="px-3 py-2 bg-blue-600 text-white rounded-lg shadow text-sm hover:bg-blue-700 transition-colors"
             >
               +
             </button>
@@ -112,7 +154,7 @@ export default function TabDataLainnya({
               className={`
                 w-full px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
                 ${
-                  errors.angkatan
+                  errors.asal_sekolah
                     ? "border border-red-500 focus:ring-red-500"
                     : "border border-gray-300 focus:ring-blue-500"
                 }
@@ -131,7 +173,7 @@ export default function TabDataLainnya({
             <button
               type="button"
               onClick={() => setShowSekolahModal(true)}
-              className="px-3 py-2 bg-blue-600 text-white rounded-lg shadow text-sm hover:bg-blue-700"
+              className="px-3 py-2 bg-blue-600 text-white rounded-lg shadow text-sm hover:bg-blue-700 transition-colors"
             >
               +
             </button>
@@ -154,26 +196,38 @@ export default function TabDataLainnya({
             type="text"
             name="thn_lulus"
             value={form.thn_lulus}
-            onChange={handleChange}
-            placeholder="2021"
+            onChange={validateTahunLulus}
+            placeholder="Contoh: 2021"
             autoComplete="off"
+            maxLength="4"
             className={`
                 w-full px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
                 ${
-                  errors.angkatan
+                  errors.thn_lulus
                     ? "border border-red-500 focus:ring-red-500"
                     : "border border-gray-300 focus:ring-blue-500"
                 }
-                transition-colors uppercase-input
+                transition-colors
             `}
-            style={{ textTransform: "uppercase" }}
           />
-          {errors.thn_lulus && (
-            <p className="text-xs text-red-600 mt-1">
-              <i className="fas fa-exclamation-circle mr-1"></i>
-              {errors.thn_lulus}
-            </p>
-          )}
+          <div className="flex justify-between mt-1">
+            {errors.thn_lulus ? (
+              <p className="text-xs text-red-600">
+                <i className="fas fa-exclamation-circle mr-1"></i>
+                {errors.thn_lulus}
+              </p>
+            ) : (
+              <p className="text-xs text-gray-500">
+                <i className="fas fa-info-circle mr-1"></i>
+                Hanya angka (4 digit)
+              </p>
+            )}
+            {form.thn_lulus && (
+              <p className="text-xs text-gray-500">
+                {form.thn_lulus.length}/4 digit
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Jenis Kelamin */}
@@ -189,11 +243,11 @@ export default function TabDataLainnya({
             className={`
                 w-full px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
                 ${
-                  errors.angkatan
+                  errors.jenis_kelamin
                     ? "border border-red-500 focus:ring-red-500"
                     : "border border-gray-300 focus:ring-blue-500"
                 }
-                transition-colors uppercase-input
+                transition-colors
             `}
           >
             <option value="">-- Pilih --</option>
@@ -214,29 +268,46 @@ export default function TabDataLainnya({
             <i className="fas fa-mobile-alt mr-1 text-blue-600"></i>
             Telepon Saya
           </label>
-          <input
-            type="text"
-            name="tlp_saya"
-            value={form.tlp_saya}
-            onChange={handleChange}
-            autoComplete="off"
-            className={`
-                w-full px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
-                ${
-                  errors.angkatan
-                    ? "border border-red-500 focus:ring-red-500"
-                    : "border border-gray-300 focus:ring-blue-500"
-                }
-                transition-colors uppercase-input
-            `}
-            style={{ textTransform: "uppercase" }}
-          />
-          {errors.tlp_saya && (
-            <p className="text-xs text-red-600 mt-1">
-              <i className="fas fa-exclamation-circle mr-1"></i>
-              {errors.tlp_saya}
-            </p>
-          )}
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <span className="text-gray-500 text-sm">+62</span>
+            </div>
+            <input
+              type="text"
+              name="tlp_saya"
+              value={form.tlp_saya}
+              onChange={validateTeleponSaya}
+              placeholder="Contoh: 81234567890"
+              autoComplete="off"
+              className={`
+                  w-full pl-12 px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
+                  ${
+                    errors.tlp_saya
+                      ? "border border-red-500 focus:ring-red-500"
+                      : "border border-gray-300 focus:ring-blue-500"
+                  }
+                  transition-colors
+              `}
+            />
+          </div>
+          <div className="flex justify-between mt-1">
+            {errors.tlp_saya ? (
+              <p className="text-xs text-red-600">
+                <i className="fas fa-exclamation-circle mr-1"></i>
+                {errors.tlp_saya}
+              </p>
+            ) : (
+              <p className="text-xs text-gray-500">
+                <i className="fas fa-info-circle mr-1"></i>
+                Hanya angka (maksimal 15 digit)
+              </p>
+            )}
+            {form.tlp_saya && (
+              <p className="text-xs text-gray-500">
+                {form.tlp_saya.length} digit
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Telepon Rumah */}
@@ -245,29 +316,46 @@ export default function TabDataLainnya({
             <i className="fas fa-phone mr-1 text-blue-600"></i>
             Telepon Rumah
           </label>
-          <input
-            type="text"
-            name="tlp_rumah"
-            value={form.tlp_rumah}
-            onChange={handleChange}
-            autoComplete="off"
-            className={`
-                w-full px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
-                ${
-                  errors.angkatan
-                    ? "border border-red-500 focus:ring-red-500"
-                    : "border border-gray-300 focus:ring-blue-500"
-                }
-                transition-colors uppercase-input
-            `}
-            style={{ textTransform: "uppercase" }}
-          />
-          {errors.tlp_rumah && (
-            <p className="text-xs text-red-600 mt-1">
-              <i className="fas fa-exclamation-circle mr-1"></i>
-              {errors.tlp_rumah}
-            </p>
-          )}
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <span className="text-gray-500 text-sm">+62</span>
+            </div>
+            <input
+              type="text"
+              name="tlp_rumah"
+              value={form.tlp_rumah}
+              onChange={validateTeleponRumah}
+              placeholder="Contoh: 0211234567"
+              autoComplete="off"
+              className={`
+                  w-full pl-12 px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
+                  ${
+                    errors.tlp_rumah
+                      ? "border border-red-500 focus:ring-red-500"
+                      : "border border-gray-300 focus:ring-blue-500"
+                  }
+                  transition-colors
+              `}
+            />
+          </div>
+          <div className="flex justify-between mt-1">
+            {errors.tlp_rumah ? (
+              <p className="text-xs text-red-600">
+                <i className="fas fa-exclamation-circle mr-1"></i>
+                {errors.tlp_rumah}
+              </p>
+            ) : (
+              <p className="text-xs text-gray-500">
+                <i className="fas fa-info-circle mr-1"></i>
+                Hanya angka (maksimal 15 digit)
+              </p>
+            )}
+            {form.tlp_rumah && (
+              <p className="text-xs text-gray-500">
+                {form.tlp_rumah.length} digit
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Alamat */}
@@ -281,11 +369,12 @@ export default function TabDataLainnya({
             value={form.alamat}
             onChange={handleChange}
             rows="3"
+            placeholder="Contoh: JL. SUDIRMAN NO. 123, KELURAHAN MENTENG, KECAMATAN MENTENG, JAKARTA PUSAT"
             autoComplete="off"
             className={`
                 w-full px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
                 ${
-                  errors.angkatan
+                  errors.alamat
                     ? "border border-red-500 focus:ring-red-500"
                     : "border border-gray-300 focus:ring-blue-500"
                 }
@@ -293,12 +382,17 @@ export default function TabDataLainnya({
             `}
             style={{ textTransform: "uppercase" }}
           ></textarea>
-          {errors.alamat && (
-            <p className="text-xs text-red-600 mt-1">
-              <i className="fas fa-exclamation-circle mr-1"></i>
-              {errors.alamat}
+          <div className="flex justify-between mt-1">
+            {errors.alamat && (
+              <p className="text-xs text-red-600">
+                <i className="fas fa-exclamation-circle mr-1"></i>
+                {errors.alamat}
+              </p>
+            )}
+            <p className="text-xs text-gray-500">
+              {form.alamat ? form.alamat.length : 0} karakter
             </p>
-          )}
+          </div>
         </div>
       </div>
 
@@ -312,7 +406,7 @@ export default function TabDataLainnya({
           setValue={setNewPekerjaan}
           placeholder="Contoh: BARISTA"
           onSubmit={tambahPekerjaan}
-          setIsChildModalOpen={setIsChildModalOpen} // 🔥 WAJIB
+          setIsChildModalOpen={setIsChildModalOpen}
         />
       )}
 
@@ -326,7 +420,7 @@ export default function TabDataLainnya({
           setValue={setNewSekolah}
           placeholder="Contoh: SMKN 1 BANYUWANGI"
           onSubmit={tambahSekolah}
-          setIsChildModalOpen={setIsChildModalOpen} // 🔥 WAJIB
+          setIsChildModalOpen={setIsChildModalOpen}
         />
       )}
     </>
