@@ -10,33 +10,64 @@ import api from "@/app/api/axios";
 export default function AdminPage() {
   const [loading, setLoading] = useState(true);
 
-  // 🔥 State untuk data dashboard
+  // ================================
+  // STATE DASHBOARD
+  // ================================
   const [stats, setStats] = useState({
     totalMahasiswa: 0,
     totalKegiatan: 0,
     pendingKegiatan: 0,
   });
 
+  const [grafikAngkatan, setGrafikAngkatan] = useState([]);
+
+  // ================================
+  // FETCH DASHBOARD DATA
+  // ================================
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
         // ================================
-        // ✅ Ambil data mahasiswa (BENAR)
+        // ✅ FETCH MAHASISWA (1x SAJA)
         // ================================
         const resMhs = await api.get("/mahasiswa");
-        const totalMahasiswa = resMhs.data.length;
+        const mahasiswa = resMhs.data || [];
+
+        const totalMahasiswa = mahasiswa.length;
 
         // ================================
-        // ✅ Ambil data kegiatan (BENAR)
+        // 🔥 HITUNG GRAFIK ANGKATAN
+        // ================================
+        const angkatanMap = {};
+
+        mahasiswa.forEach((mhs) => {
+          const angkatan = mhs.angkatan || "Tidak diketahui";
+          angkatanMap[angkatan] = (angkatanMap[angkatan] || 0) + 1;
+        });
+
+        const grafik = Object.entries(angkatanMap)
+          .map(([angkatan, jumlah]) => ({
+            angkatan,
+            jumlah,
+          }))
+          .sort((a, b) => Number(a.angkatan) - Number(b.angkatan));
+
+        setGrafikAngkatan(grafik);
+
+        // ================================
+        // ✅ FETCH KEGIATAN
         // ================================
         const resKegiatan = await api.get("/klaim");
-        const kegiatan = resKegiatan.data.data || [];
+        const kegiatan = resKegiatan.data?.data || [];
 
         const totalKegiatan = kegiatan.length;
         const pendingKegiatan = kegiatan.filter(
           (item) => item.status === "pending"
         ).length;
 
+        // ================================
+        // SET STATS
+        // ================================
         setStats({
           totalMahasiswa,
           totalKegiatan,
@@ -45,13 +76,17 @@ export default function AdminPage() {
       } catch (err) {
         console.error("Gagal fetch dashboard admin:", err);
       } finally {
-        setTimeout(() => setLoading(false), 400);
+        // sedikit delay agar transisi halus
+        setTimeout(() => setLoading(false), 300);
       }
     };
 
     fetchDashboard();
   }, []);
 
+  // ================================
+  // RENDER
+  // ================================
   return (
     <AnimatePresence mode="wait">
       {loading ? (
@@ -67,16 +102,21 @@ export default function AdminPage() {
       ) : (
         <motion.div
           key="dashboard"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.6, ease: "easeInOut" }}
+          exit={{ opacity: 0, y: -16 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
           className="space-y-6"
         >
-          {/* 🔥 Kirim data dashboard ke Cards */}
+          {/* ================================
+              CARDS STATISTIK
+          ================================ */}
           <Cards data={stats} />
 
-          <BarChartAngkatan />
+          {/* ================================
+              GRAFIK
+          ================================ */}
+          <BarChartAngkatan data={grafikAngkatan} />
           <PieChartKegiatan />
         </motion.div>
       )}
