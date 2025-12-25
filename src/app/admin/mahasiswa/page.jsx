@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import TableMhs from "./components/TableMhs";
+import TableMhs from "./components/table_mhs/TableMhs";
 
 export default function MahasiswaPage() {
   return (
