@@ -50,16 +50,23 @@ export default function TabsDetail({
                 }
                 required
                 className="
-                  w-full px-3 py-2.5 pr-10
-                  border border-gray-300 rounded-lg shadow-sm
-                  bg-white text-gray-900 text-sm
-                  focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                  transition-colors
-                  [color-scheme:light]
-                "
+        w-full px-3 py-2.5 pr-10
+        border border-gray-300 rounded-lg shadow-sm
+        bg-white text-gray-900 text-sm
+        focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+        transition-colors
+
+        [color-scheme:light]
+
+        /* SEMBUNYIKAN ICON HITAM TANPA MEMATIKAN FUNGSI */
+        [&::-webkit-calendar-picker-indicator]:opacity-0
+        [&::-webkit-calendar-picker-indicator]:absolute
+        [&::-webkit-calendar-picker-indicator]:right-3
+        [&::-webkit-calendar-picker-indicator]:cursor-pointer
+      "
               />
 
-              {/* ICON KALENDER MANUAL */}
+              {/* ICON VISUAL (FA) */}
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                 <i className="fas fa-calendar-alt text-gray-700"></i>
               </div>
