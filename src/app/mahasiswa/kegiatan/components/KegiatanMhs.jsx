@@ -177,16 +177,16 @@ export default function KegiatanMhs() {
     <div className="p-2 md:p-3">
       {/* === TOOLBAR FIXED WIDTH === */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4 md:mb-5">
-        {/* Search — UKURAN LEBIH FLEKSIBEL SESUAI TOMBOL */}
-        <div className="w-full md:w-auto md:flex-1 max-w-[400px]">
+        {/* Search — UKURAN FLEKSIBEL SESUAI TOMBOL */}
+        <div className="w-full md:w-auto md:flex-1 max-w-[350px]">
           <div className="relative">
             <input
               type="text"
-              placeholder="Cari kegiatan berdasarkan nama acara..."
+              placeholder="Cari kegiatan..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className={`
-                pl-9 pr-4 py-3
+                pl-9 pr-4 py-2.5
                 border border-gray-300 rounded-lg
                 text-sm w-full
                 focus:ring-2 focus:ring-blue-500 focus:border-blue-500
@@ -209,7 +209,7 @@ export default function KegiatanMhs() {
           </div>
         </div>
 
-        {/* Tombol Klaim Poin - LEBIH PANJANG (hingga 3 baris) */}
+        {/* Tombol Klaim Poin - MEMANJANG HORIZONTAL */}
         <div className="w-full md:w-auto">
           <button
             onClick={openPoinModal}
@@ -217,19 +217,18 @@ export default function KegiatanMhs() {
               relative
               bg-gradient-to-r from-green-600 to-green-500
               text-white
-              px-6 py-3.5 rounded-lg
+              px-7 py-3 rounded-lg
               shadow-lg hover:shadow-xl
               hover:from-green-700 hover:to-green-600
               transition-all duration-300
               w-full md:w-auto
-              min-w-[250px]
-              max-w-[300px]
+              min-w-[280px]
+              max-w-[320px]
               flex items-center justify-center
               overflow-hidden
               ${buttonAnimation ? "scale-[0.98]" : "scale-100"}
               group
-              h-full
-              min-h-[70px]
+              h-auto
             `}
           >
             {/* Shining effect - garis putih berjalan */}
@@ -240,18 +239,18 @@ export default function KegiatanMhs() {
             {/* Subtle shimmer background */}
             <div className="absolute inset-0 bg-gradient-to-r from-green-500 via-green-400 to-green-500 opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>
 
-            {/* Konten tombol - icon bintang dan teks dalam layout vertikal/panjang */}
-            <div className="relative flex flex-col items-center justify-center gap-1.5 w-full">
-              <div className="flex items-center gap-2">
-                <div className="relative">
-                  <i className="fas fa-star text-yellow-300 text-lg animate-pulse-slow"></i>
-                </div>
-                <span className="font-semibold text-base tracking-wide">
+            {/* Konten tombol - ICON + TEKS DENGAN SPASI LEBIH */}
+            <div className="relative flex items-center justify-center gap-3 w-full">
+              <div className="relative">
+                <i className="fas fa-star text-yellow-300 text-lg animate-pulse-slow"></i>
+              </div>
+              <div className="flex flex-col items-start">
+                <span className="font-semibold text-sm tracking-wide">
                   Klaim Poin Kegiatan
                 </span>
-              </div>
-              <div className="text-xs text-green-100 font-medium opacity-90 text-center px-2">
-                Ajukan poin untuk kegiatan yang telah Anda ikuti
+                <span className="text-xs text-green-100 font-medium opacity-90">
+                  Ajukan kegiatan baru
+                </span>
               </div>
             </div>
 
