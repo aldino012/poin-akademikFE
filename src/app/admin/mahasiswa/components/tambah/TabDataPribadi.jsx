@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export default function TabDataPribadi({ form, handleChange, errors = {} }) {
   const [suggestions, setSuggestions] = useState([]);
   const [showSug, setShowSug] = useState(false);
+  const [emailSuggestions, setEmailSuggestions] = useState([]);
 
   // Domain yang kamu inginkan
   const emailDomains = [
@@ -16,15 +17,42 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
     "@live.com",
   ];
 
-  // Auto-suggest email
+  // Validasi NIM (8-12 digit)
+  const validateNIM = (e) => {
+    const value = e.target.value;
+    // Hanya angka
+    const numericValue = value.replace(/[^0-9]/g, "");
+
+    // Batasi maksimal 12 digit
+    const limitedValue = numericValue.slice(0, 12);
+
+    handleChange({
+      target: { name: "nim", value: limitedValue },
+    });
+  };
+
+  // Validasi Angkatan (hanya angka tahun)
+  const validateAngkatan = (e) => {
+    const value = e.target.value;
+    // Hanya angka
+    const numericValue = value.replace(/[^0-9]/g, "");
+
+    // Batasi maksimal 4 digit (untuk tahun)
+    const limitedValue = numericValue.slice(0, 4);
+
+    handleChange({
+      target: { name: "angkatan", value: limitedValue },
+    });
+  };
+
+  // Auto-suggest email di dalam input
   const handleEmailChange = (e) => {
     const value = e.target.value;
-
-    handleChange(e); // panggil handler asli
+    handleChange(e);
 
     // Jika belum ada "@", jangan tampilkan sugesti
     if (!value.includes("@")) {
-      setShowSug(false);
+      setEmailSuggestions([]);
       return;
     }
 
@@ -32,8 +60,7 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
 
     // Jika user hanya mengetik "@"
     if (value.endsWith("@")) {
-      setSuggestions(emailDomains);
-      setShowSug(true);
+      setEmailSuggestions(emailDomains);
       return;
     }
 
@@ -42,8 +69,7 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
       d.replace("@", "").toLowerCase().startsWith(domainPart.toLowerCase())
     );
 
-    setSuggestions(filtered);
-    setShowSug(filtered.length > 0);
+    setEmailSuggestions(filtered);
   };
 
   const applySuggestion = (domain) => {
@@ -52,7 +78,16 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
     handleChange({
       target: { name: "email", value: newEmail },
     });
-    setShowSug(false);
+    setEmailSuggestions([]);
+  };
+
+  // Format tanggal untuk placeholder
+  const getTodayDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   };
 
   return (
@@ -67,20 +102,26 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
           type="text"
           name="nim"
           value={form.nim}
-          onChange={handleChange}
+          onChange={validateNIM}
           className={`
-                w-full px-3 py-2 rounded-lg shadow-sm text-sm  bg-white text-gray-900
+                w-full px-3 py-2 rounded-lg shadow-sm text-sm bg-white text-gray-900
                 ${
                   errors.nim
                     ? "border border-red-500 focus:ring-red-500"
                     : "border border-gray-300 focus:ring-blue-500"
                 }
             `}
+          placeholder="Contoh: 12345678"
         />
-        {errors.nim && (
+        {errors.nim ? (
           <p className="text-xs text-red-600 mt-1">
             <i className="fas fa-exclamation-circle mr-1"></i>
             {errors.nim}
+          </p>
+        ) : (
+          <p className="text-xs text-gray-500 mt-1">
+            <i className="fas fa-info-circle mr-1"></i>
+            Masukkan 8-12 digit NIM
           </p>
         )}
       </div>
@@ -106,7 +147,7 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
     }
     transition-colors uppercase-input
   `}
-          placeholder="Masukkan nama lengkap"
+          placeholder="Contoh: ANDI PRASETYA"
           style={{ textTransform: "uppercase" }}
         />
         {errors.nama_mhs && (
@@ -137,6 +178,7 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
                 transition-colors
             `}
         >
+          <option value="">Pilih Program Studi</option>
           <option value="S1">S1</option>
           <option value="D3">D3</option>
         </select>
@@ -158,7 +200,7 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
           type="text"
           name="angkatan"
           value={form.angkatan}
-          onChange={handleChange}
+          onChange={validateAngkatan}
           className={`
                 w-full px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
                 ${
@@ -168,11 +210,18 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
                 }
                 transition-colors uppercase-input
             `}
+          placeholder="Contoh: 2023"
+          maxLength={4}
         />
-        {errors.angkatan && (
+        {errors.angkatan ? (
           <p className="text-xs text-red-600 mt-1">
             <i className="fas fa-exclamation-circle mr-1"></i>
             {errors.angkatan}
+          </p>
+        ) : (
+          <p className="text-xs text-gray-500 mt-1">
+            <i className="fas fa-info-circle mr-1"></i>
+            Masukkan tahun angkatan (4 digit)
           </p>
         )}
       </div>
@@ -197,6 +246,8 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
                 }
                 transition-colors uppercase-input
             `}
+          placeholder="Contoh: JAKARTA"
+          style={{ textTransform: "uppercase" }}
         />
         {errors.tempat_lahir && (
           <p className="text-xs text-red-600 mt-1">
@@ -226,7 +277,13 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
       }
       transition-colors
     `}
+          max={getTodayDate()}
+          style={{ color: "#000000" }} // Warna hitam untuk teks
         />
+        <p className="text-xs text-gray-500 mt-1">
+          <i className="fas fa-info-circle mr-1"></i>
+          Format: DD/MM/YYYY
+        </p>
         {errors.tgl_lahir && (
           <p className="text-xs text-red-600 mt-1">
             <i className="fas fa-exclamation-circle mr-1"></i>
@@ -241,40 +298,48 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
           <i className="fas fa-envelope mr-1 text-blue-600"></i>
           Email
         </label>
-        <input
-          type="email"
-          name="email"
-          value={form.email}
-          onChange={handleEmailChange}
-          autoComplete="off"
-          className={`
-                w-full px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
-                ${
-                  errors.angkatan
-                    ? "border border-red-500 focus:ring-red-500"
-                    : "border border-gray-300 focus:ring-blue-500"
-                }
-                transition-colors uppercase-input
+        <div className="relative">
+          <input
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleEmailChange}
+            autoComplete="off"
+            className={`
+              w-full px-3 py-2 rounded-lg shadow-sm bg-white text-gray-900 text-sm
+              ${
+                errors.email
+                  ? "border border-red-500 focus:ring-red-500"
+                  : "border border-gray-300 focus:ring-blue-500"
+              }
+              transition-colors
             `}
-          placeholder="email@example.com"
-        />
+            placeholder="Contoh: nama@gmail.com"
+          />
 
-        {/* Dropdown Suggestion */}
-        {showSug && (
-          <ul className="absolute z-50 bg-white w-full border border-gray-300 rounded-lg shadow-md mt-1 text-sm">
-            {suggestions.map((domain, idx) => (
-              <li
-                key={idx}
-                className="px-3 py-2 hover:bg-blue-50 cursor-pointer flex items-center"
-                onClick={() => applySuggestion(domain)}
-              >
-                <i className="fas fa-at text-blue-600 mr-2"></i>
-                {form.email.split("@")[0]}
-                {domain}
-              </li>
-            ))}
-          </ul>
-        )}
+          {/* Inline suggestions container */}
+          {emailSuggestions.length > 0 && (
+            <div className="absolute inset-x-0 top-full mt-1 bg-white border border-gray-300 rounded-lg shadow-md z-10 max-h-40 overflow-y-auto">
+              {emailSuggestions.map((domain, idx) => (
+                <div
+                  key={idx}
+                  className="px-3 py-2 hover:bg-blue-50 cursor-pointer flex items-center text-sm text-gray-700"
+                  onClick={() => applySuggestion(domain)}
+                >
+                  <i className="fas fa-at text-blue-600 mr-2 text-xs"></i>
+                  <span className="text-gray-600">
+                    {form.email.split("@")[0] || "nama"}
+                  </span>
+                  <span className="text-blue-600 font-medium">{domain}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <p className="text-xs text-gray-500 mt-1">
+          <i className="fas fa-info-circle mr-1"></i>
+          Email yang valid diperlukan untuk konfirmasi
+        </p>
         {errors.email && (
           <p className="text-xs text-red-600 mt-1">
             <i className="fas fa-exclamation-circle mr-1"></i>
@@ -294,15 +359,25 @@ export default function TabDataPribadi({ form, handleChange, errors = {} }) {
           name="foto"
           onChange={handleChange}
           autoComplete="off"
-          className={`w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors
+          className={`w-full text-sm text-gray-900 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors
             ${
-              errors.angkatan
+              errors.foto
                 ? "border border-red-500 focus:ring-red-500"
                 : "border border-gray-300 focus:ring-blue-500"
             }
             `}
           accept="image/*"
         />
+        <div className="mt-2 text-xs text-gray-600">
+          <p className="flex items-center">
+            <i className="fas fa-info-circle mr-2 text-blue-600"></i>
+            Format: JPG, PNG | Maksimal: 1MB
+          </p>
+          <p className="flex items-center mt-1">
+            <i className="fas fa-image mr-2 text-blue-600"></i>
+            Rekomendasi: Foto formal dengan background polos
+          </p>
+        </div>
         {errors.foto && (
           <p className="text-xs text-red-600 mt-1">
             <i className="fas fa-exclamation-circle mr-1"></i>
