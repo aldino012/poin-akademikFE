@@ -18,6 +18,7 @@ export default function KlaimParent({ isOpen, onClose }) {
   const [masterPoin, setMasterPoin] = useState([]);
   const [activeTab, setActiveTab] = useState("informasi-dasar");
   const [isFormValid, setIsFormValid] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     nim: "",
@@ -152,51 +153,50 @@ export default function KlaimParent({ isOpen, onClose }) {
 
   /* ================= 🔴 WAJIB ADA ================= */
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!isFormValid) {
-    addToast({
-      message: "Lengkapi semua data dan upload bukti!",
-      type: "error",
-    });
-    return;
-  }
+    if (!isFormValid || submitting) return;
 
-  try {
-    const fd = new FormData();
+    try {
+      setSubmitting(true);
 
-    fd.append("masterpoin_id", formData.masterpoin_id);
-    fd.append("periode_pengajuan", formData.periode_pengajuan);
-    fd.append("tanggal_pengajuan", formData.tanggal_pengajuan);
-    fd.append("rincian_acara", formData.rincian_acara);
-    fd.append("tingkat", formData.tingkat);
-    fd.append("tempat", formData.tempat);
-    fd.append("tanggal_pelaksanaan", formData.tanggal_pelaksanaan);
-    fd.append("mentor", formData.mentor);
-    fd.append("narasumber", formData.narasumber);
-    fd.append("bukti_kegiatan", formData.bukti_kegiatan);
+      addToast({
+        message: "Mengunggah bukti dan mengajukan klaim...",
+        type: "info",
+      });
 
-    const res = await api.post("/klaim", fd, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+      const fd = new FormData();
 
-    addToast({
-      message: "Klaim poin berhasil diajukan",
-      type: "success",
-    });
+      fd.append("masterpoin_id", formData.masterpoin_id);
+      fd.append("periode_pengajuan", formData.periode_pengajuan);
+      fd.append("tanggal_pengajuan", formData.tanggal_pengajuan);
+      fd.append("rincian_acara", formData.rincian_acara);
+      fd.append("tingkat", formData.tingkat);
+      fd.append("tempat", formData.tempat);
+      fd.append("tanggal_pelaksanaan", formData.tanggal_pelaksanaan);
+      fd.append("mentor", formData.mentor);
+      fd.append("narasumber", formData.narasumber);
+      fd.append("bukti_kegiatan", formData.bukti_kegiatan);
 
-    onClose(); // tutup modal
-  } catch (err) {
-    console.error("ERR SUBMIT:", err);
+      await api.post("/klaim", fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
-    addToast({
-      message:
-        err.response?.data?.message ||
-        "Gagal mengajukan klaim poin",
-      type: "error",
-    });
-  }
-};
+      addToast({
+        message: "Klaim poin berhasil diajukan",
+        type: "success",
+      });
+
+      onClose();
+    } catch (err) {
+      addToast({
+        message: err.response?.data?.message || "Gagal mengajukan klaim poin",
+        type: "error",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
 
   if (!isOpen) return null;
@@ -296,15 +296,24 @@ export default function KlaimParent({ isOpen, onClose }) {
 
               <button
                 type="submit"
-                disabled={!isFormValid}
+                disabled={!isFormValid || submitting}
                 className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center ${
-                  isFormValid
-                    ? "bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800 cursor-pointer"
+                  isFormValid && !submitting
+                    ? "bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 }`}
               >
-                <i className="fas fa-paper-plane mr-2"></i>
-                Ajukan Klaim
+                {submitting ? (
+                  <>
+                    <i className="fas fa-spinner fa-spin mr-2"></i>
+                    Mengajukan...
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-paper-plane mr-2"></i>
+                    Ajukan Klaim
+                  </>
+                )}
               </button>
             </div>
           </div>
