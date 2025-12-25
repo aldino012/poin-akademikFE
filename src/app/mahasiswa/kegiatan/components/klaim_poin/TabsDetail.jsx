@@ -35,20 +35,36 @@ export default function TabsDetail({
             </p>
           </div>
 
-          {/* Tanggal Pelaksanaan (HTML Date Picker) */}
-          <div>
+          {/* ✅ Tanggal Pelaksanaan (ICON JELAS & KONSISTEN) */}
+          <div className="relative">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Tanggal Pelaksanaan
             </label>
-            <input
-              type="date"
-              value={formData.tanggal_pelaksanaan || ""}
-              onChange={(e) =>
-                handleDateChange(e.target.value, "tanggal_pelaksanaan")
-              }
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-            />
+
+            <div className="relative">
+              <input
+                type="date"
+                value={formData.tanggal_pelaksanaan || ""}
+                onChange={(e) =>
+                  handleDateChange(e.target.value, "tanggal_pelaksanaan")
+                }
+                required
+                className="
+                  w-full px-3 py-2.5 pr-10
+                  border border-gray-300 rounded-lg shadow-sm
+                  bg-white text-gray-900 text-sm
+                  focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                  transition-colors
+                  [color-scheme:light]
+                "
+              />
+
+              {/* ICON KALENDER MANUAL */}
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <i className="fas fa-calendar-alt text-gray-700"></i>
+              </div>
+            </div>
+
             <p className="text-xs text-gray-500 mt-1">
               Pilih tanggal pelaksanaan kegiatan
             </p>
@@ -64,7 +80,6 @@ export default function TabsDetail({
         </h4>
 
         <div className="space-y-4">
-          {/* Tempat */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Tempat
@@ -79,7 +94,6 @@ export default function TabsDetail({
             />
           </div>
 
-          {/* Tingkat */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Tingkat
@@ -99,7 +113,6 @@ export default function TabsDetail({
             </select>
           </div>
 
-          {/* Mentor */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Mentor
@@ -113,7 +126,6 @@ export default function TabsDetail({
             />
           </div>
 
-          {/* Narasumber */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Narasumber
