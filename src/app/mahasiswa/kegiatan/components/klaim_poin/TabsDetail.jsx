@@ -2,8 +2,6 @@
 
 import React from "react";
 import PropTypes from "prop-types";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 
 export default function TabsDetail({
   formData,
@@ -37,31 +35,20 @@ export default function TabsDetail({
             </p>
           </div>
 
-          {/* Tanggal Pelaksanaan */}
+          {/* Tanggal Pelaksanaan (HTML Date Picker) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Tanggal Pelaksanaan
             </label>
-
-            <DatePicker
-              selected={
-                formData.tanggal_pelaksanaan
-                  ? new Date(formData.tanggal_pelaksanaan)
-                  : null
+            <input
+              type="date"
+              value={formData.tanggal_pelaksanaan || ""}
+              onChange={(e) =>
+                handleDateChange(e.target.value, "tanggal_pelaksanaan")
               }
-              onChange={(date) => handleDateChange(date, "tanggal_pelaksanaan")}
-              dateFormat="yyyy-MM-dd"
-              showMonthDropdown
-              showYearDropdown
-              dropdownMode="select"
-              showIcon
-              placeholderText="Pilih tanggal pelaksanaan"
               className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              calendarIconClassname="text-gray-500"
-              popperClassName="z-50"
               required
             />
-
             <p className="text-xs text-gray-500 mt-1">
               Pilih tanggal pelaksanaan kegiatan
             </p>
