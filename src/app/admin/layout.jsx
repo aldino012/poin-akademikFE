@@ -29,7 +29,7 @@ export default function AdminLayout({ children }) {
     {
       icon: "fas fa-star",
       text: "Master Poin",
-      href: "/admin/poin",
+      href: "/admin/masterpoint",
     },
     {
       icon: "fas fa-calendar-check",
