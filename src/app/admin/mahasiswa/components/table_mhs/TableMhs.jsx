@@ -50,6 +50,7 @@ export default function TableMhs() {
       openImportExcel={tableMhs.openImportExcel}
       handleExportExcel={tableMhs.handleExportExcel}
       setIsExcelOpen={tableMhs.setIsExcelOpen}
+      handleImportSuccess={tableMhs.handleImportSuccess}
     />
   );
 }

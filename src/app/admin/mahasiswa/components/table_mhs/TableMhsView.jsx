@@ -49,6 +49,7 @@ export default function TableMhsView({
   openImportExcel,
   handleExportExcel,
   setIsExcelOpen,
+  handleImportSuccess,
 }) {
   const {
     currentItems,
@@ -152,15 +153,12 @@ export default function TableMhsView({
           MODAL EXCEL
       ========================== */}
       <ModalExcel
-        isOpen={tableMhs.isExcelOpen}
-        onClose={() => tableMhs.setIsExcelOpen(false)}
-        title={tableMhs.excelConfig.title}
-        importUrl={tableMhs.excelConfig.importUrl}
-        exportUrl={tableMhs.excelConfig.exportUrl}
-        onImported={() => {
-          tableMhs.fetchMahasiswa(); // 
-          tableMhs.setIsExcelOpen(false);
-        }}
+        isOpen={isExcelOpen}
+        onClose={() => setIsExcelOpen(false)}
+        title={excelConfig.title}
+        importUrl={excelConfig.importUrl}
+        exportUrl={excelConfig.exportUrl}
+        onImported={handleImportSuccess} // 🔥 BENAR
       />
     </div>
   );

@@ -223,6 +223,11 @@ export default function useTableMhs() {
     setIsExcelOpen(true);
   };
 
+  const handleImportSuccess = () => {
+    fetchMahasiswa(); // 🔥 reload data
+    setIsExcelOpen(false); // tutup modal
+  };
+
   const handleExportExcel = async () => {
     try {
       const res = await api.get("/mahasiswa/export-excel", {
@@ -291,6 +296,7 @@ export default function useTableMhs() {
     handleUpdate,
     handleDelete,
     openImportExcel,
+    handleImportSuccess,
     handleExportExcel,
     setIsExcelOpen,
 
