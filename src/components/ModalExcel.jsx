@@ -90,7 +90,6 @@ export default function ModalImportExcel({
       const formData = new FormData();
       formData.append("file", file);
 
-      // 🔥 CUKUP INI SAJA
       const res = await api.post(importUrl, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -121,6 +120,47 @@ export default function ModalImportExcel({
     setFile(null);
     setFileName("");
     setFileSize("");
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const droppedFile = e.dataTransfer.files?.[0];
+    if (!droppedFile) return;
+
+    // Validasi ukuran
+    const sizeInMB = droppedFile.size / 1024 / 1024;
+    if (sizeInMB > maxSizeMB) {
+      addToast({
+        message: `File terlalu besar. Maksimal ${maxSizeMB}MB`,
+        type: "error",
+      });
+      return;
+    }
+
+    // Validasi ekstensi
+    const fileExtension = droppedFile.name.split(".").pop().toLowerCase();
+    const acceptedTypesArray = acceptTypes
+      .split(",")
+      .map((t) => t.trim().replace(".", ""));
+
+    if (!acceptedTypesArray.includes(fileExtension)) {
+      addToast({
+        message: `Format file tidak didukung. Gunakan ${acceptTypes}`,
+        type: "error",
+      });
+      return;
+    }
+
+    setFile(droppedFile);
+    setFileName(droppedFile.name);
+    setFileSize(sizeInMB.toFixed(2) + " MB");
   };
 
   if (!isOpen) return null;
@@ -160,7 +200,15 @@ export default function ModalImportExcel({
             </div>
 
             {!file ? (
-              <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-500 transition-colors cursor-pointer bg-gray-50/50">
+              <div
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+                className="
+        border-2 border-dashed border-gray-300 rounded-xl p-6
+        text-center hover:border-blue-500 transition-colors
+        cursor-pointer bg-gray-50/50
+      "
+              >
                 <input
                   type="file"
                   accept={acceptTypes}
@@ -168,6 +216,7 @@ export default function ModalImportExcel({
                   className="hidden"
                   id="file-upload"
                 />
+
                 <label htmlFor="file-upload" className="cursor-pointer block">
                   <div className="flex flex-col items-center">
                     <div className="mb-4">
@@ -175,12 +224,15 @@ export default function ModalImportExcel({
                         <i className="fas fa-file-excel text-blue-600 text-2xl"></i>
                       </div>
                     </div>
+
                     <p className="text-sm font-medium text-gray-700 mb-1">
                       Klik untuk upload file
                     </p>
+
                     <p className="text-xs text-gray-500">
                       atau drag & drop file di sini
                     </p>
+
                     <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-300 rounded-lg text-xs text-gray-600">
                       <i className="fas fa-file text-gray-400"></i>
                       {acceptTypes}
@@ -200,6 +252,7 @@ export default function ModalImportExcel({
                         <i className="fas fa-check text-white text-[10px]"></i>
                       </div>
                     </div>
+
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-800 truncate">
                         {fileName}
