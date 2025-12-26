@@ -311,7 +311,8 @@ export default function TabDataPribadi({ form, handleChange }) {
             onChange={handleLocalChange}
             autoComplete="off"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-white 
-            text-gray-900 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors [color-scheme:light] pr-10"
+            text-gray-900 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 
+            transition-colors [color-scheme:light]"
             placeholder="Pilih tanggal lahir"
           />
           <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
