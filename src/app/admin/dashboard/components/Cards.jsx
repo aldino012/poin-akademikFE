@@ -16,13 +16,13 @@ export default function Cards({ data }) {
       border: "border-l-4 border-blue-500",
     },
     {
-      title: "Kegiatan Terdaftar",
+      title: "Pengajuan Kegiatan",
       value: data.totalKegiatan,
       change: `${data.pendingKegiatan} menunggu verifikasi`,
       changeColor: "text-yellow-600",
-      changeIcon: "fas fa-calendar-check",
+      changeIcon: "fas fa-clock",
       iconBg: "bg-yellow-100",
-      icon: "fas fa-calendar-check text-yellow-600",
+      icon: "fas fa-clock text-yellow-600",
       border: "border-l-4 border-yellow-500",
     },
   ];

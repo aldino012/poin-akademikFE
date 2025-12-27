@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+
 import Cards from "./components/Cards";
 import BarChartAngkatan from "./components/GrafikBar";
 import PieChartKegiatan from "./components/GrafikChart";
+
 import api from "@/app/api/axios";
 
 export default function AdminPage() {
@@ -28,7 +30,7 @@ export default function AdminPage() {
     const fetchDashboard = async () => {
       try {
         // ================================
-        // ✅ FETCH MAHASISWA (1x SAJA)
+        // ✅ FETCH MAHASISWA
         // ================================
         const resMhs = await api.get("/mahasiswa");
         const mahasiswa = resMhs.data || [];
@@ -55,14 +57,18 @@ export default function AdminPage() {
         setGrafikAngkatan(grafik);
 
         // ================================
-        // ✅ FETCH KEGIATAN
+        // ✅ FETCH KLAIM KEGIATAN
         // ================================
         const resKegiatan = await api.get("/klaim");
         const kegiatan = resKegiatan.data?.data || [];
 
         const totalKegiatan = kegiatan.length;
+
+        // 🔥 FIX UTAMA:
+        // Menunggu verifikasi = Diajukan + Diajukan ulang
         const pendingKegiatan = kegiatan.filter(
-          (item) => item.status === "pending"
+          (item) =>
+            item.status === "Diajukan" || item.status === "Diajukan ulang"
         ).length;
 
         // ================================
