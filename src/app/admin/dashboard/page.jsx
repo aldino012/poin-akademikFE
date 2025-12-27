@@ -22,6 +22,7 @@ export default function AdminPage() {
   });
 
   const [grafikAngkatan, setGrafikAngkatan] = useState([]);
+  const [pieKegiatan, setPieKegiatan] = useState([]);
 
   // ================================
   // FETCH DASHBOARD DATA
@@ -30,7 +31,7 @@ export default function AdminPage() {
     const fetchDashboard = async () => {
       try {
         // ================================
-        // ✅ FETCH MAHASISWA
+        // FETCH MAHASISWA
         // ================================
         const resMhs = await api.get("/mahasiswa");
         const mahasiswa = resMhs.data || [];
@@ -38,38 +39,53 @@ export default function AdminPage() {
         const totalMahasiswa = mahasiswa.length;
 
         // ================================
-        // 🔥 HITUNG GRAFIK ANGKATAN
+        // GRAFIK ANGKATAN
         // ================================
         const angkatanMap = {};
-
         mahasiswa.forEach((mhs) => {
           const angkatan = mhs.angkatan || "Tidak diketahui";
           angkatanMap[angkatan] = (angkatanMap[angkatan] || 0) + 1;
         });
 
         const grafik = Object.entries(angkatanMap)
-          .map(([angkatan, jumlah]) => ({
-            angkatan,
-            jumlah,
-          }))
+          .map(([angkatan, jumlah]) => ({ angkatan, jumlah }))
           .sort((a, b) => Number(a.angkatan) - Number(b.angkatan));
 
         setGrafikAngkatan(grafik);
 
         // ================================
-        // ✅ FETCH KLAIM KEGIATAN
+        // FETCH KLAIM
         // ================================
         const resKegiatan = await api.get("/klaim");
         const kegiatan = resKegiatan.data?.data || [];
 
         const totalKegiatan = kegiatan.length;
 
-        // 🔥 FIX UTAMA:
-        // Menunggu verifikasi = Diajukan + Diajukan ulang
+        // Menunggu verifikasi
         const pendingKegiatan = kegiatan.filter(
           (item) =>
             item.status === "Diajukan" || item.status === "Diajukan ulang"
         ).length;
+
+        // ================================
+        // PIE CHART (JENIS KEGIATAN)
+        // ================================
+        const mapKegiatan = {};
+
+        kegiatan.forEach((item) => {
+          const jenis = item.masterPoin?.jenis_kegiatan || "Lain-lain";
+          mapKegiatan[jenis] = (mapKegiatan[jenis] || 0) + 1;
+        });
+
+        const pieData =
+          totalKegiatan === 0
+            ? []
+            : Object.entries(mapKegiatan).map(([jenis, jumlah]) => ({
+                name: jenis,
+                value: Math.round((jumlah / totalKegiatan) * 100),
+              }));
+
+        setPieKegiatan(pieData);
 
         // ================================
         // SET STATS
@@ -82,7 +98,6 @@ export default function AdminPage() {
       } catch (err) {
         console.error("Gagal fetch dashboard admin:", err);
       } finally {
-        // sedikit delay agar transisi halus
         setTimeout(() => setLoading(false), 300);
       }
     };
@@ -114,16 +129,9 @@ export default function AdminPage() {
           transition={{ duration: 0.4, ease: "easeOut" }}
           className="space-y-6"
         >
-          {/* ================================
-              CARDS STATISTIK
-          ================================ */}
           <Cards data={stats} />
-
-          {/* ================================
-              GRAFIK
-          ================================ */}
           <BarChartAngkatan data={grafikAngkatan} />
-          <PieChartKegiatan />
+          <PieChartKegiatan data={pieKegiatan} />
         </motion.div>
       )}
     </AnimatePresence>

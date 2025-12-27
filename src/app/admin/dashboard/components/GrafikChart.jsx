@@ -18,21 +18,11 @@ import {
 
 const COLORS = ["#2563eb", "#16a34a", "#f59e0b", "#dc2626", "#9333ea"];
 
-export default function PieChartKegiatan() {
-  const data = [
-    { name: "Organisasi", value: 30, icon: <FaUsers /> },
-    { name: "Lomba", value: 25, icon: <FaTrophy /> },
-    { name: "Seminar / Workshop", value: 20, icon: <FaChalkboardTeacher /> },
-    { name: "Pengabdian Masyarakat", value: 15, icon: <FaHandsHelping /> },
-    { name: "Lain-lain", value: 10, icon: <FaEllipsisH /> },
-  ];
-
-  const [isVisible, setIsVisible] = useState(false);
+export default function PieChartKegiatan({ data = [] }) {
   const [windowWidth, setWindowWidth] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    setIsVisible(true);
     setWindowWidth(window.innerWidth);
     setIsMobile(window.innerWidth < 768);
 
@@ -99,7 +89,6 @@ export default function PieChartKegiatan() {
         }}
       >
         <div className="w-full h-full flex items-center justify-center text-[18px] text-white">
-          {data[index].icon}
         </div>
       </foreignObject>
     );
@@ -112,7 +101,6 @@ export default function PieChartKegiatan() {
         <div className="bg-white p-2 border border-gray-200 rounded-md shadow-sm">
           <p className="font-medium text-gray-800 flex items-center text-sm">
             <span className="mr-2" style={{ color: payload[0].payload.fill }}>
-              {data.find((item) => item.name === payload[0].name)?.icon}
             </span>
             {payload[0].name}
           </p>
@@ -323,7 +311,6 @@ export default function PieChartKegiatan() {
                   className="w-3 h-3 rounded-full mr-2 flex-shrink-0"
                   style={{ backgroundColor: COLORS[index % COLORS.length] }}
                 ></div>
-                <span className="text-base mr-1">{entry.icon}</span>
                 <span className="text-xs font-medium">
                   {entry.name} ({entry.value}%)
                 </span>
