@@ -90,7 +90,7 @@ export default function BarChartAngkatan({ data = [] }) {
               name="Jumlah Mahasiswa"
               fill="#2563eb"
               radius={[4, 4, 0, 0]}
-              isAnimationActive={false} // 🔥 MATIKAN ANIMASI RECHARTS
+              isAnimationActive={true} // 🔥 MATIKAN ANIMASI RECHARTS
             />
           </BarChart>
         </ResponsiveContainer>
