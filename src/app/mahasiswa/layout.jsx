@@ -20,12 +20,6 @@ export default function UserLayout({ children }) {
     { icon: "fas fa-tachometer-alt", text: "Dashboard", href: "/mahasiswa/dashboard" },
     { icon: "fas fa-star", text: "Poin Non Akademik", href: "/mahasiswa/poin" },
     { icon: "fas fa-calendar-check", text: " Klaim Kegiatan", href: "/mahasiswa/klaim-kegiatan" },
-    {
-      icon: "fas fa-arrow-left",
-      text: "Kembali ke Homepage",
-      href: "/",
-      extraClass: "mt-4",
-    },
   ];
 
   return (

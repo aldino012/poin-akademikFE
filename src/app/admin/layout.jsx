@@ -36,12 +36,6 @@ export default function AdminLayout({ children }) {
       text: "Verifikasi Kegiatan",
       href: "/admin/kegiatan",
     },
-    {
-      icon: "fas fa-arrow-left",
-      text: "Kembali ke Homepage",
-      href: "/",
-      extraClass: "mt-4",
-    },
   ];
 
   return (
