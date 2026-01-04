@@ -10,8 +10,8 @@ export default function KegiatanPage() {
         p-4 
         space-y-4 
         bg-gray-50 
-        h-auto                 /* 🔥 FIX: biar height menyesuaikan konten */
-        overflow-y-visible     /* 🔥 FIX utama */
+        h-auto                 
+        overflow-y-visible     
       "
     >
       {/* Card header */}
