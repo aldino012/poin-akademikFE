@@ -14,6 +14,7 @@ export default function TabsInfo({
   catatan,
   handleCatatanChange,
   setStatus,
+  catatanEditable, // 👈 TAMBAHAN BARU
 }) {
   return (
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
@@ -186,6 +187,7 @@ export default function TabsInfo({
                 </select>
               </div>
 
+              {/* 👇 BAGIAN INI YANG DIUPDATE */}
               {(status === "Revisi" || status === "Ditolak") && (
                 <div className="bg-gray-50 border border-gray-900 rounded-xl p-4">
                   <label className="block text-sm font-medium text-gray-900 mb-2">
@@ -196,10 +198,26 @@ export default function TabsInfo({
                     value={catatan}
                     onChange={handleCatatanChange}
                     rows={4}
-                    className="w-full px-3 py-2.5 text-sm border border-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none bg-white text-gray-900 font-medium uppercase placeholder:normal-case placeholder:text-gray-500"
-                    placeholder="Masukkan catatan untuk mahasiswa..."
+                    disabled={!catatanEditable} // 👈 TAMBAHAN BARU
+                    className={`w-full px-3 py-2.5 text-sm border border-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-gray-900 font-medium uppercase placeholder:normal-case placeholder:text-gray-500 ${
+                      !catatanEditable
+                        ? "opacity-60 cursor-not-allowed bg-gray-100"
+                        : "bg-white"
+                    }`} // 👈 TAMBAHAN BARU - conditional styling
+                    placeholder={
+                      catatanEditable
+                        ? "Masukkan catatan untuk mahasiswa..."
+                        : "Catatan tidak dapat diubah"
+                    } // 👈 TAMBAHAN BARU - conditional placeholder
                     style={{ textTransform: "uppercase" }}
                   />
+                  {/* 👇 TAMBAHAN BARU - Info message ketika catatan tidak bisa diedit */}
+                  {!catatanEditable && (
+                    <p className="text-xs text-amber-600 mt-2 flex items-center">
+                      <i className="fas fa-info-circle mr-1"></i>
+                      Catatan revisi sudah pernah dibuat dan tidak dapat diubah
+                    </p>
+                  )}
                 </div>
               )}
             </div>
@@ -230,4 +248,5 @@ TabsInfo.propTypes = {
   catatan: PropTypes.string.isRequired,
   handleCatatanChange: PropTypes.func.isRequired,
   setStatus: PropTypes.func.isRequired,
+  catatanEditable: PropTypes.bool.isRequired, // 👈 TAMBAHAN BARU
 };
