@@ -187,10 +187,11 @@ export default function TabsInfo({
                 </select>
               </div>
 
+              {/* ================= CATATAN REVISI ================= */}
               {(status === "Revisi" || status === "Ditolak") && (
                 <>
-                  {isRevisiDone ? (
-                    // ===== MODE DISPLAY (READ ONLY) =====
+                  {/* ===== DISPLAY MODE (SUDAH ADA CATATAN DI DB) ===== */}
+                  {isRevisiDone && (
                     <div className="bg-gray-100 border border-gray-300 rounded-xl p-4">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         <i className="fas fa-comment-dots mr-2"></i>
@@ -200,8 +201,10 @@ export default function TabsInfo({
                         {catatan}
                       </p>
                     </div>
-                  ) : (
-                    // ===== MODE INPUT =====
+                  )}
+
+                  {/* ===== INPUT MODE (BELUM ADA CATATAN) ===== */}
+                  {!isRevisiDone && statusEditable && (
                     <div className="bg-gray-50 border border-gray-900 rounded-xl p-4">
                       <label className="block text-sm font-medium text-gray-900 mb-2">
                         <i className="fas fa-comment-dots mr-2 text-gray-800"></i>
@@ -211,7 +214,9 @@ export default function TabsInfo({
                         value={catatan}
                         onChange={handleCatatanChange}
                         rows={4}
-                        className="w-full px-3 py-2.5 text-sm border border-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none bg-white text-gray-900 font-medium uppercase"
+                        className="w-full px-3 py-2.5 text-sm border border-gray-900 rounded-lg
+                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                     resize-none bg-white text-gray-900 font-medium uppercase"
                         placeholder="Masukkan catatan untuk mahasiswa..."
                       />
                     </div>
