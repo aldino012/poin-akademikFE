@@ -14,7 +14,6 @@ export default function TabsInfo({
   catatan,
   handleCatatanChange,
   setStatus,
-  isRevisiDone,
 }) {
   return (
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
@@ -187,39 +186,21 @@ export default function TabsInfo({
                 </select>
               </div>
 
-              {/* ================= CATATAN REVISI ================= */}
-              {(status === "Revisi" || dbStatus === "Revisi") && (
-                <>
-                  {/* ===== DISPLAY MODE ===== */}
-                  {isRevisiDone && (
-                    <div className="bg-gray-100 border border-gray-300 rounded-xl p-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        <i className="fas fa-comment-dots mr-2"></i>
-                        Catatan Revisi
-                      </label>
-                      <p className="text-sm text-gray-800 whitespace-pre-line">
-                        {claim.catatan_revisi}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* ===== INPUT MODE ===== */}
-                  {!isRevisiDone && statusEditable && (
-                    <div className="bg-gray-50 border border-gray-900 rounded-xl p-4">
-                      <label className="block text-sm font-medium text-gray-900 mb-2">
-                        <i className="fas fa-comment-dots mr-2"></i>
-                        Catatan Revisi
-                      </label>
-                      <textarea
-                        value={catatan}
-                        onChange={handleCatatanChange}
-                        rows={4}
-                        className="w-full px-3 py-2.5 text-sm border border-gray-900 rounded-lg"
-                        placeholder="Masukkan catatan revisi..."
-                      />
-                    </div>
-                  )}
-                </>
+              {(status === "Revisi" || status === "Ditolak") && (
+                <div className="bg-gray-50 border border-gray-900 rounded-xl p-4">
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    <i className="fas fa-comment-dots mr-2 text-gray-800"></i>
+                    Catatan {status === "Revisi" ? "Revisi" : "Penolakan"}
+                  </label>
+                  <textarea
+                    value={catatan}
+                    onChange={handleCatatanChange}
+                    rows={4}
+                    className="w-full px-3 py-2.5 text-sm border border-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none bg-white text-gray-900 font-medium uppercase placeholder:normal-case placeholder:text-gray-500"
+                    placeholder="Masukkan catatan untuk mahasiswa..."
+                    style={{ textTransform: "uppercase" }}
+                  />
+                </div>
               )}
             </div>
           ) : (
@@ -249,6 +230,4 @@ TabsInfo.propTypes = {
   catatan: PropTypes.string.isRequired,
   handleCatatanChange: PropTypes.func.isRequired,
   setStatus: PropTypes.func.isRequired,
-  isRevisiDone: PropTypes.bool.isRequired,
-  
 };

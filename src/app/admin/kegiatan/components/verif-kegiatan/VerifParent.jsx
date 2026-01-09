@@ -24,10 +24,6 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
   const kegiatan = claim || {};
   const dbStatus = claim?.status;
 
- const isRevisiDone =
-   claim?.status === "Revisi" &&
-   typeof claim?.catatan_revisi === "string" &&
-   claim.catatan_revisi.trim().length > 0;
   /* =================== RESPONSIVE DETECTION =================== */
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -38,8 +34,8 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
   }, []);
 
   /* =================== STATUS LOGIC =================== */
- const finalAdmin = ["Disetujui", "Ditolak"];
- const statusEditable = !finalAdmin.includes(dbStatus) && !isRevisiDone;
+  const finalAdmin = ["Disetujui", "Ditolak"];
+  const statusEditable = !finalAdmin.includes(dbStatus);
 
   const validTransitions = {
     Diajukan: ["Revisi", "Disetujui", "Ditolak"],
@@ -268,7 +264,6 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
               catatan={catatan}
               handleCatatanChange={handleCatatanChange}
               setStatus={setStatus}
-              isRevisiDone={isRevisiDone}
             />
           )}
 
@@ -293,7 +288,7 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
               Tutup
             </button>
 
-            {statusEditable && !isRevisiDone && (
+            {statusEditable && (
               <button
                 onClick={handleSave}
                 disabled={saving}
