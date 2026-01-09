@@ -102,10 +102,20 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
       setPdfError(false);
       setActiveTab("informasi");
 
-      // 👇 TAMBAHAN BARU - Cek apakah sudah pernah revisi
-      // Jika catatan_revisi sudah ada dan status bukan "Revisi", berarti sudah pernah revisi
-      const hasBeenRevised = claim.catatan_revisi && claim.status !== "Revisi";
-      setIsFirstRevision(!hasBeenRevised);
+      // 👇 PERBAIKAN LOGIKA - Cek apakah sudah pernah revisi
+      // Jika status = "Diajukan ulang", berarti sudah pernah direvisi sebelumnya
+      // Atau jika ada catatan_revisi DAN status bukan "Diajukan" atau "Revisi"
+      const isResubmission = claim.status === "Diajukan ulang";
+      const hasExistingNote =
+        claim.catatan_revisi && claim.catatan_revisi.trim() !== "";
+
+      // Catatan tidak bisa diedit jika:
+      // 1. Status = "Diajukan ulang" (sudah pernah revisi sebelumnya)
+      // 2. Ada catatan DAN status bukan "Diajukan" pertama kali
+      const canEditNote =
+        !isResubmission && (claim.status === "Diajukan" || !hasExistingNote);
+
+      setIsFirstRevision(canEditNote);
     }
   }, [isOpen, claim]);
 
