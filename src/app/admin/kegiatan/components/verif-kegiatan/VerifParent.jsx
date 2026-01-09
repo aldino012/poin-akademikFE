@@ -25,9 +25,9 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
   const dbStatus = claim?.status;
 
  const isRevisiDone =
-   dbStatus === "Revisi" &&
-   !!claim?.catatan_revisi &&
-   claim.catatan_revisi.trim() !== "";
+   claim?.status === "Revisi" &&
+   typeof claim?.catatan_revisi === "string" &&
+   claim.catatan_revisi.trim().length > 0;
   /* =================== RESPONSIVE DETECTION =================== */
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -38,7 +38,7 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
   }, []);
 
   /* =================== STATUS LOGIC =================== */
-  const finalAdmin = ["Disetujui", "Ditolak"];
+ const finalAdmin = ["Disetujui", "Ditolak"];
  const statusEditable = !finalAdmin.includes(dbStatus) && !isRevisiDone;
 
   const validTransitions = {
