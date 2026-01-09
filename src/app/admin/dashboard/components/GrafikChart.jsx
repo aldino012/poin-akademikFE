@@ -258,7 +258,7 @@ export default function PieChartKegiatan({ data = [] }) {
           <span className="pulse-circle"></span>
           <FaChalkboardTeacher className="text-green-600 text-lg" />
           <h2 className="text-base sm:text-lg font-medium text-gray-800">
-            Distribusi Jenis Kegiatan Mahasiswa
+            Persentase Jenis Kegiatan yang diikuti Mahasiswa
           </h2>
         </div>
       </div>
