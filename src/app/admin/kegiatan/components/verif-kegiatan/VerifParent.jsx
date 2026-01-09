@@ -18,7 +18,6 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
   const [catatan, setCatatan] = useState("");
   const [saving, setSaving] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [isFirstRevision, setIsFirstRevision] = useState(true); // 👈 TAMBAHAN BARU
 
   const mahasiswa = claim?.mahasiswa || {};
   const master = claim?.masterPoin || {};
@@ -37,9 +36,6 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
   /* =================== STATUS LOGIC =================== */
   const finalAdmin = ["Disetujui", "Ditolak"];
   const statusEditable = !finalAdmin.includes(dbStatus);
-
-  // 👇 TAMBAHAN BARU - Logika untuk catatan editable
-  const catatanEditable = statusEditable && isFirstRevision;
 
   const validTransitions = {
     Diajukan: ["Revisi", "Disetujui", "Ditolak"],
@@ -92,7 +88,7 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
       document.removeEventListener("mousedown", handleClickOutside);
       document.body.style.overflow = "unset";
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   /* =================== SYNC STATUS =================== */
   useEffect(() => {
@@ -101,21 +97,6 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
       setCatatan(claim.catatan_revisi || "");
       setPdfError(false);
       setActiveTab("informasi");
-
-      // 👇 PERBAIKAN LOGIKA - Cek apakah sudah pernah revisi
-      // Jika status = "Diajukan ulang", berarti sudah pernah direvisi sebelumnya
-      // Atau jika ada catatan_revisi DAN status bukan "Diajukan" atau "Revisi"
-      const isResubmission = claim.status === "Diajukan ulang";
-      const hasExistingNote =
-        claim.catatan_revisi && claim.catatan_revisi.trim() !== "";
-
-      // Catatan tidak bisa diedit jika:
-      // 1. Status = "Diajukan ulang" (sudah pernah revisi sebelumnya)
-      // 2. Ada catatan DAN status bukan "Diajukan" pertama kali
-      const canEditNote =
-        !isResubmission && (claim.status === "Diajukan" || !hasExistingNote);
-
-      setIsFirstRevision(canEditNote);
     }
   }, [isOpen, claim]);
 
@@ -178,6 +159,7 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
       );
     }
 
+    const base = process.env.NEXT_PUBLIC_API_URL;
     const url = `/api/proxy/klaim/${klaimId}/bukti`;
 
     const handleOpenInNewTab = () => {
@@ -236,6 +218,7 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
     );
   };
 
+
   /* =================== CATATAN CHANGE =================== */
   const handleCatatanChange = (e) => setCatatan(e.target.value.toUpperCase());
 
@@ -281,7 +264,6 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
               catatan={catatan}
               handleCatatanChange={handleCatatanChange}
               setStatus={setStatus}
-              catatanEditable={catatanEditable} // 👈 TAMBAHAN BARU
             />
           )}
 
@@ -309,8 +291,8 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
             {statusEditable && (
               <button
                 onClick={handleSave}
-                disabled={saving || !catatanEditable} // 👈 TAMBAHAN BARU - disable jika bukan revisi pertama
-                className="px-4 sm:px-5 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800 text-sm font-medium transition-colors shadow-sm flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={saving}
+                className="px-4 sm:px-5 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800 text-sm font-medium transition-colors shadow-sm flex items-center justify-center disabled:opacity-50"
               >
                 {saving ? (
                   <>
