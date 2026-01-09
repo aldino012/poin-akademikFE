@@ -40,7 +40,7 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
 
   /* =================== STATUS LOGIC =================== */
   const finalAdmin = ["Disetujui", "Ditolak"];
-  const statusEditable = !finalAdmin.includes(dbStatus);
+  const statusEditable = !finalAdmin.includes(dbStatus) && !isRevisiDone;
 
   const validTransitions = {
     Diajukan: ["Revisi", "Disetujui", "Ditolak"],
