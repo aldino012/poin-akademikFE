@@ -194,11 +194,15 @@ export default function TabsInfo({
                   </label>
                   <textarea
                     value={catatan}
-                    onChange={handleCatatanChange}
+                    onChange={statusEditable ? handleCatatanChange : undefined}
+                    readOnly={!statusEditable} // ✅ Tambahkan ini
                     rows={4}
-                    className="w-full px-3 py-2.5 text-sm border border-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none bg-white text-gray-900 font-medium uppercase placeholder:normal-case placeholder:text-gray-500"
+                    className={`w-full px-3 py-2.5 text-sm border rounded-lg resize-none ${
+                      statusEditable
+                        ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                        : "bg-gray-100 text-gray-600 cursor-not-allowed"
+                    }`}
                     placeholder="Masukkan catatan untuk mahasiswa..."
-                    style={{ textTransform: "uppercase" }}
                   />
                 </div>
               )}
