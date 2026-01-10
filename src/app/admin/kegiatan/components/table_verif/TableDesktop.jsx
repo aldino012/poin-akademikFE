@@ -1,14 +1,26 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
+import ModalExcel from "@/components/ModalExcel"; // universal modal import Excel
 
 export default function TableDesktop({
   currentClaims,
   startIndex,
   statusColors,
   openDetailModal,
+  importKlaimExcel, // 🔹 prop baru dari hooks
 }) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const handleDetailClick = (claim) => {
     openDetailModal(claim);
+  };
+
+  const openImportModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeImportModal = () => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -40,6 +52,18 @@ export default function TableDesktop({
           animation: fadeIn 0.4s ease-out forwards;
         }
       `}</style>
+
+      {/* ===== IMPORT BUTTON ===== */}
+      <div className="flex justify-end mb-3">
+        <button
+          type="button"
+          className="bg-green-100 text-green-700 px-3 py-1 rounded text-sm hover:bg-green-200 flex items-center gap-1 shadow-sm"
+          onClick={openImportModal}
+        >
+          <i className="fas fa-file-upload"></i>
+          Import Excel
+        </button>
+      </div>
 
       <div className="hidden lg:block overflow-x-auto overflow-y-visible rounded-xl shadow-lg border border-gray-100">
         <table className="w-full text-left text-xs">
@@ -87,31 +111,24 @@ export default function TableDesktop({
                   <td className="px-3 py-2 font-medium text-gray-700 text-xs">
                     {startIndex + idx + 1}
                   </td>
-
                   <td className="px-3 py-2 font-mono text-gray-900 text-xs">
                     {claim.mahasiswa?.nim || "-"}
                   </td>
-
                   <td className="px-3 py-2 font-medium text-gray-900 text-xs">
                     {claim.mahasiswa?.nama_mhs || "-"}
                   </td>
-
                   <td className="px-3 py-2 text-gray-700 text-xs">
                     {claim.mahasiswa?.prodi || "-"}
                   </td>
-
                   <td className="px-3 py-2 text-gray-700 text-xs">
                     {claim.tanggal_pengajuan || "-"}
                   </td>
-
                   <td className="px-3 py-2 text-gray-700 text-xs">
                     {claim.tanggal_pelaksanaan || "-"}
                   </td>
-
                   <td className="px-3 py-2 text-gray-700 text-xs">
                     {claim.masterPoin?.jenis_kegiatan || "-"}
                   </td>
-
                   <td className="px-3 py-2 text-center">
                     <span
                       className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
@@ -122,8 +139,6 @@ export default function TableDesktop({
                       {claim.status || "-"}
                     </span>
                   </td>
-
-                  {/* ONLY DETAIL BUTTON LEFT */}
                   <td className="px-3 py-2">
                     <div className="flex gap-1 justify-center">
                       <button
@@ -158,6 +173,16 @@ export default function TableDesktop({
           </tbody>
         </table>
       </div>
+
+      {/* ===== MODAL IMPORT EXCEL ===== */}
+      {isModalOpen && (
+        <ModalExcel
+          isOpen={isModalOpen}
+          onClose={closeImportModal}
+          onUpload={importKlaimExcel} // 🔹 fungsi dari hook
+          title="Import Klaim Kegiatan"
+        />
+      )}
     </>
   );
 }

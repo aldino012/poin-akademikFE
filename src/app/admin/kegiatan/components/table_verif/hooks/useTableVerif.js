@@ -34,9 +34,10 @@ export default function useTableVerif() {
   };
 
   // ==========================
-  // FETCH
+  // FETCH DATA KLAIM
   // ==========================
   const fetchVerif = async () => {
+    setLoading(true);
     try {
       const res = await api.get("/klaim");
       let data = res.data.data || [];
@@ -50,7 +51,10 @@ export default function useTableVerif() {
       setClaims(data);
     } catch (err) {
       console.error(err);
-      addToast({ message: "Gagal mengambil data verifikasi!", type: "danger" });
+      addToast({
+        message: "Gagal mengambil data verifikasi!",
+        type: "danger",
+      });
     } finally {
       setLoading(false);
     }
@@ -61,7 +65,7 @@ export default function useTableVerif() {
   }, []);
 
   // ==========================
-  // FILTER
+  // FILTER SEARCH
   // ==========================
   const filterFn = useCallback(
     (c) => {
@@ -77,7 +81,7 @@ export default function useTableVerif() {
   const pagination = usePaginationFilter(claims, search, filterFn, 7, []);
 
   // ==========================
-  // MODAL
+  // MODAL DETAIL
   // ==========================
   const openDetail = (claim) => {
     setSelectedClaim(claim);
@@ -90,7 +94,7 @@ export default function useTableVerif() {
   };
 
   // ==========================
-  // UPDATE STATUS
+  // UPDATE STATUS KLAIM
   // ==========================
   const updateStatus = async (id, status, catatan) => {
     try {
@@ -104,6 +108,49 @@ export default function useTableVerif() {
         type: "danger",
       });
       throw err;
+    }
+  };
+
+  // ==========================
+  // IMPORT EXCEL
+  // ==========================
+  const importKlaimExcel = async (file) => {
+    if (!file) {
+      addToast({
+        message: "Pilih file Excel terlebih dahulu!",
+        type: "warning",
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    setLoading(true);
+
+    try {
+      const res = await api.post("/klaim/import", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      addToast({
+        message: res.data.message || "Import berhasil!",
+        type: "success",
+      });
+
+      // Refresh tabel setelah import
+      await fetchVerif();
+
+      return res.data;
+    } catch (err) {
+      console.error(err);
+      addToast({
+        message: err.response?.data?.message || "Gagal import Excel klaim!",
+        type: "danger",
+      });
+      throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -128,5 +175,6 @@ export default function useTableVerif() {
 
     // actions
     updateStatus,
+    importKlaimExcel, // 🔥 fungsi import
   };
 }
