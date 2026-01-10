@@ -229,9 +229,6 @@ export default function TabsInfo({
         : "border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed"
     }`}
                 style={{ textTransform: "uppercase" }}
-                placeholder={
-                  catatanEditable ? "Masukkan catatan untuk mahasiswa..." : ""
-                }
               />
             </div>
           )}
