@@ -94,7 +94,11 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
   useEffect(() => {
     if (isOpen && claim) {
       setStatus(claim.status);
-      setCatatan(claim.catatan_revisi || "");
+
+      setCatatan(
+        claim.catatan_revisi || claim.catatan || claim.catatan_admin || ""
+      );
+
       setPdfError(false);
       setActiveTab("informasi");
     }

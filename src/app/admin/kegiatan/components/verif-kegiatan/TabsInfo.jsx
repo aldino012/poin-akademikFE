@@ -196,7 +196,7 @@ export default function TabsInfo({
 
                   <textarea
                     value={catatan}
-                    readOnly={!catatanEditable} // 🔒 kunci di sini
+                    readOnly={!catatanEditable}
                     onChange={catatanEditable ? handleCatatanChange : undefined}
                     rows={4}
                     className={`w-full px-3 py-2.5 text-sm border rounded-lg resize-none
