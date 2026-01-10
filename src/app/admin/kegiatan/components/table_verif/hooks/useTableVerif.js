@@ -15,6 +15,16 @@ export default function useTableVerif() {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState(null);
 
+  // ==========================
+  // EXCEL MODAL STATE
+  // ==========================
+  const [isExcelOpen, setIsExcelOpen] = useState(false);
+  const [excelConfig, setExcelConfig] = useState({
+    title: "Import Excel Klaim Kegiatan",
+    importUrl: "/klaim/import",
+    exportUrl: "", // optional jika ada export
+  });
+
   // 🎨 WARNA STATUS
   const statusColors = {
     Diajukan: "bg-gray-100 text-gray-700",
@@ -87,7 +97,6 @@ export default function useTableVerif() {
     setSelectedClaim(claim);
     setIsDetailOpen(true);
   };
-
   const closeDetail = () => {
     setSelectedClaim(null);
     setIsDetailOpen(false);
@@ -114,50 +123,28 @@ export default function useTableVerif() {
   // ==========================
   // IMPORT EXCEL KLAIM
   // ==========================
-  const importKlaimExcel = async (file) => {
-    if (!file) {
-      addToast({
-        message: "Pilih file Excel terlebih dahulu!",
-        type: "warning",
-      });
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("file_excel", file); // ⚠️ HARUS SAMA DENGAN backend upload.single("file_excel")
-
-    setLoading(true);
-
-    try {
-      // ❌ Jangan set headers content-type → biarkan browser handle boundary
-      const res = await api.post("/klaim/import", formData);
-
-      addToast({
-        message: res.data.message || "Import berhasil!",
-        type: "success",
-      });
-
-      // Refresh tabel setelah import
-      await fetchVerif();
-
-      return res.data;
-    } catch (err) {
-      console.error(err);
-      addToast({
-        message: err.response?.data?.message || "Gagal import Excel klaim!",
-        type: "danger",
-      });
-      throw err;
-    } finally {
-      setLoading(false);
-    }
+  const openImportExcel = () => {
+    setExcelConfig({
+      title: "Import Excel Klaim Kegiatan",
+      importUrl: "/klaim/import",
+      exportUrl: "",
+    });
+    setIsExcelOpen(true);
   };
 
+  const handleImportSuccess = async () => {
+    await fetchVerif(); // refresh data
+    setIsExcelOpen(false); // tutup modal
+  };
+
+  // ==========================
+  // RETURN API
+  // ==========================
   return {
     // data
     claims,
-    loading,
     selectedClaim,
+    loading,
 
     // ui
     search,
@@ -167,13 +154,19 @@ export default function useTableVerif() {
     // pagination
     pagination,
 
-    // modal
+    // modal detail
     isDetailOpen,
     openDetail,
     closeDetail,
 
+    // modal excel
+    isExcelOpen,
+    excelConfig,
+    openImportExcel,
+    handleImportSuccess,
+    setIsExcelOpen,
+
     // actions
     updateStatus,
-    importKlaimExcel, // 🔥 fungsi import siap pakai
   };
 }
