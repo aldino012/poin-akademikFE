@@ -34,7 +34,7 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
   }, []);
 
   /* =================== STATUS LOGIC =================== */
-  const statusEditable = !["Disetujui", "Ditolak"].includes(dbStatus);
+ const statusEditable = !["Disetujui", "Ditolak", "Revisi"].includes(dbStatus);
   const catatanEditable = !["Revisi", "Ditolak"].includes(dbStatus);
 
   const validTransitions = {
@@ -296,8 +296,14 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
             {statusEditable && (
               <button
                 onClick={handleSave}
-                disabled={saving}
-                className="px-4 sm:px-5 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800 text-sm font-medium transition-colors shadow-sm flex items-center justify-center disabled:opacity-50"
+                disabled={!statusEditable || saving}
+                className={`px-4 sm:px-5 py-2.5 rounded-lg text-sm font-medium shadow-sm flex items-center justify-center
+    ${
+      !statusEditable
+        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+        : "bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800"
+    }
+  `}
               >
                 {saving ? (
                   <>

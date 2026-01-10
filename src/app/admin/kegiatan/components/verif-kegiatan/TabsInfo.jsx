@@ -170,10 +170,20 @@ export default function TabsInfo({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Ubah Status
                 </label>
+
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
-                  className={`w-full px-3 py-2.5 rounded-lg border shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm font-medium ${selectedColor}`}
+                  disabled={!statusEditable}
+                  className={`w-full px-3 py-2.5 rounded-lg border shadow-sm text-sm font-medium
+      focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+      ${selectedColor}
+      ${
+        !statusEditable
+          ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+          : "bg-white"
+      }
+    `}
                 >
                   <option value={status} disabled>
                     {status} (Saat ini)
@@ -185,6 +195,12 @@ export default function TabsInfo({
                     </option>
                   ))}
                 </select>
+
+                {!statusEditable && (
+                  <p className="mt-1 text-xs text-gray-500">
+                    Status tidak dapat diubah pada tahap ini
+                  </p>
+                )}
               </div>
 
               {(status === "Revisi" || status === "Ditolak") && (
@@ -233,6 +249,7 @@ TabsInfo.propTypes = {
   status: PropTypes.string.isRequired,
   selectedColor: PropTypes.string.isRequired,
   statusEditable: PropTypes.bool.isRequired,
+  catatanEditable: PropTypes.bool.isRequired,
   statusOptions: PropTypes.array.isRequired,
 
   catatan: PropTypes.string.isRequired,
