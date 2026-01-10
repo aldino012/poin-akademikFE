@@ -34,7 +34,8 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
   }, []);
 
   /* =================== STATUS LOGIC =================== */
-const statusEditable = !["Disetujui", "Ditolak", "Revisi"].includes(dbStatus);
+  const statusEditable = !["Disetujui", "Ditolak"].includes(dbStatus);
+  const catatanEditable = status !== "Revisi" && status !== "Ditolak";
 
   const validTransitions = {
     Diajukan: ["Revisi", "Disetujui", "Ditolak"],
@@ -259,6 +260,7 @@ const statusEditable = !["Disetujui", "Ditolak", "Revisi"].includes(dbStatus);
               status={status}
               selectedColor={selectedColor}
               statusEditable={statusEditable}
+              catatanEditable={catatanEditable}
               statusOptions={statusOptions}
               catatan={catatan}
               handleCatatanChange={handleCatatanChange}

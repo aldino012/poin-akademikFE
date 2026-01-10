@@ -192,17 +192,20 @@ export default function TabsInfo({
                     <i className="fas fa-comment-dots mr-2 text-gray-800"></i>
                     Catatan {status === "Revisi" ? "Revisi" : "Penolakan"}
                   </label>
+
                   <textarea
                     value={catatan}
+                    readOnly={!statusEditable} // ✅ KUNCI UTAMA
                     onChange={statusEditable ? handleCatatanChange : undefined}
-                    readOnly={!statusEditable} // ✅ Tambahkan ini
                     rows={4}
-                    className={`w-full px-3 py-2.5 text-sm border rounded-lg resize-none ${
-                      statusEditable
-                        ? "focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
-                        : "bg-gray-100 text-gray-600 cursor-not-allowed"
-                    }`}
+                    className={`w-full px-3 py-2.5 text-sm border rounded-lg resize-none 
+        ${
+          statusEditable
+            ? "border-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            : "border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed"
+        }`}
                     placeholder="Masukkan catatan untuk mahasiswa..."
+                    style={{ textTransform: "uppercase" }}
                   />
                 </div>
               )}
