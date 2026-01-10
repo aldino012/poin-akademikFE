@@ -52,6 +52,7 @@ export default function useTableVerif() {
       const res = await api.get("/klaim");
       let data = res.data.data || [];
 
+      // sort berdasarkan prioritas status
       data.sort((a, b) => {
         const pa = statusPriority[a.status] ?? 999;
         const pb = statusPriority[b.status] ?? 999;
@@ -132,9 +133,34 @@ export default function useTableVerif() {
     setIsExcelOpen(true);
   };
 
-  const handleImportSuccess = async () => {
-    await fetchVerif(); // refresh data
-    setIsExcelOpen(false); // tutup modal
+  const handleImportExcel = async (file) => {
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await api.post("/klaim/import", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("Import berhasil:", res.data);
+      addToast({
+        message: "Import Excel berhasil!",
+        type: "success",
+      });
+
+      await fetchVerif(); // refresh data klaim
+      setIsExcelOpen(false); // tutup modal
+    } catch (err) {
+      console.error("Import gagal:", err);
+      addToast({
+        message: err.response?.data?.message || "Import Excel gagal!",
+        type: "danger",
+      });
+    }
   };
 
   // ==========================
@@ -163,7 +189,7 @@ export default function useTableVerif() {
     isExcelOpen,
     excelConfig,
     openImportExcel,
-    handleImportSuccess,
+    handleImportExcel,
     setIsExcelOpen,
 
     // actions
