@@ -163,9 +163,18 @@ export default function TabsInfo({
             </div>
 
             {!statusEditable && (
-              <div className="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+              <div
+                className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1
+            ${
+              status === "Revisi"
+                ? "bg-gradient-to-r from-yellow-400 to-yellow-500 text-white"
+                : "bg-gradient-to-r from-gray-500 to-gray-600 text-white"
+            }`}
+              >
                 <i className="fas fa-lock"></i>
-                Status Final
+                {status === "Revisi"
+                  ? "Menunggu perbaikan mahasiswa"
+                  : "Status final"}
               </div>
             )}
           </div>
@@ -181,8 +190,8 @@ export default function TabsInfo({
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
                 className={`w-full px-3 py-2.5 rounded-lg border shadow-sm text-sm font-medium
-            focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-            ${selectedColor}`}
+          focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+          ${selectedColor}`}
               >
                 <option value={status} disabled>
                   {status} (Saat ini)
@@ -211,25 +220,21 @@ export default function TabsInfo({
               <textarea
                 value={catatan}
                 readOnly={!catatanEditable}
-                onChange={catatanEditable ? handleCatatanChange : undefined}
                 rows={4}
-                className={`w-full px-3 py-2.5 text-sm border rounded-lg resize-none
-            ${
-              catatanEditable
-                ? "border-gray-900 bg-white focus:ring-2 focus:ring-blue-500"
-                : "border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed"
-            }`}
+                className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg resize-none bg-gray-100 text-gray-600 cursor-not-allowed"
                 style={{ textTransform: "uppercase" }}
               />
             </div>
           )}
 
-          {/* ================= INFO FINAL ================= */}
+          {/* ================= INFO STATUS (KHUSUS SAAT TERKUNCI) ================= */}
           {!statusEditable && (
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center">
-              <i className="fas fa-lock text-gray-400 text-2xl mb-2"></i>
+              <i className="fas fa-info-circle text-gray-400 text-xl mb-2"></i>
               <p className="text-sm text-gray-600">
-                Status sudah final dan tidak dapat diubah
+                {status === "Revisi"
+                  ? "Status dikunci sementara dan menunggu mahasiswa melakukan perbaikan"
+                  : "Status sudah final dan tidak dapat diubah"}
               </p>
             </div>
           )}
