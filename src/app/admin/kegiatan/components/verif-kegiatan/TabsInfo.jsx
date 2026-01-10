@@ -17,6 +17,12 @@ export default function TabsInfo({
   catatanEditable,
   setStatus,
 }) {
+
+  const showCatatan =
+    status === "Revisi" ||
+    status === "Ditolak" ||
+    dbStatus === "Revisi" ||
+    dbStatus === "Ditolak";
   return (
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
       {/* ================= IDENTITAS MAHASISWA ================= */}
@@ -204,11 +210,14 @@ export default function TabsInfo({
                 )}
               </div>
 
-              {(dbStatus === "Revisi" || dbStatus === "Ditolak") && (
+              {showCatatan && (
                 <div className="bg-gray-50 border border-gray-900 rounded-xl p-4">
                   <label className="block text-sm font-medium text-gray-900 mb-2">
                     <i className="fas fa-comment-dots mr-2 text-gray-800"></i>
-                    Catatan {dbStatus === "Revisi" ? "Revisi" : "Penolakan"}
+                    Catatan{" "}
+                    {(status === "Revisi" || dbStatus === "Revisi") && "Revisi"}
+                    {(status === "Ditolak" || dbStatus === "Ditolak") &&
+                      "Penolakan"}
                   </label>
 
                   <textarea
