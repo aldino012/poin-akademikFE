@@ -219,10 +219,19 @@ export default function TabsInfo({
 
               <textarea
                 value={catatan}
+                onChange={catatanEditable ? handleCatatanChange : undefined}
                 readOnly={!catatanEditable}
                 rows={4}
-                className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg resize-none bg-gray-100 text-gray-600 cursor-not-allowed"
+                className={`w-full px-3 py-2.5 text-sm border rounded-lg resize-none
+    ${
+      catatanEditable
+        ? "border-gray-900 bg-white text-gray-800 focus:ring-2 focus:ring-blue-500"
+        : "border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed"
+    }`}
                 style={{ textTransform: "uppercase" }}
+                placeholder={
+                  catatanEditable ? "Masukkan catatan untuk mahasiswa..." : ""
+                }
               />
             </div>
           )}

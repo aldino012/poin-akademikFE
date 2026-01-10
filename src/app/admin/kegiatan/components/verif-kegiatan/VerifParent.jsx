@@ -35,8 +35,9 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
 
   /* =================== STATUS LOGIC =================== */
  const statusEditable = !["Disetujui", "Ditolak", "Revisi"].includes(dbStatus);
- const catatanEditable =
-   statusEditable && (status === "Revisi" || status === "Ditolak");
+const catatanEditable =
+  (status === "Revisi" || status === "Ditolak") &&
+  !["Disetujui"].includes(dbStatus);
   const validTransitions = {
     Diajukan: ["Revisi", "Disetujui", "Ditolak"],
     "Diajukan ulang": ["Revisi", "Disetujui", "Ditolak"],
@@ -91,18 +92,19 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
   }, [isOpen]);
 
   /* =================== SYNC STATUS =================== */
-  useEffect(() => {
-    if (isOpen && claim) {
-      setStatus(claim.status);
+ useEffect(() => {
+   if (isOpen && claim) {
+     setStatus(claim.status);
 
-      setCatatan(
-        claim.catatan_revisi || claim.catatan || claim.catatan_admin || ""
-      );
+     // Hanya set catatan saat modal pertama kali dibuka
+     setCatatan(
+       claim.catatan_revisi || claim.catatan || claim.catatan_admin || ""
+     );
 
-      setPdfError(false);
-      setActiveTab("informasi");
-    }
-  }, [isOpen, claim]);
+     setPdfError(false);
+     setActiveTab("informasi");
+   }
+ }, [isOpen, claim]);
 
   if (!isOpen || !claim) return null;
 
