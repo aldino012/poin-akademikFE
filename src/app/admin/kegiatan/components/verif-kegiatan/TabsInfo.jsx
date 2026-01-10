@@ -195,12 +195,12 @@ export default function TabsInfo({
 
                   <textarea
                     value={catatan}
-                    readOnly={!statusEditable} // ✅ KUNCI UTAMA
-                    onChange={statusEditable ? handleCatatanChange : undefined}
+                    readOnly={!catatanEditable} // ✅ KUNCI UTAMA
+                    onChange={catatanEditable ? handleCatatanChange : undefined}
                     rows={4}
-                    className={`w-full px-3 py-2.5 text-sm border rounded-lg resize-none 
+                    className={`w-full px-3 py-2.5 text-sm border rounded-lg resize-none
         ${
-          statusEditable
+          catatanEditable
             ? "border-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             : "border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed"
         }`}
