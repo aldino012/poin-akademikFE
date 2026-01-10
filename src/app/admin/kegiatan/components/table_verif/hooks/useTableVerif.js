@@ -112,7 +112,7 @@ export default function useTableVerif() {
   };
 
   // ==========================
-  // IMPORT EXCEL
+  // IMPORT EXCEL KLAIM
   // ==========================
   const importKlaimExcel = async (file) => {
     if (!file) {
@@ -124,14 +124,13 @@ export default function useTableVerif() {
     }
 
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file_excel", file); // ⚠️ HARUS SAMA DENGAN backend upload.single("file_excel")
 
     setLoading(true);
 
     try {
-      const res = await api.post("/klaim/import", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      // ❌ Jangan set headers content-type → biarkan browser handle boundary
+      const res = await api.post("/klaim/import", formData);
 
       addToast({
         message: res.data.message || "Import berhasil!",
@@ -175,6 +174,6 @@ export default function useTableVerif() {
 
     // actions
     updateStatus,
-    importKlaimExcel, // 🔥 fungsi import
+    importKlaimExcel, // 🔥 fungsi import siap pakai
   };
 }
