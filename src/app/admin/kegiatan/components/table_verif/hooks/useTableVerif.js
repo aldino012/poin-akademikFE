@@ -1,31 +1,39 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import api from "@/app/api/axios";
+import api from "@/app/api/axios"; // Axios tetap sama
 import { useToast } from "@/components/Toats";
 import usePaginationFilter from "@/app/hooks/usePaginationFilter";
 
 export default function useTableVerif() {
   const { addToast } = useToast();
 
+  // ==========================
+  // STATE UTAMA
+  // ==========================
   const [claims, setClaims] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
+  // ==========================
+  // MODAL DETAIL
+  // ==========================
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState(null);
 
   // ==========================
-  // EXCEL MODAL STATE
+  // MODAL EXCEL
   // ==========================
   const [isExcelOpen, setIsExcelOpen] = useState(false);
   const [excelConfig, setExcelConfig] = useState({
     title: "Import Excel Klaim Kegiatan",
-    importUrl: "/klaim/import",
-    exportUrl: "", // optional jika ada export
+    importUrl: "/klaim/import", // Path setelah proxy
+    exportUrl: "",
   });
 
-  // 🎨 WARNA STATUS
+  // ==========================
+  // WARNA STATUS
+  // ==========================
   const statusColors = {
     Diajukan: "bg-gray-100 text-gray-700",
     Revisi: "bg-yellow-100 text-yellow-700",
@@ -34,7 +42,6 @@ export default function useTableVerif() {
     Disetujui: "bg-blue-100 text-blue-700",
   };
 
-  // 🎯 PRIORITAS SORT
   const statusPriority = {
     Diajukan: 1,
     Revisi: 2,
@@ -49,7 +56,7 @@ export default function useTableVerif() {
   const fetchVerif = async () => {
     setLoading(true);
     try {
-      const res = await api.get("/klaim");
+      const res = await api.get("/klaim"); // dipanggil via proxy
       let data = res.data.data || [];
 
       // sort berdasarkan prioritas status
@@ -127,44 +134,19 @@ export default function useTableVerif() {
   const openImportExcel = () => {
     setExcelConfig({
       title: "Import Excel Klaim Kegiatan",
-      importUrl: "/klaim/import",
+      importUrl: "/klaim/import", // tetap path setelah proxy
       exportUrl: "",
     });
     setIsExcelOpen(true);
   };
 
-  const handleImportExcel = async (file) => {
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const res = await api.post("/klaim/import", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      console.log("Import berhasil:", res.data);
-      addToast({
-        message: "Import Excel berhasil!",
-        type: "success",
-      });
-
-      await fetchVerif(); // refresh data klaim
-      setIsExcelOpen(false); // tutup modal
-    } catch (err) {
-      console.error("Import gagal:", err);
-      addToast({
-        message: err.response?.data?.message || "Import Excel gagal!",
-        type: "danger",
-      });
-    }
+  const handleImportSuccess = async () => {
+    await fetchVerif(); // refresh data setelah import
+    setIsExcelOpen(false);
   };
 
   // ==========================
-  // RETURN API
+  // RETURN API HOOK
   // ==========================
   return {
     // data
@@ -189,7 +171,7 @@ export default function useTableVerif() {
     isExcelOpen,
     excelConfig,
     openImportExcel,
-    handleImportExcel,
+    handleImportSuccess,
     setIsExcelOpen,
 
     // actions
