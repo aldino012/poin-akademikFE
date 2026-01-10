@@ -151,7 +151,7 @@ export default function TabsInfo({
         </h4>
 
         <div className="space-y-4">
-          {/* Status Saat Ini */}
+          {/* ================= STATUS SAAT INI ================= */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 gap-2">
             <div>
               <p className="text-xs text-gray-600">Status Saat Ini</p>
@@ -163,81 +163,69 @@ export default function TabsInfo({
             </div>
 
             {!statusEditable && (
-              <div className="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 self-start sm:self-auto">
+              <div className="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
                 <i className="fas fa-lock"></i>
                 Status Final
               </div>
             )}
           </div>
 
-          {/* Ubah Status */}
-          {statusEditable ? (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Ubah Status
-                </label>
+          {/* ================= UBAH STATUS (HANYA JIKA EDITABLE) ================= */}
+          {statusEditable && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Ubah Status
+              </label>
 
-                <select
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
-                  disabled={!statusEditable}
-                  className={`w-full px-3 py-2.5 rounded-lg border shadow-sm text-sm font-medium
-      focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-      ${selectedColor}
-      ${
-        !statusEditable
-          ? "bg-gray-100 text-gray-500 cursor-not-allowed"
-          : "bg-white"
-      }
-    `}
-                >
-                  <option value={status} disabled>
-                    {status} (Saat ini)
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                className={`w-full px-3 py-2.5 rounded-lg border shadow-sm text-sm font-medium
+            focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+            ${selectedColor}`}
+              >
+                <option value={status} disabled>
+                  {status} (Saat ini)
+                </option>
+
+                {statusOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
                   </option>
-
-                  {statusOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-
-                {!statusEditable && (
-                  <p className="mt-1 text-xs text-gray-500">
-                    Status tidak dapat diubah pada tahap ini
-                  </p>
-                )}
-              </div>
-
-              {showCatatan && (
-                <div className="bg-gray-50 border border-gray-900 rounded-xl p-4">
-                  <label className="block text-sm font-medium text-gray-900 mb-2">
-                    <i className="fas fa-comment-dots mr-2 text-gray-800"></i>
-                    Catatan{" "}
-                    {(status === "Revisi" || dbStatus === "Revisi") && "Revisi"}
-                    {(status === "Ditolak" || dbStatus === "Ditolak") &&
-                      "Penolakan"}
-                  </label>
-
-                  <textarea
-                    value={catatan}
-                    readOnly={!catatanEditable}
-                    onChange={catatanEditable ? handleCatatanChange : undefined}
-                    rows={4}
-                    className={`w-full px-3 py-2.5 text-sm border rounded-lg resize-none
-        ${
-          catatanEditable
-            ? "border-gray-900 bg-white focus:ring-2 focus:ring-blue-500"
-            : "border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed"
-        }`}
-                    placeholder="Masukkan catatan untuk mahasiswa..."
-                    style={{ textTransform: "uppercase" }}
-                  />
-                </div>
-              )}
+                ))}
+              </select>
             </div>
-          ) : (
+          )}
+
+          {/* ================= CATATAN (SELALU TAMPIL JIKA ADA) ================= */}
+          {showCatatan && (
+            <div className="bg-gray-50 border border-gray-900 rounded-xl p-4">
+              <label className="block text-sm font-medium text-gray-900 mb-2">
+                <i className="fas fa-comment-dots mr-2 text-gray-800"></i>
+                Catatan{" "}
+                {(status === "Revisi" || dbStatus === "Revisi") && "Revisi"}
+                {(status === "Ditolak" || dbStatus === "Ditolak") &&
+                  "Penolakan"}
+              </label>
+
+              <textarea
+                value={catatan}
+                readOnly={!catatanEditable}
+                onChange={catatanEditable ? handleCatatanChange : undefined}
+                rows={4}
+                className={`w-full px-3 py-2.5 text-sm border rounded-lg resize-none
+            ${
+              catatanEditable
+                ? "border-gray-900 bg-white focus:ring-2 focus:ring-blue-500"
+                : "border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed"
+            }`}
+                style={{ textTransform: "uppercase" }}
+              />
+            </div>
+          )}
+
+          {/* ================= INFO FINAL ================= */}
+          {!statusEditable && (
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center">
               <i className="fas fa-lock text-gray-400 text-2xl mb-2"></i>
               <p className="text-sm text-gray-600">
