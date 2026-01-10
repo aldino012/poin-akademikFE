@@ -267,6 +267,7 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
               catatanEditable={catatanEditable}
               statusOptions={statusOptions}
               catatan={catatan}
+              dbStatus={dbStatus}
               handleCatatanChange={handleCatatanChange}
               setStatus={setStatus}
             />

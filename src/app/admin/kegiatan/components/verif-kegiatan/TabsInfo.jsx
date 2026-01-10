@@ -12,8 +12,9 @@ export default function TabsInfo({
   statusOptions,
   selectedColor,
   catatan,
+  dbStatus,
   handleCatatanChange,
-  catatanEditable, 
+  catatanEditable,
   setStatus,
 }) {
   return (
@@ -203,11 +204,11 @@ export default function TabsInfo({
                 )}
               </div>
 
-              {(status === "Revisi" || status === "Ditolak") && (
+              {(dbStatus === "Revisi" || dbStatus === "Ditolak") && (
                 <div className="bg-gray-50 border border-gray-900 rounded-xl p-4">
                   <label className="block text-sm font-medium text-gray-900 mb-2">
                     <i className="fas fa-comment-dots mr-2 text-gray-800"></i>
-                    Catatan {status === "Revisi" ? "Revisi" : "Penolakan"}
+                    Catatan {dbStatus === "Revisi" ? "Revisi" : "Penolakan"}
                   </label>
 
                   <textarea
