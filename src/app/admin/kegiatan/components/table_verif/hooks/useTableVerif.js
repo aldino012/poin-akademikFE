@@ -1,39 +1,21 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import api from "@/app/api/axios"; // Axios tetap sama
+import api from "@/app/api/axios";
 import { useToast } from "@/components/Toats";
 import usePaginationFilter from "@/app/hooks/usePaginationFilter";
 
 export default function useTableVerif() {
   const { addToast } = useToast();
 
-  // ==========================
-  // STATE UTAMA
-  // ==========================
   const [claims, setClaims] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  // ==========================
-  // MODAL DETAIL
-  // ==========================
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState(null);
 
-  // ==========================
-  // MODAL EXCEL
-  // ==========================
-  const [isExcelOpen, setIsExcelOpen] = useState(false);
-  const [excelConfig, setExcelConfig] = useState({
-    title: "Import Excel Klaim Kegiatan",
-    importUrl: "/klaim/import", // Path setelah proxy
-    exportUrl: "",
-  });
-
-  // ==========================
-  // WARNA STATUS
-  // ==========================
+  // 🎨 WARNA STATUS
   const statusColors = {
     Diajukan: "bg-gray-100 text-gray-700",
     Revisi: "bg-yellow-100 text-yellow-700",
@@ -42,6 +24,7 @@ export default function useTableVerif() {
     Disetujui: "bg-blue-100 text-blue-700",
   };
 
+  // 🎯 PRIORITAS SORT
   const statusPriority = {
     Diajukan: 1,
     Revisi: 2,
@@ -51,15 +34,13 @@ export default function useTableVerif() {
   };
 
   // ==========================
-  // FETCH DATA KLAIM
+  // FETCH
   // ==========================
   const fetchVerif = async () => {
-    setLoading(true);
     try {
-      const res = await api.get("/klaim"); // dipanggil via proxy
+      const res = await api.get("/klaim");
       let data = res.data.data || [];
 
-      // sort berdasarkan prioritas status
       data.sort((a, b) => {
         const pa = statusPriority[a.status] ?? 999;
         const pb = statusPriority[b.status] ?? 999;
@@ -69,10 +50,7 @@ export default function useTableVerif() {
       setClaims(data);
     } catch (err) {
       console.error(err);
-      addToast({
-        message: "Gagal mengambil data verifikasi!",
-        type: "danger",
-      });
+      addToast({ message: "Gagal mengambil data verifikasi!", type: "danger" });
     } finally {
       setLoading(false);
     }
@@ -83,7 +61,7 @@ export default function useTableVerif() {
   }, []);
 
   // ==========================
-  // FILTER SEARCH
+  // FILTER
   // ==========================
   const filterFn = useCallback(
     (c) => {
@@ -99,19 +77,20 @@ export default function useTableVerif() {
   const pagination = usePaginationFilter(claims, search, filterFn, 7, []);
 
   // ==========================
-  // MODAL DETAIL
+  // MODAL
   // ==========================
   const openDetail = (claim) => {
     setSelectedClaim(claim);
     setIsDetailOpen(true);
   };
+
   const closeDetail = () => {
     setSelectedClaim(null);
     setIsDetailOpen(false);
   };
 
   // ==========================
-  // UPDATE STATUS KLAIM
+  // UPDATE STATUS
   // ==========================
   const updateStatus = async (id, status, catatan) => {
     try {
@@ -128,31 +107,11 @@ export default function useTableVerif() {
     }
   };
 
-  // ==========================
-  // IMPORT EXCEL KLAIM
-  // ==========================
-  const openImportExcel = () => {
-    setExcelConfig({
-      title: "Import Excel Klaim Kegiatan",
-      importUrl: "/klaim/import", // tetap path setelah proxy
-      exportUrl: "",
-    });
-    setIsExcelOpen(true);
-  };
-
-  const handleImportSuccess = async () => {
-    await fetchVerif(); // refresh data setelah import
-    setIsExcelOpen(false);
-  };
-
-  // ==========================
-  // RETURN API HOOK
-  // ==========================
   return {
     // data
     claims,
-    selectedClaim,
     loading,
+    selectedClaim,
 
     // ui
     search,
@@ -162,17 +121,10 @@ export default function useTableVerif() {
     // pagination
     pagination,
 
-    // modal detail
+    // modal
     isDetailOpen,
     openDetail,
     closeDetail,
-
-    // modal excel
-    isExcelOpen,
-    excelConfig,
-    openImportExcel,
-    handleImportSuccess,
-    setIsExcelOpen,
 
     // actions
     updateStatus,
