@@ -36,9 +36,7 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
   /* =================== STATUS LOGIC =================== */
  const statusEditable = !["Disetujui", "Ditolak", "Revisi"].includes(dbStatus);
  const catatanEditable =
-   (status === "Revisi" || status === "Ditolak") &&
-   !["Revisi", "Ditolak"].includes(dbStatus);
-
+   statusEditable && (status === "Revisi" || status === "Ditolak");
   const validTransitions = {
     Diajukan: ["Revisi", "Disetujui", "Ditolak"],
     "Diajukan ulang": ["Revisi", "Disetujui", "Ditolak"],
