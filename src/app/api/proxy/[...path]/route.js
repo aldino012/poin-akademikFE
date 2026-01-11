@@ -41,10 +41,11 @@ async function proxy(req, method, params) {
   // ==============================
   if (method !== "GET" && method !== "HEAD") {
     if (contentType.includes("multipart/form-data")) {
-      // 🔥 PENTING: jangan set content-type sendiri untuk multipart
-      // biarkan fetch otomatis set boundary
-      options.body = req.body; // pakai body asli request
+      // 🔥 FILE UPLOAD
+      headers.set("content-type", contentType);
+      options.body = await req.arrayBuffer();
     } else {
+      // 🔥 JSON / LOGIN / NORMAL POST
       headers.set("content-type", contentType);
       options.body = await req.text();
     }
