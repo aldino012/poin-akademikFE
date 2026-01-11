@@ -133,7 +133,9 @@ export default function TableVerifView({
         acceptTypes=".xlsx,.xls"
         maxSizeMB={5}
         loading={importing}
-        onImport={handleImport} // 🔥 pakai wrapper ini
+        onImport={async (file) => {
+          await importExcel(file, () => setIsImportOpen(false)); // modal auto-close
+        }}
       />
     </div>
   );

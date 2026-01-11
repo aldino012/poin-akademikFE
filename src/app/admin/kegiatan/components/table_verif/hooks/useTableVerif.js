@@ -117,8 +117,7 @@ export default function useTableVerif() {
       console.error(err);
       addToast({
         message:
-          err.response?.data?.message ||
-          "Gagal memperbarui status verifikasi!",
+          err.response?.data?.message || "Gagal memperbarui status verifikasi!",
         type: "danger",
       });
       throw err;
@@ -128,48 +127,38 @@ export default function useTableVerif() {
   // ==========================
   // 🔥 IMPORT EXCEL KLAIM
   // ==========================
-  const importExcel = async (file) => {
-    if (!file) {
-      addToast({
-        message: "File Excel belum dipilih",
-        type: "warning",
-      });
-      return;
-    }
+  const importExcel = async (file, onImported) => {
+    if (!file)
+      return addToast({ message: "File Excel belum dipilih", type: "warning" });
 
-    // validasi client-side (opsional tapi bagus)
     const isExcel =
       file.type ===
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
       file.type === "application/vnd.ms-excel";
-
-    if (!isExcel) {
-      addToast({
+    if (!isExcel)
+      return addToast({
         message: "File harus berformat Excel (.xls / .xlsx)",
         type: "danger",
       });
-      return;
-    }
 
     const formData = new FormData();
-    formData.append("file", file); // 🔥 HARUS "file"
+    formData.append("file", file);
 
     setImporting(true);
     setImportResult(null);
 
     try {
       const res = await api.post("/klaim/import-excel", formData);
-
       const result = res.data;
       setImportResult(result);
 
-      // TOAST HASIL
+      // TOAST hasil import
       if (result.inserted > 0 && result.failed === 0) {
         addToast({
           message: `Import berhasil (${result.inserted} data)`,
           type: "success",
         });
-      } else if (result.inserted > 0 && result.failed > 0) {
+      } else if (result.inserted > 0) {
         addToast({
           message: `Import sebagian berhasil (${result.inserted} berhasil, ${result.failed} gagal)`,
           type: "warning",
@@ -181,14 +170,17 @@ export default function useTableVerif() {
         });
       }
 
-      // 🔥 REFRESH TABLE
+      // REFRESH DATA
       await fetchVerif();
+
+      if (onImported && typeof onImported === "function") {
+        onImported(); // modal bisa tertutup lewat callback
+      }
     } catch (err) {
       console.error("IMPORT ERROR:", err);
       addToast({
         message:
-          err.response?.data?.message ||
-          "Gagal mengimpor klaim dari Excel",
+          err.response?.data?.message || "Gagal mengimpor klaim dari Excel",
         type: "danger",
       });
     } finally {
@@ -225,5 +217,6 @@ export default function useTableVerif() {
     importExcel,
     importing,
     importResult,
+    fetchVerif, // optional, untuk dipassing ke view
   };
 }
