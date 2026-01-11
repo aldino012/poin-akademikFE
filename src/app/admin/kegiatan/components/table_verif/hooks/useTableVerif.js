@@ -8,6 +8,9 @@ import usePaginationFilter from "@/app/hooks/usePaginationFilter";
 export default function useTableVerif() {
   const { addToast } = useToast();
 
+  // ==========================
+  // STATE
+  // ==========================
   const [claims, setClaims] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -15,7 +18,13 @@ export default function useTableVerif() {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState(null);
 
-  // 🎨 WARNA STATUS
+  // 🔥 IMPORT EXCEL
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState(null);
+
+  // ==========================
+  // STATUS STYLE
+  // ==========================
   const statusColors = {
     Diajukan: "bg-gray-100 text-gray-700",
     Revisi: "bg-yellow-100 text-yellow-700",
@@ -24,7 +33,7 @@ export default function useTableVerif() {
     Disetujui: "bg-blue-100 text-blue-700",
   };
 
-  // 🎯 PRIORITAS SORT
+  // PRIORITAS SORT
   const statusPriority = {
     Diajukan: 1,
     Revisi: 2,
@@ -34,12 +43,13 @@ export default function useTableVerif() {
   };
 
   // ==========================
-  // FETCH
+  // FETCH DATA
   // ==========================
   const fetchVerif = async () => {
+    setLoading(true);
     try {
       const res = await api.get("/klaim");
-      let data = res.data.data || [];
+      let data = res.data?.data || [];
 
       data.sort((a, b) => {
         const pa = statusPriority[a.status] ?? 999;
@@ -50,7 +60,10 @@ export default function useTableVerif() {
       setClaims(data);
     } catch (err) {
       console.error(err);
-      addToast({ message: "Gagal mengambil data verifikasi!", type: "danger" });
+      addToast({
+        message: "Gagal mengambil data verifikasi klaim!",
+        type: "danger",
+      });
     } finally {
       setLoading(false);
     }
@@ -61,14 +74,14 @@ export default function useTableVerif() {
   }, []);
 
   // ==========================
-  // FILTER
+  // FILTER & PAGINATION
   // ==========================
   const filterFn = useCallback(
     (c) => {
       const s = search.toLowerCase();
       return (
         c.mahasiswa?.nama_mhs?.toLowerCase().includes(s) ||
-        c.mahasiswa?.id_mhs?.toString().includes(s)
+        c.mahasiswa?.nim?.toString().includes(s)
       );
     },
     [search]
@@ -77,7 +90,7 @@ export default function useTableVerif() {
   const pagination = usePaginationFilter(claims, search, filterFn, 7, []);
 
   // ==========================
-  // MODAL
+  // MODAL DETAIL
   // ==========================
   const openDetail = (claim) => {
     setSelectedClaim(claim);
@@ -96,6 +109,10 @@ export default function useTableVerif() {
     try {
       await api.patch(`/klaim/${id}/status`, { status, catatan });
       await fetchVerif();
+      addToast({
+        message: "Status klaim berhasil diperbarui",
+        type: "success",
+      });
     } catch (err) {
       console.error(err);
       addToast({
@@ -107,6 +124,79 @@ export default function useTableVerif() {
     }
   };
 
+  // ==========================
+  // 🔥 IMPORT EXCEL KLAIM
+  // ==========================
+  const importExcel = async (file) => {
+    if (!file) {
+      addToast({
+        message: "File Excel belum dipilih",
+        type: "warning",
+      });
+      return;
+    }
+
+    // validasi client-side (opsional tapi bagus)
+    const isExcel =
+      file.type ===
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+      file.type === "application/vnd.ms-excel";
+
+    if (!isExcel) {
+      addToast({
+        message: "File harus berformat Excel (.xls / .xlsx)",
+        type: "danger",
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file); // 🔥 HARUS "file"
+
+    setImporting(true);
+    setImportResult(null);
+
+    try {
+      const res = await api.post("/klaim/import-excel", formData);
+
+      const result = res.data;
+      setImportResult(result);
+
+      // TOAST HASIL
+      if (result.inserted > 0 && result.failed === 0) {
+        addToast({
+          message: `Import berhasil (${result.inserted} data)`,
+          type: "success",
+        });
+      } else if (result.inserted > 0 && result.failed > 0) {
+        addToast({
+          message: `Import sebagian berhasil (${result.inserted} berhasil, ${result.failed} gagal)`,
+          type: "warning",
+        });
+      } else {
+        addToast({
+          message: "Import gagal, tidak ada data yang masuk",
+          type: "danger",
+        });
+      }
+
+      // 🔥 REFRESH TABLE
+      await fetchVerif();
+    } catch (err) {
+      console.error("IMPORT ERROR:", err);
+      addToast({
+        message:
+          err.response?.data?.message || "Gagal mengimpor klaim dari Excel",
+        type: "danger",
+      });
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  // ==========================
+  // RETURN
+  // ==========================
   return {
     // data
     claims,
@@ -128,5 +218,10 @@ export default function useTableVerif() {
 
     // actions
     updateStatus,
+
+    // 🔥 import
+    importExcel,
+    importing,
+    importResult,
   };
 }

@@ -20,6 +20,8 @@ export default function TableVerif() {
       openDetail={verif.openDetail}
       closeDetail={verif.closeDetail}
       updateStatus={verif.updateStatus}
+      // 🔥 TAMBAHAN SATU BARIS
+      refreshData={verif.fetchVerif}
     />
   );
 }
