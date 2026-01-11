@@ -33,6 +33,7 @@ export default function useTableVerif() {
     Disetujui: "bg-blue-100 text-blue-700",
   };
 
+  // PRIORITAS SORT
   const statusPriority = {
     Diajukan: 1,
     Revisi: 2,
@@ -42,7 +43,7 @@ export default function useTableVerif() {
   };
 
   // ==========================
-  // FETCH DATA KLAIM
+  // FETCH DATA
   // ==========================
   const fetchVerif = async () => {
     setLoading(true);
@@ -50,7 +51,6 @@ export default function useTableVerif() {
       const res = await api.get("/klaim");
       let data = res.data?.data || [];
 
-      // SORT BERDASARKAN PRIORITAS STATUS
       data.sort((a, b) => {
         const pa = statusPriority[a.status] ?? 999;
         const pb = statusPriority[b.status] ?? 999;
@@ -136,7 +136,7 @@ export default function useTableVerif() {
       return;
     }
 
-    // VALIDASI FILE CLIENT-SIDE (opsional)
+    // validasi client-side (opsional tapi bagus)
     const isExcel =
       file.type ===
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
@@ -151,7 +151,7 @@ export default function useTableVerif() {
     }
 
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", file); // 🔥 HARUS "file"
 
     setImporting(true);
     setImportResult(null);
@@ -162,7 +162,7 @@ export default function useTableVerif() {
       const result = res.data;
       setImportResult(result);
 
-      // TOAST HASIL IMPORT
+      // TOAST HASIL
       if (result.inserted > 0 && result.failed === 0) {
         addToast({
           message: `Import berhasil (${result.inserted} data)`,
@@ -180,7 +180,7 @@ export default function useTableVerif() {
         });
       }
 
-      // 🔥 REFRESH TABLE OTOMATIS
+      // 🔥 REFRESH TABLE
       await fetchVerif();
     } catch (err) {
       console.error("IMPORT ERROR:", err);
@@ -198,33 +198,30 @@ export default function useTableVerif() {
   // RETURN
   // ==========================
   return {
-    // DATA
+    // data
     claims,
     loading,
     selectedClaim,
 
-    // UI
+    // ui
     search,
     setSearch,
     statusColors,
 
-    // PAGINATION
+    // pagination
     pagination,
 
-    // MODAL DETAIL
+    // modal
     isDetailOpen,
     openDetail,
     closeDetail,
 
-    // ACTIONS
+    // actions
     updateStatus,
 
-    // 🔥 IMPORT
+    // 🔥 import
     importExcel,
     importing,
     importResult,
-
-    // 🔥 REFRESH DATA
-    fetchVerif,
   };
 }
