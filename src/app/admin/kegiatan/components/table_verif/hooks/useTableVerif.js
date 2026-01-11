@@ -127,7 +127,7 @@ export default function useTableVerif() {
   // ==========================
   // 🔥 IMPORT EXCEL KLAIM
   // ==========================
-  const importExcel = async (file, onImported) => {
+  const importExcel = async (file) => {
     if (!file) {
       addToast({
         message: "File Excel belum dipilih",
@@ -136,7 +136,7 @@ export default function useTableVerif() {
       return;
     }
 
-    // validasi client-side
+    // validasi client-side (opsional tapi bagus)
     const isExcel =
       file.type ===
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
@@ -151,7 +151,7 @@ export default function useTableVerif() {
     }
 
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", file); // 🔥 HARUS "file"
 
     setImporting(true);
     setImportResult(null);
@@ -182,11 +182,6 @@ export default function useTableVerif() {
 
       // 🔥 REFRESH TABLE
       await fetchVerif();
-
-      // 🔥 CALLBACK OPTIONAL
-      if (onImported && typeof onImported === "function") {
-        onImported();
-      }
     } catch (err) {
       console.error("IMPORT ERROR:", err);
       addToast({
@@ -228,6 +223,5 @@ export default function useTableVerif() {
     importExcel,
     importing,
     importResult,
-    fetchVerif, // optional, untuk dipassing ke view
   };
 }
