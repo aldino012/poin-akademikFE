@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-
 import TableToolbar from "./TableToolbar";
 import TableDesktop from "./TableDesktop";
 import TableMobile from "./TableMobile";
@@ -22,8 +21,9 @@ export default function TableVerifView({
   closeDetail,
   updateStatus,
 
-  // 🔥 TAMBAHAN DARI HOOK
-  refreshData, // <-- fetchVerif dari parent
+  // 🔥 DARI HOOK
+  importExcel,
+  importing,
 }) {
   const {
     filtered,
@@ -35,9 +35,6 @@ export default function TableVerifView({
     endIndex,
   } = pagination;
 
-  // ==========================
-  // IMPORT MODAL STATE
-  // ==========================
   const [isImportOpen, setIsImportOpen] = useState(false);
 
   if (loading) {
@@ -54,7 +51,6 @@ export default function TableVerifView({
           setCurrentPage={setCurrentPage}
         />
 
-        {/* 🔥 IMPORT BUTTON */}
         <button
           onClick={() => setIsImportOpen(true)}
           className="
@@ -104,16 +100,17 @@ export default function TableVerifView({
         onSaveStatus={updateStatus}
       />
 
-      {/* ================= Import Excel Modal ================= */}
+      {/* ================= Import Modal ================= */}
       <ModalImportExcel
         isOpen={isImportOpen}
         onClose={() => setIsImportOpen(false)}
         title="Import Klaim Kegiatan"
-        importUrl="/klaim/import-excel" // 🔥 lewat proxy otomatis
         acceptTypes=".xlsx,.xls"
         maxSizeMB={5}
-        onImported={() => {
-          refreshData(); // 🔥 refresh klaim setelah import
+        loading={importing}
+        onImport={async (file) => {
+          await importExcel(file); // 🔥 HOOK yang handle semuanya
+          setIsImportOpen(false); // 🔥 AUTO CLOSE
         }}
       />
     </div>

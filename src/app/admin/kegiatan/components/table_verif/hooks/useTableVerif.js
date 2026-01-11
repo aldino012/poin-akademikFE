@@ -33,7 +33,6 @@ export default function useTableVerif() {
     Disetujui: "bg-blue-100 text-blue-700",
   };
 
-  // PRIORITAS SORT
   const statusPriority = {
     Diajukan: 1,
     Revisi: 2,
@@ -49,7 +48,7 @@ export default function useTableVerif() {
     setLoading(true);
     try {
       const res = await api.get("/klaim");
-      let data = res.data?.data || [];
+      const data = res.data?.data || [];
 
       data.sort((a, b) => {
         const pa = statusPriority[a.status] ?? 999;
@@ -125,7 +124,7 @@ export default function useTableVerif() {
   };
 
   // ==========================
-  // 🔥 IMPORT EXCEL KLAIM
+  // 🔥 IMPORT EXCEL KLAIM (FIX UTAMA)
   // ==========================
   const importExcel = async (file) => {
     if (!file) {
@@ -133,10 +132,9 @@ export default function useTableVerif() {
         message: "File Excel belum dipilih",
         type: "warning",
       });
-      return;
+      throw new Error("File kosong");
     }
 
-    // validasi client-side (opsional tapi bagus)
     const isExcel =
       file.type ===
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
@@ -147,17 +145,19 @@ export default function useTableVerif() {
         message: "File harus berformat Excel (.xls / .xlsx)",
         type: "danger",
       });
-      return;
+      throw new Error("Format file salah");
     }
 
     const formData = new FormData();
-    formData.append("file", file); // 🔥 HARUS "file"
+    formData.append("file", file);
 
     setImporting(true);
     setImportResult(null);
 
     try {
-      const res = await api.post("/klaim/import-excel", formData);
+      const res = await api.post("/klaim/import-excel", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       const result = res.data;
       setImportResult(result);
@@ -180,8 +180,11 @@ export default function useTableVerif() {
         });
       }
 
-      // 🔥 REFRESH TABLE
+      // 🔥 PENTING
       await fetchVerif();
+
+      // 🔥 RETURN RESULT → BIAR MODAL TAHU SUKSES
+      return result;
     } catch (err) {
       console.error("IMPORT ERROR:", err);
       addToast({
@@ -189,6 +192,7 @@ export default function useTableVerif() {
           err.response?.data?.message || "Gagal mengimpor klaim dari Excel",
         type: "danger",
       });
+      throw err;
     } finally {
       setImporting(false);
     }
