@@ -22,8 +22,10 @@ export default function TableVerifView({
   closeDetail,
   updateStatus,
 
-  // 🔥 TAMBAHAN DARI HOOK
-  refreshData, // <-- fetchVerif dari parent
+  // 🔥 DARI HOOK
+  importExcel,
+  importing,
+  refreshData, // <-- fetchVerif dari hook
 }) {
   const {
     filtered,
@@ -109,11 +111,15 @@ export default function TableVerifView({
         isOpen={isImportOpen}
         onClose={() => setIsImportOpen(false)}
         title="Import Klaim Kegiatan"
-        importUrl="/klaim/import-excel" // 🔥 lewat proxy otomatis
         acceptTypes=".xlsx,.xls"
         maxSizeMB={5}
-        onImported={() => {
-          refreshData(); // 🔥 refresh klaim setelah import
+        loading={importing}
+        onImport={async (file) => {
+          await importExcel(file); // 🔥 handle import via hook
+          setIsImportOpen(false); // 🔥 modal auto-close
+          if (refreshData && typeof refreshData === "function") {
+            await refreshData(); // 🔥 refresh table setelah import
+          }
         }}
       />
     </div>
