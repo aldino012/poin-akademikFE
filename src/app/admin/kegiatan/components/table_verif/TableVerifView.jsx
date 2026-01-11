@@ -21,11 +21,9 @@ export default function TableVerifView({
   openDetail,
   closeDetail,
   updateStatus,
-
-  // 🔥 props dari hook
   importExcel,
   importing,
-  refreshData,
+  fetchVerif, // dari hook, untuk refresh table
 }) {
   const {
     filtered,
@@ -37,34 +35,14 @@ export default function TableVerifView({
     endIndex,
   } = pagination;
 
+  // ==========================
+  // IMPORT MODAL STATE
+  // ==========================
   const [isImportOpen, setIsImportOpen] = useState(false);
 
   if (loading) {
     return <p className="text-center py-4">Loading...</p>;
   }
-
-  // 🔥 Fungsi import wrapper untuk modal
-  const handleImport = async (file) => {
-    if (!file) return;
-
-    try {
-      // panggil hook importExcel
-      if (importExcel && typeof importExcel === "function") {
-        await importExcel(file);
-      }
-
-      // refresh table
-      if (refreshData && typeof refreshData === "function") {
-        await refreshData();
-      }
-
-      // close modal
-      setIsImportOpen(false);
-    } catch (err) {
-      console.error("IMPORT FAILED", err);
-      // tetap biarkan modal terbuka jika error
-    }
-  };
 
   return (
     <div className="bg-white rounded-xl shadow-md border p-4 overflow-y-visible">
@@ -76,7 +54,7 @@ export default function TableVerifView({
           setCurrentPage={setCurrentPage}
         />
 
-        {/* 🔥 IMPORT BUTTON */}
+        {/* ================= IMPORT BUTTON ================= */}
         <button
           onClick={() => setIsImportOpen(true)}
           className="
@@ -100,6 +78,7 @@ export default function TableVerifView({
           statusColors={statusColors}
           openDetailModal={openDetail}
         />
+
         <TableMobile
           currentClaims={currentItems}
           statusColors={statusColors}
@@ -134,7 +113,15 @@ export default function TableVerifView({
         maxSizeMB={5}
         loading={importing}
         onImport={async (file) => {
-          await importExcel(file, () => setIsImportOpen(false)); // modal auto-close
+          // 🔥 handle import via hook
+          await importExcel(file, async () => {
+            setIsImportOpen(false); // modal otomatis tertutup
+          });
+
+          // 🔥 refresh table otomatis (opsional, sudah di hook)
+          if (fetchVerif && typeof fetchVerif === "function") {
+            await fetchVerif();
+          }
         }}
       />
     </div>

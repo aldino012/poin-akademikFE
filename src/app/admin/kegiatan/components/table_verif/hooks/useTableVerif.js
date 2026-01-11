@@ -18,7 +18,7 @@ export default function useTableVerif() {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState(null);
 
-  // 🔥 IMPORT EXCEL
+  // IMPORT EXCEL
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState(null);
 
@@ -125,21 +125,26 @@ export default function useTableVerif() {
   };
 
   // ==========================
-  // 🔥 IMPORT EXCEL KLAIM
+  // IMPORT EXCEL
   // ==========================
   const importExcel = async (file, onImported) => {
-    if (!file)
-      return addToast({ message: "File Excel belum dipilih", type: "warning" });
+    if (!file) {
+      addToast({ message: "File Excel belum dipilih", type: "warning" });
+      return;
+    }
 
     const isExcel =
       file.type ===
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
       file.type === "application/vnd.ms-excel";
-    if (!isExcel)
-      return addToast({
+
+    if (!isExcel) {
+      addToast({
         message: "File harus berformat Excel (.xls / .xlsx)",
         type: "danger",
       });
+      return;
+    }
 
     const formData = new FormData();
     formData.append("file", file);
@@ -173,8 +178,9 @@ export default function useTableVerif() {
       // REFRESH DATA
       await fetchVerif();
 
+      // CALLBACK optional untuk close modal
       if (onImported && typeof onImported === "function") {
-        onImported(); // modal bisa tertutup lewat callback
+        onImported();
       }
     } catch (err) {
       console.error("IMPORT ERROR:", err);
@@ -213,10 +219,10 @@ export default function useTableVerif() {
     // actions
     updateStatus,
 
-    // 🔥 import
+    // import
     importExcel,
     importing,
     importResult,
-    fetchVerif, // optional, untuk dipassing ke view
+    fetchVerif, // opsional untuk parent
   };
 }
