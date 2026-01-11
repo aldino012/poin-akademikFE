@@ -22,8 +22,10 @@ export default function TableVerifView({
   closeDetail,
   updateStatus,
 
-  // 🔥 TAMBAHAN DARI HOOK
-  refreshData, // <-- fetchVerif dari parent
+  // 🔥 props dari hook
+  importExcel,
+  importing,
+  refreshData,
 }) {
   const {
     filtered,
@@ -35,14 +37,34 @@ export default function TableVerifView({
     endIndex,
   } = pagination;
 
-  // ==========================
-  // IMPORT MODAL STATE
-  // ==========================
   const [isImportOpen, setIsImportOpen] = useState(false);
 
   if (loading) {
     return <p className="text-center py-4">Loading...</p>;
   }
+
+  // 🔥 Fungsi import wrapper untuk modal
+  const handleImport = async (file) => {
+    if (!file) return;
+
+    try {
+      // panggil hook importExcel
+      if (importExcel && typeof importExcel === "function") {
+        await importExcel(file);
+      }
+
+      // refresh table
+      if (refreshData && typeof refreshData === "function") {
+        await refreshData();
+      }
+
+      // close modal
+      setIsImportOpen(false);
+    } catch (err) {
+      console.error("IMPORT FAILED", err);
+      // tetap biarkan modal terbuka jika error
+    }
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-md border p-4 overflow-y-visible">
@@ -78,7 +100,6 @@ export default function TableVerifView({
           statusColors={statusColors}
           openDetailModal={openDetail}
         />
-
         <TableMobile
           currentClaims={currentItems}
           statusColors={statusColors}
@@ -109,12 +130,10 @@ export default function TableVerifView({
         isOpen={isImportOpen}
         onClose={() => setIsImportOpen(false)}
         title="Import Klaim Kegiatan"
-        importUrl="/klaim/import-excel" // 🔥 lewat proxy otomatis
         acceptTypes=".xlsx,.xls"
         maxSizeMB={5}
-        onImported={() => {
-          refreshData(); // 🔥 refresh klaim setelah import
-        }}
+        loading={importing}
+        onImport={handleImport} // 🔥 pakai wrapper ini
       />
     </div>
   );
