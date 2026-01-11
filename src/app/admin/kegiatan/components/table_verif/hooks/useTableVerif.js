@@ -117,7 +117,8 @@ export default function useTableVerif() {
       console.error(err);
       addToast({
         message:
-          err.response?.data?.message || "Gagal memperbarui status verifikasi!",
+          err.response?.data?.message ||
+          "Gagal memperbarui status verifikasi!",
         type: "danger",
       });
       throw err;
@@ -186,7 +187,8 @@ export default function useTableVerif() {
       console.error("IMPORT ERROR:", err);
       addToast({
         message:
-          err.response?.data?.message || "Gagal mengimpor klaim dari Excel",
+          err.response?.data?.message ||
+          "Gagal mengimpor klaim dari Excel",
         type: "danger",
       });
     } finally {
