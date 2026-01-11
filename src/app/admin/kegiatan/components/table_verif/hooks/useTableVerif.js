@@ -42,14 +42,15 @@ export default function useTableVerif() {
   };
 
   // ==========================
-  // FETCH DATA
+  // FETCH DATA KLAIM
   // ==========================
   const fetchVerif = async () => {
     setLoading(true);
     try {
       const res = await api.get("/klaim");
-      const data = res.data?.data || [];
+      let data = res.data?.data || [];
 
+      // SORT BERDASARKAN PRIORITAS STATUS
       data.sort((a, b) => {
         const pa = statusPriority[a.status] ?? 999;
         const pb = statusPriority[b.status] ?? 999;
@@ -124,7 +125,7 @@ export default function useTableVerif() {
   };
 
   // ==========================
-  // 🔥 IMPORT EXCEL KLAIM (FIX UTAMA)
+  // 🔥 IMPORT EXCEL KLAIM
   // ==========================
   const importExcel = async (file) => {
     if (!file) {
@@ -132,9 +133,10 @@ export default function useTableVerif() {
         message: "File Excel belum dipilih",
         type: "warning",
       });
-      throw new Error("File kosong");
+      return;
     }
 
+    // VALIDASI FILE CLIENT-SIDE (opsional)
     const isExcel =
       file.type ===
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
@@ -145,7 +147,7 @@ export default function useTableVerif() {
         message: "File harus berformat Excel (.xls / .xlsx)",
         type: "danger",
       });
-      throw new Error("Format file salah");
+      return;
     }
 
     const formData = new FormData();
@@ -155,14 +157,12 @@ export default function useTableVerif() {
     setImportResult(null);
 
     try {
-      const res = await api.post("/klaim/import-excel", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const res = await api.post("/klaim/import-excel", formData);
 
       const result = res.data;
       setImportResult(result);
 
-      // TOAST HASIL
+      // TOAST HASIL IMPORT
       if (result.inserted > 0 && result.failed === 0) {
         addToast({
           message: `Import berhasil (${result.inserted} data)`,
@@ -180,11 +180,8 @@ export default function useTableVerif() {
         });
       }
 
-      // 🔥 PENTING
+      // 🔥 REFRESH TABLE OTOMATIS
       await fetchVerif();
-
-      // 🔥 RETURN RESULT → BIAR MODAL TAHU SUKSES
-      return result;
     } catch (err) {
       console.error("IMPORT ERROR:", err);
       addToast({
@@ -192,7 +189,6 @@ export default function useTableVerif() {
           err.response?.data?.message || "Gagal mengimpor klaim dari Excel",
         type: "danger",
       });
-      throw err;
     } finally {
       setImporting(false);
     }
@@ -202,30 +198,33 @@ export default function useTableVerif() {
   // RETURN
   // ==========================
   return {
-    // data
+    // DATA
     claims,
     loading,
     selectedClaim,
 
-    // ui
+    // UI
     search,
     setSearch,
     statusColors,
 
-    // pagination
+    // PAGINATION
     pagination,
 
-    // modal
+    // MODAL DETAIL
     isDetailOpen,
     openDetail,
     closeDetail,
 
-    // actions
+    // ACTIONS
     updateStatus,
 
-    // 🔥 import
+    // 🔥 IMPORT
     importExcel,
     importing,
     importResult,
+
+    // 🔥 REFRESH DATA
+    fetchVerif,
   };
 }

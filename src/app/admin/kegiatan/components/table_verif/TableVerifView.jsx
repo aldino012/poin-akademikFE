@@ -51,6 +51,7 @@ export default function TableVerifView({
           setCurrentPage={setCurrentPage}
         />
 
+        {/* BUTTON IMPORT */}
         <button
           onClick={() => setIsImportOpen(true)}
           className="
@@ -109,8 +110,8 @@ export default function TableVerifView({
         maxSizeMB={5}
         loading={importing}
         onImport={async (file) => {
-          await importExcel(file); // 🔥 HOOK yang handle semuanya
-          setIsImportOpen(false); // 🔥 AUTO CLOSE
+          await importExcel(file); // 🔥 HOOK handle import & refresh tabel
+          setIsImportOpen(false); // 🔥 AUTO CLOSE MODAL
         }}
       />
     </div>
