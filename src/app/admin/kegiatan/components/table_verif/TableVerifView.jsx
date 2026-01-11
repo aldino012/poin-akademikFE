@@ -22,10 +22,10 @@ export default function TableVerifView({
   closeDetail,
   updateStatus,
 
-  // 🔥 DARI HOOK
+  // 🔥 props baru dari hook
   importExcel,
   importing,
-  refreshData, // <-- fetchVerif dari hook
+  refreshData, // fetchVerif dari hook
 }) {
   const {
     filtered,
@@ -115,7 +115,9 @@ export default function TableVerifView({
         maxSizeMB={5}
         loading={importing}
         onImport={async (file) => {
-          await importExcel(file); // 🔥 handle import via hook
+          if (importExcel && typeof importExcel === "function") {
+            await importExcel(file); // 🔥 hook handle import
+          }
           setIsImportOpen(false); // 🔥 modal auto-close
           if (refreshData && typeof refreshData === "function") {
             await refreshData(); // 🔥 refresh table setelah import
