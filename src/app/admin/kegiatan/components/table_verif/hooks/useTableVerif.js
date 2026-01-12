@@ -121,7 +121,7 @@ export default function useTableVerif() {
   // ==========================
   // IMPORT EXCEL
   // ==========================
-  const importExcel = async (file) => {
+  const importExcel = async (file, onFinish) => {
     if (!file) return;
 
     const formData = new FormData();
@@ -156,7 +156,13 @@ export default function useTableVerif() {
         });
       }
 
+      // 🔄 Refresh data otomatis
       await fetchVerif();
+
+      // ✅ Callback dari parent jika ada (misal untuk menutup modal)
+      if (onFinish && typeof onFinish === "function") {
+        onFinish();
+      }
     } catch (err) {
       console.error(err);
       addToast({
@@ -168,6 +174,7 @@ export default function useTableVerif() {
       setImportLoading(false);
     }
   };
+
 
   return {
     // data

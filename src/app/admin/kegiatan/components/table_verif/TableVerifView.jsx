@@ -111,7 +111,7 @@ export default function TableVerifView({
         onClose={() => setIsImportOpen(false)}
         title="Import Klaim Excel"
         importUrl="/klaim/import-excel"
-        onImported={() => setIsImportOpen(false)} // nutup modal setelah sukses
+        onImported={() => importExcel(file, () => setIsImportOpen(false))} // ✅ panggil hook dan tutup modal
       />
     </div>
   );
