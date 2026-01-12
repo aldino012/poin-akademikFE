@@ -10,7 +10,7 @@ import DetailVerifModal from "../verif-kegiatan/VerifParent";
 import ModalExcel from "@/components/ModalExcel";
 
 export default function TableVerifView({
-  // data
+  // ===== DATA & UI =====
   claims,
   loading,
   search,
@@ -18,16 +18,14 @@ export default function TableVerifView({
   statusColors,
   pagination,
 
-  // modal detail
+  // ===== MODAL DETAIL =====
   isDetailOpen,
   selectedClaim,
   openDetail,
   closeDetail,
 
-  // actions
+  // ===== ACTIONS =====
   updateStatus,
-  importExcel,
-  importLoading,
 }) {
   const [isImportOpen, setIsImportOpen] = useState(false);
 
@@ -48,7 +46,7 @@ export default function TableVerifView({
   return (
     <div className="bg-white rounded-xl shadow-md border p-4 overflow-y-visible">
       {/* =========================
-          TOOLBAR + IMPORT
+          TOOLBAR + IMPORT BUTTON
       ========================= */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
         <TableToolbar
@@ -59,15 +57,9 @@ export default function TableVerifView({
 
         <button
           onClick={() => setIsImportOpen(true)}
-          disabled={importLoading}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition
-            ${
-              importLoading
-                ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 text-white"
-            }`}
+          className="px-4 py-2 rounded-lg text-sm font-medium transition bg-blue-600 hover:bg-blue-700 text-white"
         >
-          {importLoading ? "Mengimport..." : "Import Excel"}
+          Import Excel
         </button>
       </div>
 
@@ -117,10 +109,9 @@ export default function TableVerifView({
       <ModalExcel
         isOpen={isImportOpen}
         onClose={() => setIsImportOpen(false)}
-        onImport={importExcel}
-        loading={importLoading}
-        title="Import Klaim Poin (Excel)"
-        description="Upload file Excel. Data duplikat tidak akan dimasukkan."
+        title="Import Klaim Excel"
+        importUrl="/klaim/import-excel"
+        onImported={() => setIsImportOpen(false)} // nutup modal setelah sukses
       />
     </div>
   );

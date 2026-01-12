@@ -130,7 +130,7 @@ export default function useTableVerif() {
     try {
       setImportLoading(true);
 
-      const res = await api.post("/klaim/import", formData, {
+      const res = await api.post("/klaim/import-excel", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
