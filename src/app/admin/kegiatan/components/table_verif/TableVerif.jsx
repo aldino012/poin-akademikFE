@@ -9,22 +9,22 @@ export default function TableVerif() {
 
   return (
     <TableVerifView
-      /* data */
+      /* ===== DATA ===== */
       claims={verif.claims}
       loading={verif.loading}
       search={verif.search}
       setSearch={verif.setSearch}
       statusColors={verif.statusColors}
       pagination={verif.pagination}
-      /* modal detail */
+      /* ===== MODAL DETAIL ===== */
       isDetailOpen={verif.isDetailOpen}
       selectedClaim={verif.selectedClaim}
       openDetail={verif.openDetail}
       closeDetail={verif.closeDetail}
-      /* actions */
+      /* ===== ACTIONS ===== */
       updateStatus={verif.updateStatus}
-      importExcel={verif.importExcel}
-      importLoading={verif.importLoading}
+      importExcel={verif.importExcel} // ✅ hook importExcel sudah pass ke view
+      importLoading={verif.importLoading} // ✅ state loading import
     />
   );
 }
