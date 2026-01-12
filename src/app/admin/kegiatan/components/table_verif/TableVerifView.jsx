@@ -1,26 +1,36 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 
 import TableToolbar from "./TableToolbar";
 import TableDesktop from "./TableDesktop";
 import TableMobile from "./TableMobile";
 import TablePagination from "@/components/Pagianation";
 import DetailVerifModal from "../verif-kegiatan/VerifParent";
+import ModalExcel from "@/components/ModalExcel";
 
 export default function TableVerifView({
+  // data
   claims,
   loading,
   search,
   setSearch,
   statusColors,
   pagination,
+
+  // modal detail
   isDetailOpen,
   selectedClaim,
   openDetail,
   closeDetail,
+
+  // actions
   updateStatus,
+  importExcel,
+  importLoading,
 }) {
+  const [isImportOpen, setIsImportOpen] = useState(false);
+
   const {
     filtered,
     currentItems,
@@ -37,14 +47,33 @@ export default function TableVerifView({
 
   return (
     <div className="bg-white rounded-xl shadow-md border p-4 overflow-y-visible">
-      {/* Toolbar */}
-      <TableToolbar
-        search={search}
-        setSearch={setSearch}
-        setCurrentPage={setCurrentPage}
-      />
+      {/* =========================
+          TOOLBAR + IMPORT
+      ========================= */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+        <TableToolbar
+          search={search}
+          setSearch={setSearch}
+          setCurrentPage={setCurrentPage}
+        />
 
-      {/* Table */}
+        <button
+          onClick={() => setIsImportOpen(true)}
+          disabled={importLoading}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition
+            ${
+              importLoading
+                ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 text-white"
+            }`}
+        >
+          {importLoading ? "Mengimport..." : "Import Excel"}
+        </button>
+      </div>
+
+      {/* =========================
+          TABLE
+      ========================= */}
       <div className="overflow-y-visible">
         <TableDesktop
           currentClaims={currentItems}
@@ -60,7 +89,9 @@ export default function TableVerifView({
         />
       </div>
 
-      {/* Pagination */}
+      {/* =========================
+          PAGINATION
+      ========================= */}
       <TablePagination
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
@@ -70,12 +101,26 @@ export default function TableVerifView({
         filteredCount={filtered.length}
       />
 
-      {/* Detail Modal */}
+      {/* =========================
+          DETAIL MODAL
+      ========================= */}
       <DetailVerifModal
         isOpen={isDetailOpen}
         onClose={closeDetail}
         claim={selectedClaim}
         onSaveStatus={updateStatus}
+      />
+
+      {/* =========================
+          IMPORT MODAL
+      ========================= */}
+      <ModalExcel
+        isOpen={isImportOpen}
+        onClose={() => setIsImportOpen(false)}
+        onImport={importExcel}
+        loading={importLoading}
+        title="Import Klaim Poin (Excel)"
+        description="Upload file Excel. Data duplikat tidak akan dimasukkan."
       />
     </div>
   );
