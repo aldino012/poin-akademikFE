@@ -22,19 +22,24 @@ export default function TableMhs() {
       /* data */
       studentsData={tableMhs.studentsData}
       selectedStudent={tableMhs.selectedStudent}
+      loading={tableMhs.loading} 
+
       /* filter */
       search={tableMhs.search}
       setSearch={tableMhs.setSearch}
       filterPoin={tableMhs.filterPoin}
       setFilterPoin={tableMhs.setFilterPoin}
+
       /* pagination */
       pagination={tableMhs.pagination}
+
       /* modal state */
       isDetailOpen={tableMhs.isDetailOpen}
       isTambahOpen={tableMhs.isTambahOpen}
       isEditOpen={tableMhs.isEditOpen}
       isExcelOpen={tableMhs.isExcelOpen}
       excelConfig={tableMhs.excelConfig}
+
       /* modal handler */
       openDetail={tableMhs.openDetail}
       closeDetail={tableMhs.closeDetail}
@@ -42,6 +47,7 @@ export default function TableMhs() {
       closeTambah={tableMhs.closeTambah}
       openEdit={tableMhs.openEdit}
       closeEdit={tableMhs.closeEdit}
+
       /* actions */
       openCetak={tableMhs.openCetak}
       handleTambahSuccess={tableMhs.handleTambahSuccess}

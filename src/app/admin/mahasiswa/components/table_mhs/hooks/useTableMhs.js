@@ -9,6 +9,11 @@ export default function useTableMhs() {
   const { addToast } = useToast();
 
   // ==========================
+  // GLOBAL LOADING (Overlay)
+  // ==========================
+  const [loading, setLoading] = useState(false);
+
+  // ==========================
   // STATE DATA
   // ==========================
   const [studentsData, setStudentsData] = useState([]);
@@ -41,6 +46,7 @@ export default function useTableMhs() {
   // FETCH DATA
   // ==========================
   const fetchMahasiswa = async () => {
+    setLoading(true);
     try {
       const res = await api.get("/mahasiswa");
       setStudentsData(res.data);
@@ -50,6 +56,8 @@ export default function useTableMhs() {
         message: "Gagal memuat data mahasiswa",
         type: "error",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -82,7 +90,7 @@ export default function useTableMhs() {
 
       return (namaMatch || nimMatch) && matchPoin;
     },
-    7
+    7,
   );
 
   // ==========================
@@ -137,6 +145,7 @@ export default function useTableMhs() {
   };
 
   const handleUpdate = async (updatedStudent) => {
+    setLoading(true);
     try {
       const formData = new FormData();
 
@@ -153,7 +162,7 @@ export default function useTableMhs() {
       const res = await api.put(
         `/mahasiswa/${updatedStudent.id_mhs}`,
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        { headers: { "Content-Type": "multipart/form-data" } },
       );
 
       const updated = res.data.mahasiswa;
@@ -185,17 +194,20 @@ export default function useTableMhs() {
       }
 
       addToast({ message: msg, type: "error" });
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDelete = async (student) => {
     if (!window.confirm(`Hapus mahasiswa "${student.nama_mhs}"?`)) return;
 
+    setLoading(true);
     try {
       await api.delete(`/mahasiswa/${student.id_mhs}`);
 
       setStudentsData((prev) =>
-        prev.filter((m) => m.id_mhs !== student.id_mhs)
+        prev.filter((m) => m.id_mhs !== student.id_mhs),
       );
 
       addToast({
@@ -208,6 +220,8 @@ export default function useTableMhs() {
         message: "Gagal menghapus mahasiswa",
         type: "error",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -224,11 +238,12 @@ export default function useTableMhs() {
   };
 
   const handleImportSuccess = () => {
-    fetchMahasiswa(); // 🔥 reload data
-    setIsExcelOpen(false); // tutup modal
+    fetchMahasiswa();
+    setIsExcelOpen(false);
   };
 
   const handleExportExcel = async () => {
+    setLoading(true);
     try {
       const res = await api.get("/mahasiswa/export-excel", {
         responseType: "blob",
@@ -255,6 +270,8 @@ export default function useTableMhs() {
         message: "Gagal export Excel",
         type: "error",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -303,5 +320,8 @@ export default function useTableMhs() {
     // utils
     fetchMahasiswa,
     setSelectedStudent,
+
+    // loading overlay
+    loading,
   };
 }
