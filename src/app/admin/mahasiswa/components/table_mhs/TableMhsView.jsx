@@ -17,6 +17,9 @@ export default function TableMhsView({
   studentsData,
   selectedStudent,
 
+  // loading state
+  isLoading = false, // Tambahkan prop loading state
+
   // filter
   search,
   setSearch,
@@ -85,6 +88,7 @@ export default function TableMhsView({
         onImport={openImportExcel}
         onExport={handleExportExcel}
         disableExport={studentsData.length === 0}
+        isLoading={isLoading} // Kirim loading state ke toolbar jika diperlukan
       />
 
       {/* ==========================
@@ -98,6 +102,7 @@ export default function TableMhsView({
           openCetak={openCetak}
           onEdit={openEdit}
           onDelete={handleDelete}
+          isLoading={isLoading} // Kirim loading state ke TableDesktop
         />
 
         <TableMobile
@@ -106,20 +111,24 @@ export default function TableMhsView({
           openCetak={openCetak}
           onEdit={openEdit}
           onDelete={handleDelete}
+          isLoading={isLoading} // Kirim loading state ke TableMobile (perlu update TableMobile juga)
         />
       </div>
 
       {/* ==========================
           PAGINATION
+          (sembunyikan saat loading jika mau)
       ========================== */}
-      <TablePagination
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-        totalPages={totalPages}
-        startIndex={startIndex}
-        endIndex={endIndex}
-        filteredCount={filtered.length}
-      />
+      {!isLoading && (
+        <TablePagination
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          totalPages={totalPages}
+          startIndex={startIndex}
+          endIndex={endIndex}
+          filteredCount={filtered.length}
+        />
+      )}
 
       {/* ==========================
           MODAL TAMBAH
@@ -158,7 +167,7 @@ export default function TableMhsView({
         title={excelConfig.title}
         importUrl={excelConfig.importUrl}
         exportUrl={excelConfig.exportUrl}
-        onImported={handleImportSuccess} 
+        onImported={handleImportSuccess}
       />
     </div>
   );
