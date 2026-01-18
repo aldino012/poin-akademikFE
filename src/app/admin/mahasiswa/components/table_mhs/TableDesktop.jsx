@@ -3,12 +3,11 @@ import React from "react";
 
 export default function TableDesktop({
   students,
-  startIndex,
+  startIndex, 
   openDetail,
   openCetak,
   onEdit,
   onDelete,
-  isLoading = false, // Tambahkan prop untuk loading state
 }) {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -40,36 +39,6 @@ export default function TableDesktop({
         .animate-fade-in {
           animation: fadeIn 0.4s ease-out forwards;
         }
-        @keyframes pulse {
-          0%,
-          100% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.5;
-          }
-        }
-        .animate-pulse {
-          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        @keyframes shimmer {
-          0% {
-            background-position: -1000px 0;
-          }
-          100% {
-            background-position: 1000px 0;
-          }
-        }
-        .animate-shimmer {
-          animation: shimmer 2s infinite linear;
-          background: linear-gradient(
-            to right,
-            #f3f4f6 4%,
-            #e5e7eb 25%,
-            #f3f4f6 36%
-          );
-          background-size: 1000px 100%;
-        }
       `}</style>
 
       <div className="hidden lg:block overflow-x-auto rounded-xl shadow-md border border-gray-100">
@@ -99,60 +68,8 @@ export default function TableDesktop({
           </thead>
 
           <tbody className="divide-y divide-gray-200 text-[12.5px] text-gray-700">
-            {/* Loading State */}
-            {isLoading && (
-              <>
-                {Array.from({ length: 5 }).map((_, idx) => (
-                  <tr
-                    key={`loading-${idx}`}
-                    className="hover:bg-blue-50/60 transition-colors duration-150"
-                  >
-                    {/* NOMOR */}
-                    <td className="px-3 py-3">
-                      <div className="h-4 w-6 bg-gray-200 rounded animate-pulse"></div>
-                    </td>
-
-                    {/* NIM */}
-                    <td className="px-3 py-3">
-                      <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
-                    </td>
-
-                    {/* NAMA */}
-                    <td className="px-3 py-3">
-                      <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
-                    </td>
-
-                    {/* PRODI */}
-                    <td className="px-3 py-3">
-                      <div className="h-4 w-28 bg-gray-200 rounded animate-pulse"></div>
-                    </td>
-
-                    {/* TOTAL POIN */}
-                    <td className="px-3 py-3">
-                      <div className="h-6 w-24 bg-gray-200 rounded-full animate-pulse"></div>
-                    </td>
-
-                    {/* FOTO */}
-                    <td className="px-4 py-3">
-                      <div className="w-12 h-12 rounded-full bg-gray-200 animate-pulse"></div>
-                    </td>
-
-                    {/* AKSI */}
-                    <td className="px-3 py-3">
-                      <div className="flex flex-wrap gap-1.5">
-                        <div className="h-7 w-16 bg-gray-200 rounded-md animate-pulse"></div>
-                        <div className="h-7 w-16 bg-gray-200 rounded-md animate-pulse"></div>
-                        <div className="h-7 w-16 bg-gray-200 rounded-md animate-pulse"></div>
-                        <div className="h-7 w-16 bg-gray-200 rounded-md animate-pulse"></div>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </>
-            )}
-
-            {/* Jika TIDAK ADA DATA dan tidak loading */}
-            {!isLoading && students.length === 0 && (
+            {/* Jika TIDAK ADA DATA */}
+            {students.length === 0 && (
               <tr>
                 <td colSpan={7} className="py-16 px-4 text-center">
                   <div className="animate-fade-in flex flex-col items-center justify-center">
@@ -175,92 +92,91 @@ export default function TableDesktop({
               </tr>
             )}
 
-            {/* Jika ADA DATA dan tidak loading */}
-            {!isLoading &&
-              students.map((student, idx) => (
-                <tr
-                  key={student.id_mhs || idx}
-                  className="hover:bg-blue-50/60 transition-colors duration-150 animate-slide-in"
-                  style={{ animationDelay: `${idx * 0.1}s` }}
-                >
-                  {/* NOMOR */}
-                  <td className="px-3 py-2 font-medium text-gray-700">
-                    {startIndex + idx + 1}
-                  </td>
+            {/* Jika ADA DATA */}
+            {students.map((student, idx) => (
+              <tr
+                key={student.id_mhs || idx}
+                className="hover:bg-blue-50/60 transition-colors duration-150 animate-slide-in"
+                style={{ animationDelay: `${idx * 0.1}s` }}
+              >
+                {/* NOMOR */}
+                <td className="px-3 py-2 font-medium text-gray-700">
+                  {startIndex + idx + 1}
+                </td>
 
-                  <td className="px-3 py-2 font-mono text-gray-900">
-                    {student.nim}
-                  </td>
+                <td className="px-3 py-2 font-mono text-gray-900">
+                  {student.nim}
+                </td>
 
-                  <td className="px-3 py-2 font-semibold text-gray-900">
-                    {student.nama_mhs}
-                  </td>
+                <td className="px-3 py-2 font-semibold text-gray-900">
+                  {student.nama_mhs}
+                </td>
 
-                  <td className="px-3 py-2 text-gray-700">{student.prodi}</td>
+                <td className="px-3 py-2 text-gray-700">{student.prodi}</td>
 
-                  <td className="px-3 py-2">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-100 text-blue-800">
-                      <i className="fas fa-star mr-1 text-[10px]"></i>
-                      {student.total_poin} Total Poin
-                    </span>
-                  </td>
+                <td className="px-3 py-2">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-100 text-blue-800">
+                    <i className="fas fa-star mr-1 text-[10px]"></i>
+                    {student.total_poin} Total Poin
+                  </span>
+                </td>
 
-                  <td className="px-4 py-2">
-                    <img
-                      src={
-                        student.foto_file_id
-                          ? `/api/proxy/mahasiswa/foto/${
-                              student.foto_file_id
-                            }?t=${student.updated_at || student.id_mhs}`
-                          : `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                              student.nama_mhs,
-                            )}`
-                      }
-                      alt="Foto Mahasiswa"
-                      loading="lazy"
-                      decoding="async"
-                      className="w-12 h-12 object-cover rounded-full bg-gray-200"
-                      onError={(e) => {
-                        e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                          student.nama_mhs,
-                        )}`;
-                      }}
-                    />
-                  </td>
+                <td className="px-4 py-2">
+                  <img
+                    src={
+                      student.foto_file_id
+                        ? `/api/proxy/mahasiswa/foto/${
+                            student.foto_file_id
+                          }?t=${student.updated_at || student.id_mhs}`
+                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                            student.nama_mhs
+                          )}`
+                    }
+                    alt="Foto Mahasiswa"
+                    loading="lazy"
+                    decoding="async"
+                    className="w-12 h-12 object-cover rounded-full bg-gray-200"
+                    onError={(e) => {
+                      e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                        student.nama_mhs
+                      )}`;
+                    }}
+                  />
+                </td>
 
-                  <td className="px-3 py-2">
-                    <div className="flex flex-wrap gap-1.5">
-                      <button
-                        className="bg-blue-100 text-blue-700 px-2.5 py-1.5 rounded-md text-[11px] hover:bg-blue-200 flex items-center transition-colors shadow-sm"
-                        onClick={() => openDetail(student)}
-                      >
-                        <i className="fas fa-info-circle mr-1"></i> Detail
-                      </button>
+                <td className="px-3 py-2">
+                  <div className="flex flex-wrap gap-1.5">
+                    <button
+                      className="bg-blue-100 text-blue-700 px-2.5 py-1.5 rounded-md text-[11px] hover:bg-blue-200 flex items-center transition-colors shadow-sm"
+                      onClick={() => openDetail(student)}
+                    >
+                      <i className="fas fa-info-circle mr-1"></i> Detail
+                    </button>
 
-                      <button
-                        className="bg-amber-100 text-amber-700 px-2.5 py-1.5 rounded-md text-[11px] hover:bg-amber-200 flex items-center transition-colors shadow-sm"
-                        onClick={() => onEdit(student)}
-                      >
-                        <i className="fas fa-edit mr-1"></i> Edit
-                      </button>
+                    <button
+                      className="bg-amber-100 text-amber-700 px-2.5 py-1.5 rounded-md text-[11px] hover:bg-amber-200 flex items-center transition-colors shadow-sm"
+                      onClick={() => onEdit(student)}
+                    >
+                      <i className="fas fa-edit mr-1"></i> Edit
+                    </button>
 
-                      <button
-                        className="bg-red-100 text-red-700 px-2.5 py-1.5 rounded-md text-[11px] hover:bg-red-200 flex items-center transition-colors shadow-sm"
-                        onClick={() => onDelete(student)}
-                      >
-                        <i className="fas fa-trash-alt mr-1"></i> Hapus
-                      </button>
+                    <button
+                      className="bg-red-100 text-red-700 px-2.5 py-1.5 rounded-md text-[11px] hover:bg-red-200 flex items-center transition-colors shadow-sm"
+                      onClick={() => onDelete(student)}
+                    >
+                      <i className="fas fa-trash-alt mr-1"></i> Hapus
+                    </button>
 
-                      <button
-                        className="bg-green-100 text-green-700 px-2.5 py-1.5 rounded-md text-[11px] hover:bg-green-200 flex items-center transition-colors shadow-sm"
-                        onClick={() => openCetak(student)}
-                      >
-                        <i className="fas fa-print mr-1"></i> Cetak
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    <button
+                      className="bg-green-100 text-green-700 px-2.5 py-1.5 rounded-md text-[11px] hover:bg-green-200 flex items-center transition-colors shadow-sm"
+                      onClick={() => openCetak(student)}
+                    >
+                      <i className="fas fa-print mr-1"></i> Cetak
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
