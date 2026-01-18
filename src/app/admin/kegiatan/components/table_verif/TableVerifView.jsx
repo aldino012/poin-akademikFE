@@ -21,13 +21,15 @@ export default function TableVerifView({
   // ===== MODAL DETAIL =====
   isDetailOpen,
   selectedClaim,
-  importExcel, 
-  importLoading, 
+  importExcel,
+  importLoading,
   openDetail,
   closeDetail,
 
   // ===== ACTIONS =====
   updateStatus,
+  exportExcel, // 🔥 NEW
+  exportLoading, // 🔥 NEW
 }) {
   const [isImportOpen, setIsImportOpen] = useState(false);
 
@@ -48,7 +50,7 @@ export default function TableVerifView({
   return (
     <div className="bg-white rounded-xl shadow-md border p-4 overflow-y-visible">
       {/* =========================
-          TOOLBAR + IMPORT BUTTON
+          TOOLBAR + ACTION BUTTON
       ========================= */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
         <TableToolbar
@@ -57,12 +59,37 @@ export default function TableVerifView({
           setCurrentPage={setCurrentPage}
         />
 
-        <button
-          onClick={() => setIsImportOpen(true)}
-          className="px-4 py-2 rounded-lg text-sm font-medium transition bg-blue-600 hover:bg-blue-700 text-white"
-        >
-          Import Excel
-        </button>
+        <div className="flex gap-2">
+          {/* 🔥 EXPORT BUTTON */}
+          <button
+            onClick={exportExcel}
+            disabled={exportLoading}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition
+              ${
+                exportLoading
+                  ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-700 text-white"
+              }
+            `}
+          >
+            {exportLoading ? "Exporting..." : "Export Excel"}
+          </button>
+
+          {/* IMPORT BUTTON */}
+          <button
+            onClick={() => setIsImportOpen(true)}
+            disabled={importLoading}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition
+              ${
+                importLoading
+                  ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
+              }
+            `}
+          >
+            Import Excel
+          </button>
+        </div>
       </div>
 
       {/* =========================
@@ -113,7 +140,7 @@ export default function TableVerifView({
         onClose={() => setIsImportOpen(false)}
         title="Import Klaim Excel"
         importUrl="/klaim/import-excel"
-        onImported={(file) => importExcel(file, () => setIsImportOpen(false))} // ✅ panggil hook dan tutup modal
+        onImported={(file) => importExcel(file, () => setIsImportOpen(false))}
       />
     </div>
   );

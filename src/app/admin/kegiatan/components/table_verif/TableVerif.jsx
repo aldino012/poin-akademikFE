@@ -23,8 +23,12 @@ export default function TableVerif() {
       closeDetail={verif.closeDetail}
       /* ===== ACTIONS ===== */
       updateStatus={verif.updateStatus}
-      importExcel={verif.importExcel} // ✅ hook importExcel sudah pass ke view
-      importLoading={verif.importLoading} // ✅ state loading import
+      /* ===== IMPORT ===== */
+      importExcel={verif.importExcel}
+      importLoading={verif.importLoading}
+      /* ===== EXPORT 🔥 ===== */
+      exportExcel={verif.exportExcel}
+      exportLoading={verif.exportLoading}
     />
   );
 }

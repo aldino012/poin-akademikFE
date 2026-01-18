@@ -16,6 +16,7 @@ export default function useTableVerif() {
   const [selectedClaim, setSelectedClaim] = useState(null);
 
   const [importLoading, setImportLoading] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false); // 🔥 NEW
 
   // 🎨 WARNA STATUS
   const statusColors = {
@@ -77,7 +78,7 @@ export default function useTableVerif() {
         c.mahasiswa?.nim?.toString().includes(s)
       );
     },
-    [search]
+    [search],
   );
 
   const pagination = usePaginationFilter(claims, search, filterFn, 7, []);
@@ -138,14 +139,12 @@ export default function useTableVerif() {
 
       const { inserted = 0, skipped = 0, failed = 0, errors = [] } = res.data;
 
-      // ✅ TOAST RINGKAS
       addToast({
         message: `Import selesai → ${inserted} berhasil, ${skipped} duplikat, ${failed} gagal`,
         type: failed > 0 ? "warning" : "success",
         duration: 6000,
       });
 
-      // ❌ DETAIL ERROR (JIKA ADA)
       if (failed > 0 && errors.length > 0) {
         errors.slice(0, 3).forEach((e) => {
           addToast({
@@ -156,10 +155,8 @@ export default function useTableVerif() {
         });
       }
 
-      // 🔄 Refresh data otomatis
       await fetchVerif();
 
-      // ✅ Callback dari parent jika ada (misal untuk menutup modal)
       if (onFinish && typeof onFinish === "function") {
         onFinish();
       }
@@ -175,6 +172,46 @@ export default function useTableVerif() {
     }
   };
 
+  // ==========================
+  // 🔥 EXPORT EXCEL (BARU)
+  // ==========================
+  const exportExcel = async () => {
+    try {
+      setExportLoading(true);
+
+      const res = await api.get("/klaim/export-excel", {
+        responseType: "blob",
+      });
+
+      const blob = new Blob([res.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = "klaim_kegiatan.xlsx";
+      document.body.appendChild(link);
+      link.click();
+
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      addToast({
+        message: "Export Excel berhasil",
+        type: "success",
+      });
+    } catch (err) {
+      console.error(err);
+      addToast({
+        message: "Gagal export Excel!",
+        type: "danger",
+      });
+    } finally {
+      setExportLoading(false);
+    }
+  };
 
   return {
     // data
@@ -198,8 +235,10 @@ export default function useTableVerif() {
     // actions
     updateStatus,
     importExcel,
+    exportExcel, // 🔥 expose
 
     // state
     importLoading,
+    exportLoading, // 🔥 expose
   };
 }
