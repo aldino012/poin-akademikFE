@@ -102,7 +102,7 @@ export default function useTableVerif() {
     try {
       await api.patch(`/klaim/${id}/status`, { status, catatan });
 
-      // ✅ UPDATE STATE LOKAL (TANPA FETCH ULANG)
+      // ✅ update data lokal TANPA reload / fetch ulang
       setClaims((prev) =>
         prev.map((c) =>
           c.id_klaim === id
@@ -114,18 +114,8 @@ export default function useTableVerif() {
             : c,
         ),
       );
-
-      addToast({
-        message: "Status klaim berhasil diperbarui",
-        type: "success",
-      });
     } catch (err) {
       console.error(err);
-      addToast({
-        message:
-          err.response?.data?.message || "Gagal memperbarui status verifikasi!",
-        type: "danger",
-      });
       throw err;
     }
   };
