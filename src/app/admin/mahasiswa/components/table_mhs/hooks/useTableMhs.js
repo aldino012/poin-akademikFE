@@ -82,7 +82,7 @@ export default function useTableMhs() {
 
       return (namaMatch || nimMatch) && matchPoin;
     },
-    7
+    7,
   );
 
   // ==========================
@@ -150,7 +150,10 @@ export default function useTableMhs() {
         formData.append("foto", updatedStudent.foto);
       }
 
-      await api.put(`/mahasiswa/${updatedStudent.id_mhs}`, formData);
+      const res = await api.put(
+        `/mahasiswa/${updatedStudent.id_mhs}`,
+        formData,
+      );
 
       const updated = res.data.mahasiswa;
 
@@ -191,7 +194,7 @@ export default function useTableMhs() {
       await api.delete(`/mahasiswa/${student.id_mhs}`);
 
       setStudentsData((prev) =>
-        prev.filter((m) => m.id_mhs !== student.id_mhs)
+        prev.filter((m) => m.id_mhs !== student.id_mhs),
       );
 
       addToast({
