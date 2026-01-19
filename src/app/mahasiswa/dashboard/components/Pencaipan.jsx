@@ -137,7 +137,7 @@ export default function Pencapaian({ mahasiswa }) {
 
                 <div className="mt-3 text-center max-w-[160px]">
                   <p className="text-xs font-semibold text-gray-800 truncate">
-                    {item.rincianAcara}
+                    {item.namaKegiatan}
                   </p>
                   <p className="text-[11px] text-gray-500">{item.tanggal}</p>
                 </div>
