@@ -33,31 +33,32 @@ export default function BarChartKegiatan({ data = [] }) {
     );
   }
 
-  // Komponen Label Kustom untuk Nama Kegiatan & Persentase
+  // Komponen Label Kustom yang diperbaiki
   const renderCustomLabel = (props) => {
     const { x, y, width, value, name } = props;
 
-    // Tentukan apakah bar cukup panjang untuk menampung teks (misal threshold 40%)
-    const isLongEnough = width > 160;
+    // Threshold untuk menentukan posisi angka persen (di dalam atau di luar bar)
+    const isLongEnough = width > 50;
 
     return (
       <g>
-        {/* Nama Kegiatan di atas Bar (Solusi agar tidak terpotong dan rapat kiri) */}
+        {/* Nama Kegiatan: Diposisikan di atas Bar dengan offset y negatif */}
         <text
           x={x}
-          y={y - 8}
+          y={y - 10}
           fill="#374151"
-          fontSize="11px"
+          fontSize="12px"
           fontWeight="600"
           textAnchor="start"
+          style={{ textTransform: "uppercase" }}
         >
           {name}
         </text>
 
-        {/* Persentase */}
+        {/* Persentase Angka */}
         <text
-          x={isLongEnough ? x + width - 8 : x + width + 8}
-          y={y + 16}
+          x={isLongEnough ? x + width - 10 : x + width + 10}
+          y={y + 18} // Berada di tengah bar secara vertikal (asumsi barSize 28)
           fill={isLongEnough ? "#ffffff" : "#374151"}
           fontSize="11px"
           fontWeight="700"
@@ -85,7 +86,7 @@ export default function BarChartKegiatan({ data = [] }) {
         .title-wrapper {
           position: relative;
           display: inline-block;
-          margin-bottom: 30px;
+          margin-bottom: 40px; /* Ditambah agar tidak tabrakan dengan bar pertama */
         }
         .animated-line {
           position: absolute;
@@ -107,19 +108,20 @@ export default function BarChartKegiatan({ data = [] }) {
         <span className="animated-line"></span>
       </div>
 
-      {/* Tinggi ditambah (h-96) agar jarak antar bar yang punya label atas tidak sesak */}
-      <div className="w-full h-96">
+      {/* Tinggi disesuaikan agar item tidak terlalu rapat */}
+      <div className="w-full" style={{ height: data.length * 70 }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={data}
             layout="vertical"
             margin={{
-              top: 10,
-              right: 50,
-              left: 0, // Benar-benar menempel ke garis L kiri
-              bottom: 10,
+              top: 5,
+              right: 60,
+              left: 20,
+              bottom: 5,
             }}
-            barGap={20}
+            // Menambah jarak antar kategori agar teks tidak bertabrakan
+            categoryGap="30%"
           >
             <CartesianGrid
               strokeDasharray="3 3"
@@ -132,13 +134,14 @@ export default function BarChartKegiatan({ data = [] }) {
             <YAxis
               dataKey="name"
               type="category"
-              width={0} // Menghilangkan kolom label di kiri
-              axisLine={{ stroke: "#e5e7eb" }}
+              width={1} // Lebar minimal agar garis terlihat
+              axisLine={{ stroke: "#94a3b8", strokeWidth: 2 }} // Garis L vertikal
+              tick={false} // Sembunyikan tick default karena kita pakai custom label
               tickLine={false}
             />
 
             <Tooltip
-              cursor={{ fill: "#f9fafb" }}
+              cursor={{ fill: "#f1f5f9" }}
               formatter={(val) => [`${val}%`, "Partisipasi"]}
               contentStyle={{
                 borderRadius: "8px",
@@ -147,10 +150,13 @@ export default function BarChartKegiatan({ data = [] }) {
               }}
             />
 
-            <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={28}>
-              {/* Custom Label yang menangani nama di atas dan angka di dalam/luar */}
+            <Bar
+              dataKey="value"
+              radius={[0, 4, 4, 0]}
+              barSize={28}
+              animationDuration={1500}
+            >
               <LabelList dataKey="value" content={renderCustomLabel} />
-
               {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
