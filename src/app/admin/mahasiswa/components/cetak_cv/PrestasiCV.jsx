@@ -27,7 +27,34 @@ export default function PrestasiCV({ prestasi = [] }) {
   // ================= FORMAT TAHUN =================
   const formatTahun = (dateStr) => {
     if (!dateStr) return "";
-    return new Date(dateStr).getFullYear();
+    const d = new Date(dateStr);
+    return isNaN(d) ? "" : d.getFullYear();
+  };
+
+  // ================= RENDER ITEM =================
+  const renderItem = (item, idx) => {
+    const judul =
+      item.rincianAcara || item.namaKegiatan || "Prestasi Mahasiswa";
+
+    const tahun = formatTahun(item.tanggal);
+
+    return (
+      <li key={idx} className="mb-1">
+        {/* 🔑 NAMA LOMBA / KOMPETISI */}
+        <b>{judul}</b>
+
+        {/* POSISI / JUARA */}
+        {item.posisi && <span className="text-gray-700"> — {item.posisi}</span>}
+
+        {/* TINGKAT */}
+        {item.tingkat && (
+          <span className="text-gray-600">, {item.tingkat}</span>
+        )}
+
+        {/* TAHUN */}
+        {tahun && <span className="text-gray-500 text-sm"> ({tahun})</span>}
+      </li>
+    );
   };
 
   return (
@@ -41,26 +68,10 @@ export default function PrestasiCV({ prestasi = [] }) {
 
       <div className="two-columns-grid">
         {/* ================= KOLOM KIRI ================= */}
-        <ul>
-          {kolomKiri.map((item, idx) => (
-            <li key={idx}>
-              <b>{item.posisi || item.namaKegiatan}</b>
-              {item.tingkat && ` – ${item.tingkat}`}
-              {item.tanggal && ` (${formatTahun(item.tanggal)})`}
-            </li>
-          ))}
-        </ul>
+        <ul>{kolomKiri.map(renderItem)}</ul>
 
         {/* ================= KOLOM KANAN ================= */}
-        <ul>
-          {kolomKanan.map((item, idx) => (
-            <li key={idx}>
-              <b>{item.posisi || item.namaKegiatan}</b>
-              {item.tingkat && ` – ${item.tingkat}`}
-              {item.tanggal && ` (${formatTahun(item.tanggal)})`}
-            </li>
-          ))}
-        </ul>
+        <ul>{kolomKanan.map(renderItem)}</ul>
       </div>
     </div>
   );

@@ -24,10 +24,32 @@ export default function OrganisasiCV({ organisasi = [] }) {
   const kolomKiri = organisasi.slice(0, mid);
   const kolomKanan = organisasi.slice(mid);
 
-  // ================= FORMAT TANGGAL =================
-  const formatTanggal = (dateStr) => {
+  // ================= FORMAT TAHUN =================
+  const formatTahun = (dateStr) => {
     if (!dateStr) return "";
-    return new Date(dateStr).getFullYear();
+    const d = new Date(dateStr);
+    return isNaN(d) ? "" : d.getFullYear();
+  };
+
+  // ================= RENDER =================
+  const renderItem = (item, idx) => {
+    const judul =
+      item.rincianAcara || item.namaKegiatan || "Kegiatan Organisasi";
+
+    const tahun = formatTahun(item.tanggal);
+
+    return (
+      <li key={idx} className="mb-1">
+        {/* 🔑 JUDUL UTAMA */}
+        <b>{judul}</b>
+
+        {/* POSISI */}
+        {item.posisi && <span className="text-gray-700"> — {item.posisi}</span>}
+
+        {/* TAHUN */}
+        {tahun && <span className="text-gray-500 text-sm"> ({tahun})</span>}
+      </li>
+    );
   };
 
   return (
@@ -41,26 +63,10 @@ export default function OrganisasiCV({ organisasi = [] }) {
 
       <div className="two-columns-grid">
         {/* ================= KOLOM KIRI ================= */}
-        <ul>
-          {kolomKiri.map((item, idx) => (
-            <li key={idx}>
-              <b>{item.namaKegiatan}</b>
-              {item.posisi && ` – ${item.posisi}`}
-              {item.tanggal && ` (${formatTanggal(item.tanggal)})`}
-            </li>
-          ))}
-        </ul>
+        <ul>{kolomKiri.map(renderItem)}</ul>
 
         {/* ================= KOLOM KANAN ================= */}
-        <ul>
-          {kolomKanan.map((item, idx) => (
-            <li key={idx}>
-              <b>{item.namaKegiatan}</b>
-              {item.posisi && ` – ${item.posisi}`}
-              {item.tanggal && ` (${formatTanggal(item.tanggal)})`}
-            </li>
-          ))}
-        </ul>
+        <ul>{kolomKanan.map(renderItem)}</ul>
       </div>
     </div>
   );
