@@ -9,29 +9,17 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Cell,
+  Legend,
 } from "recharts";
-import { FaChalkboardTeacher } from "react-icons/fa";
 
 /**
- * Grafik Jenis Kegiatan Mahasiswa
- * --------------------------------
- * - Horizontal bar chart
- * - Warna bar menyesuaikan jenis kegiatan
- * - Animasi ringan & aman untuk laporan akademik
- * - Data dikirim dari parent
+ * Grafik Mahasiswa per Angkatan
+ * ------------------------------
+ * - PURE COMPONENT
+ * - Data dari parent
+ * - Animasi ringan & akademik
  */
-
-// Mapping warna per jenis kegiatan
-const COLOR_MAP = {
-  Akademik: "#2563eb",
-  Organisasi: "#16a34a",
-  Sosial: "#f59e0b",
-  Kompetisi: "#dc2626",
-  Lainnya: "#9333ea",
-};
-
-export default function BarChartKegiatan({ data = [] }) {
+export default function BarChartAngkatan({ data = [] }) {
   // =============================
   // EMPTY STATE
   // =============================
@@ -39,55 +27,81 @@ export default function BarChartKegiatan({ data = [] }) {
     return (
       <div className="bg-white p-4 rounded-lg shadow-sm h-64 flex items-center justify-center">
         <p className="text-gray-400 text-sm">
-          Data grafik kegiatan belum tersedia
+          Data grafik angkatan belum tersedia
         </p>
       </div>
     );
   }
 
   // =============================
-  // UI GRAFIK
+  // UI
   // =============================
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm">
+      {/* STYLE KHUSUS GARIS ANIMASI */}
+      <style jsx>{`
+        @keyframes lineGrow {
+          from {
+            width: 0;
+            opacity: 0;
+          }
+          to {
+            width: 100%;
+            opacity: 1;
+          }
+        }
+
+        .title-wrapper {
+          position: relative;
+          display: inline-block;
+          margin-bottom: 12px;
+        }
+
+        .animated-line {
+          position: absolute;
+          left: 0;
+          bottom: -4px;
+          height: 3px;
+          width: 0;
+          border-radius: 2px;
+          background: linear-gradient(90deg, #2563eb, #3b82f6, #60a5fa);
+          animation: lineGrow 0.8s ease-out forwards;
+        }
+      `}</style>
+
       {/* TITLE */}
-      <h2 className="text-base font-medium text-gray-700 mb-4 flex items-center gap-2">
-        <span className="inline-block w-2 h-2 rounded-full bg-green-600"></span>
-        <FaChalkboardTeacher className="text-green-600 text-sm" />
-        Persentase Jenis Kegiatan yang Diikuti Mahasiswa
-      </h2>
+      <div className="title-wrapper">
+        <h2 className="text-base font-medium text-gray-700 flex items-center gap-2">
+          <span className="inline-block w-2 h-2 rounded-full bg-blue-600"></span>
+          <i className="fas fa-chart-bar text-blue-600 text-sm"></i>
+          Grafik Mahasiswa per Angkatan
+        </h2>
+        <span className="animated-line"></span>
+      </div>
 
       {/* CHART */}
-      <div className="w-full h-64 sm:h-72">
+      <div className="w-full h-56 sm:h-64 md:h-72">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={data}
-            layout="vertical"
-            margin={{ top: 10, right: 30, left: 40, bottom: 10 }}
+            margin={{ top: 15, right: 20, left: 0, bottom: 5 }}
           >
             <CartesianGrid strokeDasharray="2 2" className="stroke-gray-200" />
 
             <XAxis
-              type="number"
-              tickFormatter={(v) => `${v}%`}
+              dataKey="angkatan"
               fontSize="0.75rem"
               tick={{ fill: "#4b5563" }}
             />
 
             <YAxis
-              dataKey="kegiatan"
-              type="category"
               fontSize="0.75rem"
               tick={{ fill: "#4b5563" }}
-              width={120}
+              allowDecimals={false}
             />
 
             <Tooltip
               cursor={{ fill: "#f3f4f6" }}
-              formatter={(value, name, props) => [
-                `${props.payload.persentase}% (${props.payload.jumlah} mahasiswa)`,
-                "Jumlah",
-              ]}
               contentStyle={{
                 borderRadius: "6px",
                 boxShadow:
@@ -97,26 +111,26 @@ export default function BarChartKegiatan({ data = [] }) {
               }}
             />
 
+            <Legend
+              wrapperStyle={{
+                paddingTop: 8,
+                fontSize: "0.75rem",
+                color: "#374151",
+              }}
+            />
+
             <Bar
-              dataKey="persentase"
-              radius={[0, 6, 6, 0]}
+              dataKey="jumlah"
+              name="Jumlah Mahasiswa"
+              fill="#2563eb"
+              radius={[4, 4, 0, 0]}
               isAnimationActive={true}
-              animationDuration={700} // 🎯 animasi ringan
+              animationDuration={700}
               animationEasing="ease-out"
-            >
-              {data.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLOR_MAP[entry.kegiatan] || "#6b7280"}
-                />
-              ))}
-            </Bar>
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>
-
-      {/* FOOTNOTE */}
-      <p className="text-xs text-gray-400 mt-2">Sumber: Data 369 Mahasiswa</p>
     </div>
   );
 }
