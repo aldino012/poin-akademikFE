@@ -10,6 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
+  LabelList,
 } from "recharts";
 import { FaChalkboardTeacher } from "react-icons/fa";
 
@@ -23,7 +24,7 @@ const COLORS = [
   "#10b981",
 ];
 
-// Komponen kustom untuk label Y-Axis agar teks tidak berantakan
+// Komponen kustom untuk label Y-Axis agar teks rapi
 const CustomYAxisTick = ({ x, y, payload }) => {
   return (
     <g transform={`translate(${x},${y})`}>
@@ -35,11 +36,9 @@ const CustomYAxisTick = ({ x, y, payload }) => {
         fill="#4b5563"
         fontSize="11px"
         fontWeight="500"
-        className="recharts-text recharts-cartesian-axis-tick-value"
       >
-        {/* Logika memotong teks jika terlalu panjang (opsional) */}
-        {payload.value.length > 20
-          ? `${payload.value.substring(0, 20)}...`
+        {payload.value.length > 22
+          ? `${payload.value.substring(0, 22)}...`
           : payload.value}
       </text>
     </g>
@@ -93,7 +92,6 @@ export default function BarChartKegiatan({ data = [] }) {
         <span className="animated-line"></span>
       </div>
 
-      {/* Tinggi disesuaikan agar label tidak berhimpitan (h-80 atau h-96 lebih ideal untuk banyak data) */}
       <div className="w-full h-80">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
@@ -101,8 +99,8 @@ export default function BarChartKegiatan({ data = [] }) {
             layout="vertical"
             margin={{
               top: 5,
-              right: 30,
-              left: 10, // Margin luar kiri dikecilkan
+              right: 45, // Ditambah agar label persentase di ujung kanan tidak terpotong
+              left: 5,
               bottom: 5,
             }}
           >
@@ -115,25 +113,21 @@ export default function BarChartKegiatan({ data = [] }) {
             <XAxis
               type="number"
               domain={[0, 100]}
-              tickFormatter={(v) => `${v}%`}
-              fontSize={11}
-              tick={{ fill: "#9ca3af" }}
-              axisLine={{ stroke: "#e5e7eb" }}
-              tickLine={false}
+              hide // Sembunyikan Axis X agar lebih bersih karena angka sudah ada di Bar
             />
 
             <YAxis
               dataKey="name"
               type="category"
-              width={140} // Lebar area teks kiri (sesuaikan dengan panjang teks)
+              width={130}
               tick={<CustomYAxisTick />}
-              axisLine={{ stroke: "#e5e7eb" }}
+              axisLine={false}
               tickLine={false}
             />
 
             <Tooltip
               cursor={{ fill: "#f9fafb" }}
-              formatter={(value) => [`${value}%`, "Partisipasi"]}
+              formatter={(value) => [`${value}%`, "Persentase"]}
               contentStyle={{
                 borderRadius: "8px",
                 border: "none",
@@ -145,9 +139,18 @@ export default function BarChartKegiatan({ data = [] }) {
             <Bar
               dataKey="value"
               radius={[0, 4, 4, 0]}
-              barSize={20} // Ukuran batang dipertegas
+              barSize={24}
               isAnimationActive={true}
             >
+              {/* Menampilkan Persentase di dalam/ujung Bar */}
+              <LabelList
+                dataKey="value"
+                position="right"
+                formatter={(val) => `${val}%`}
+                style={{ fill: "#374151", fontSize: "11px", fontWeight: "600" }}
+                offset={10}
+              />
+
               {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
