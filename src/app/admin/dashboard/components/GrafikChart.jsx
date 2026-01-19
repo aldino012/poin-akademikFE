@@ -13,21 +13,40 @@ import {
 } from "recharts";
 import { FaChalkboardTeacher } from "react-icons/fa";
 
-// WARNA SAMA DENGAN PIE CHART
-const COLORS = ["#2563eb", "#16a34a", "#f59e0b", "#dc2626", "#9333ea"];
+const COLORS = [
+  "#2563eb",
+  "#16a34a",
+  "#f59e0b",
+  "#dc2626",
+  "#9333ea",
+  "#3b82f6",
+  "#10b981",
+];
 
-/**
- * Grafik Bar - Persentase Jenis Kegiatan Mahasiswa
- * -----------------------------------------------
- * - Data langsung dari pie chart (name, value)
- * - TANPA hitung ulang
- * - Layout horizontal
- * - Garis animasi judul
- */
+// Komponen kustom untuk label Y-Axis agar teks tidak berantakan
+const CustomYAxisTick = ({ x, y, payload }) => {
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text
+        x={-10}
+        y={0}
+        dy={4}
+        textAnchor="end"
+        fill="#4b5563"
+        fontSize="11px"
+        fontWeight="500"
+        className="recharts-text recharts-cartesian-axis-tick-value"
+      >
+        {/* Logika memotong teks jika terlalu panjang (opsional) */}
+        {payload.value.length > 20
+          ? `${payload.value.substring(0, 20)}...`
+          : payload.value}
+      </text>
+    </g>
+  );
+};
+
 export default function BarChartKegiatan({ data = [] }) {
-  // =============================
-  // EMPTY STATE
-  // =============================
   if (!data || data.length === 0) {
     return (
       <div className="bg-white p-4 rounded-lg shadow-sm h-64 flex items-center justify-center">
@@ -37,8 +56,7 @@ export default function BarChartKegiatan({ data = [] }) {
   }
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm">
-      {/* STYLE GARIS ANIMASI */}
+    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
       <style jsx>{`
         @keyframes lineGrow {
           from {
@@ -50,87 +68,87 @@ export default function BarChartKegiatan({ data = [] }) {
             opacity: 1;
           }
         }
-
         .title-wrapper {
           position: relative;
           display: inline-block;
-          margin-left: 6px; /* 🔥 sejajar dengan grafik angkatan */
-          margin-bottom: 14px;
+          margin-bottom: 24px;
         }
-
         .animated-line {
           position: absolute;
           left: 0;
-          bottom: -4px;
+          bottom: -6px;
           height: 3px;
           width: 0;
           border-radius: 2px;
-          background: linear-gradient(90deg, #16a34a, #22c55e, #4ade80);
+          background: linear-gradient(90deg, #16a34a, #4ade80);
           animation: lineGrow 0.8s ease-out forwards;
         }
       `}</style>
 
-      {/* TITLE */}
       <div className="title-wrapper">
-        <h2 className="text-base font-medium text-gray-700 flex items-center gap-2">
-          <span className="inline-block w-2 h-2 rounded-full bg-green-600"></span>
-          <FaChalkboardTeacher className="text-green-600 text-sm" />
-          Persentase Jenis Kegiatan yang Diikuti Mahasiswa
+        <h2 className="text-base font-semibold text-gray-800 flex items-center gap-2">
+          <FaChalkboardTeacher className="text-green-600" />
+          Persentase Jenis Kegiatan Mahasiswa
         </h2>
         <span className="animated-line"></span>
       </div>
 
-      {/* CHART */}
-      <div className="w-full h-64 sm:h-72">
+      {/* Tinggi disesuaikan agar label tidak berhimpitan (h-80 atau h-96 lebih ideal untuk banyak data) */}
+      <div className="w-full h-80">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={data}
             layout="vertical"
             margin={{
-              top: 10,
-              right: 10, // 🔥 DIKECILKAN → grafik MUNDUR
-              left: 120, // 🔥 RAPAT KE KIRI
-              bottom: 10,
+              top: 5,
+              right: 30,
+              left: 10, // Margin luar kiri dikecilkan
+              bottom: 5,
             }}
           >
-            <CartesianGrid strokeDasharray="2 2" className="stroke-gray-200" />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              horizontal={false}
+              stroke="#f0f0f0"
+            />
 
             <XAxis
               type="number"
               domain={[0, 100]}
               tickFormatter={(v) => `${v}%`}
-              fontSize="0.75rem"
-              tick={{ fill: "#4b5563" }}
+              fontSize={11}
+              tick={{ fill: "#9ca3af" }}
+              axisLine={{ stroke: "#e5e7eb" }}
+              tickLine={false}
             />
 
             <YAxis
               dataKey="name"
               type="category"
-              fontSize="0.75rem"
-              tick={{ fill: "#4b5563" }}
-              width={110}
+              width={140} // Lebar area teks kiri (sesuaikan dengan panjang teks)
+              tick={<CustomYAxisTick />}
+              axisLine={{ stroke: "#e5e7eb" }}
+              tickLine={false}
             />
 
             <Tooltip
-              cursor={{ fill: "#f3f4f6" }}
-              formatter={(value) => [`${value}%`, "Persentase"]}
+              cursor={{ fill: "#f9fafb" }}
+              formatter={(value) => [`${value}%`, "Partisipasi"]}
               contentStyle={{
-                borderRadius: "6px",
-                boxShadow:
-                  "0 2px 4px -1px rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.06)",
+                borderRadius: "8px",
                 border: "none",
-                fontSize: "0.8rem",
+                boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+                fontSize: "12px",
               }}
             />
 
             <Bar
               dataKey="value"
-              radius={[0, 6, 6, 0]}
+              radius={[0, 4, 4, 0]}
+              barSize={20} // Ukuran batang dipertegas
               isAnimationActive={true}
-              animationDuration={700}
-              animationEasing="ease-out"
             >
-              {data.map((_, index) => (
+              {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={COLORS[index % COLORS.length]}
