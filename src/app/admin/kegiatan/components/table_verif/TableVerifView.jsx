@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 
-import TableToolbarVerif from "./TableToolbarVerif";
+import TableToolbarVerif from "./TableToolbar";
 import TableDesktop from "./TableDesktop";
 import TableMobile from "./TableMobile";
 import TablePagination from "@/components/Pagianation";
