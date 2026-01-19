@@ -22,6 +22,8 @@ const COLORS = [
   "#9333ea",
   "#3b82f6",
   "#10b981",
+  "#6366f1",
+  "#14b8a6",
 ];
 
 export default function BarChartKegiatan({ data = [] }) {
@@ -33,33 +35,29 @@ export default function BarChartKegiatan({ data = [] }) {
     );
   }
 
-  // Komponen Label Kustom yang diperbaiki
   const renderCustomLabel = (props) => {
     const { x, y, width, value, name } = props;
-
-    // Threshold untuk menentukan posisi angka persen (di dalam atau di luar bar)
     const isLongEnough = width > 50;
 
     return (
       <g>
-        {/* Nama Kegiatan: Diposisikan di atas Bar dengan offset y negatif */}
+        {/* Label Judul di Atas Bar */}
         <text
-          x={x}
-          y={y - 10}
-          fill="#374151"
-          fontSize="12px"
+          x={x + 5}
+          y={y - 12}
+          fill="#4b5563"
+          fontSize="11px"
           fontWeight="600"
           textAnchor="start"
-          style={{ textTransform: "uppercase" }}
         >
           {name}
         </text>
 
-        {/* Persentase Angka */}
+        {/* Angka Persentase */}
         <text
-          x={isLongEnough ? x + width - 10 : x + width + 10}
-          y={y + 18} // Berada di tengah bar secara vertikal (asumsi barSize 28)
-          fill={isLongEnough ? "#ffffff" : "#374151"}
+          x={isLongEnough ? x + width - 8 : x + width + 8}
+          y={y + 18}
+          fill={isLongEnough ? "#ffffff" : "#4b5563"}
           fontSize="11px"
           fontWeight="700"
           textAnchor={isLongEnough ? "end" : "start"}
@@ -86,7 +84,7 @@ export default function BarChartKegiatan({ data = [] }) {
         .title-wrapper {
           position: relative;
           display: inline-block;
-          margin-bottom: 40px; /* Ditambah agar tidak tabrakan dengan bar pertama */
+          margin-bottom: 40px;
         }
         .animated-line {
           position: absolute;
@@ -108,60 +106,54 @@ export default function BarChartKegiatan({ data = [] }) {
         <span className="animated-line"></span>
       </div>
 
-      {/* Tinggi disesuaikan agar item tidak terlalu rapat */}
-      <div className="w-full" style={{ height: data.length * 70 }}>
+      <div className="w-full" style={{ height: data.length * 75 }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={data}
             layout="vertical"
             margin={{
-              top: 5,
-              right: 60,
-              left: 20,
-              bottom: 5,
+              top: 10,
+              right: 40,
+              left: 10, // Memberi sedikit ruang agar garis Y tidak terpotong tepi
+              bottom: 20, // Ruang untuk garis X
             }}
-            // Menambah jarak antar kategori agar teks tidak bertabrakan
-            categoryGap="30%"
           >
+            {/* Garis Grid Vertical saja untuk membantu pembacaan angka */}
             <CartesianGrid
               strokeDasharray="3 3"
               horizontal={false}
-              stroke="#f0f0f0"
+              stroke="#f3f4f6"
             />
 
-            <XAxis type="number" domain={[0, 100]} hide />
+            {/* Sumbu X (Garis Horizontal Bawah) */}
+            <XAxis
+              type="number"
+              domain={[0, 100]}
+              axisLine={{ stroke: "#d1d5db", strokeWidth: 2 }}
+              tick={false} // Menghilangkan angka di bawah agar bersih seperti contoh
+            />
 
+            {/* Sumbu Y (Garis Vertikal Kiri) */}
             <YAxis
               dataKey="name"
               type="category"
-              width={1} // Lebar minimal agar garis terlihat
-              axisLine={{ stroke: "#94a3b8", strokeWidth: 2 }} // Garis L vertikal
-              tick={false} // Sembunyikan tick default karena kita pakai custom label
+              width={1} // Lebar sangat kecil agar bar menempel ke garis
+              axisLine={{ stroke: "#d1d5db", strokeWidth: 2 }} // Garis "L" vertikal
+              tick={false}
               tickLine={false}
             />
 
             <Tooltip
-              cursor={{ fill: "#f1f5f9" }}
+              cursor={{ fill: "#f9fafb" }}
               formatter={(val) => [`${val}%`, "Partisipasi"]}
-              contentStyle={{
-                borderRadius: "8px",
-                border: "none",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-              }}
             />
 
-            <Bar
-              dataKey="value"
-              radius={[0, 4, 4, 0]}
-              barSize={28}
-              animationDuration={1500}
-            >
+            <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={28}>
               <LabelList dataKey="value" content={renderCustomLabel} />
               {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={COLORS[index % COLORS.length]}
-                  fillOpacity={0.9}
                 />
               ))}
             </Bar>
