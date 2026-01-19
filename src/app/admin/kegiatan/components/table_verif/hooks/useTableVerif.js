@@ -101,7 +101,19 @@ export default function useTableVerif() {
   const updateStatus = async (id, status, catatan) => {
     try {
       await api.patch(`/klaim/${id}/status`, { status, catatan });
-      await fetchVerif();
+
+      // ✅ UPDATE STATE LOKAL (TANPA FETCH ULANG)
+      setClaims((prev) =>
+        prev.map((c) =>
+          c.id_klaim === id
+            ? {
+                ...c,
+                status,
+                catatan,
+              }
+            : c,
+        ),
+      );
 
       addToast({
         message: "Status klaim berhasil diperbarui",
@@ -117,6 +129,7 @@ export default function useTableVerif() {
       throw err;
     }
   };
+
 
   // ==========================
   // IMPORT EXCEL
