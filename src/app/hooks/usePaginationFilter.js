@@ -1,46 +1,34 @@
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 
 export default function usePaginationFilter(
-  data = [],
+  data,
   search,
   filterFn,
   itemsPerPage = 7,
-  filterDeps = [],
+  filterDeps = [] // 🔥 tambahan penting
 ) {
   const [currentPage, setCurrentPage] = useState(1);
 
-  // ==========================
-  // FILTER DATA (MEMOIZED)
-  // ==========================
-  const filtered = useMemo(() => {
-    return data.filter(filterFn);
-  }, [data, filterFn]);
+  // 1️⃣ Filter Data
+  const filtered = data.filter(filterFn);
 
-  // ==========================
-  // TOTAL PAGE
-  // ==========================
+  // 2️⃣ Hitung total halaman
   const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
 
-  // ==========================
-  // 🔥 RESET PAGE SAAT DATA BERUBAH
-  // ==========================
+  // 3️⃣ Reset pagination hanya saat search atau filterDeps berubah
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, data.length, ...filterDeps]);
+  }, [search, ...filterDeps]); // 🔥 PERBAIKAN TERPENTING
 
-  // ==========================
-  // JAGA PAGE VALID
-  // ==========================
+  // 4️⃣ Jaga currentPage agar tidak melebihi totalPages
   useEffect(() => {
     if (currentPage > totalPages) {
       setCurrentPage(1);
     }
-  }, [totalPages, currentPage]);
+  }, [totalPages]);
 
-  // ==========================
-  // CURRENT ITEMS
-  // ==========================
+  // 5️⃣ Ambil item berdasarkan halaman sekarang
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentItems = filtered.slice(startIndex, endIndex);
