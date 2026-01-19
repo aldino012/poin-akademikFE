@@ -25,7 +25,7 @@ export default function TabsKegiatan({
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="font-semibold text-gray-800 text-sm">
-                        {org.namaKegiatan}
+                        {org.rincianAcara}
                       </div>
 
                       <div className="flex flex-wrap gap-3 text-xs text-gray-600 mt-2">
@@ -70,7 +70,7 @@ export default function TabsKegiatan({
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="font-semibold text-gray-800 text-sm">
-                        {comp.namaKegiatan}
+                        {comp.rincianAcara}
                       </div>
 
                       <div className="flex flex-wrap gap-3 text-xs text-gray-600 mt-2">
@@ -111,7 +111,7 @@ export default function TabsKegiatan({
               className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100"
             >
               <div className="font-semibold text-gray-800 text-sm">
-                {act.namaKegiatan}
+                {act.rincianAcara}
               </div>
 
               <div className="flex flex-wrap gap-3 text-xs text-gray-600 mt-2">
