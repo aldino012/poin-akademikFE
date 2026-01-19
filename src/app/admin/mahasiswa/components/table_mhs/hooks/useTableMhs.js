@@ -142,7 +142,7 @@ export default function useTableMhs() {
 
       Object.entries(updatedStudent).forEach(([key, val]) => {
         if (key === "foto") return;
-        if (val === undefined || val === null) return;
+        if (val === undefined || val === null || val === "") return;
         formData.append(key, val);
       });
 
@@ -150,11 +150,7 @@ export default function useTableMhs() {
         formData.append("foto", updatedStudent.foto);
       }
 
-      const res = await api.put(
-        `/mahasiswa/${updatedStudent.id_mhs}`,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
+      await api.put(`/mahasiswa/${updatedStudent.id_mhs}`, formData);
 
       const updated = res.data.mahasiswa;
 
