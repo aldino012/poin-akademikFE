@@ -15,13 +15,13 @@ import {
 /**
  * Grafik Mahasiswa per Angkatan
  * ------------------------------
- * - PURE COMPONENT (tidak fetch data)
- * - Data DIKIRIM dari parent
- * - Aman untuk performance dashboard
+ * - PURE COMPONENT
+ * - Data dari parent
+ * - Animasi ringan & akademik
  */
 export default function BarChartAngkatan({ data = [] }) {
   // =============================
-  // EMPTY / FALLBACK STATE
+  // EMPTY STATE
   // =============================
   if (!data || data.length === 0) {
     return (
@@ -34,16 +34,50 @@ export default function BarChartAngkatan({ data = [] }) {
   }
 
   // =============================
-  // UI GRAFIK
+  // UI
   // =============================
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm">
+      {/* STYLE KHUSUS GARIS ANIMASI */}
+      <style jsx>{`
+        @keyframes lineGrow {
+          from {
+            width: 0;
+            opacity: 0;
+          }
+          to {
+            width: 100%;
+            opacity: 1;
+          }
+        }
+
+        .title-wrapper {
+          position: relative;
+          display: inline-block;
+          margin-bottom: 12px;
+        }
+
+        .animated-line {
+          position: absolute;
+          left: 0;
+          bottom: -4px;
+          height: 3px;
+          width: 0;
+          border-radius: 2px;
+          background: linear-gradient(90deg, #2563eb, #3b82f6, #60a5fa);
+          animation: lineGrow 0.8s ease-out forwards;
+        }
+      `}</style>
+
       {/* TITLE */}
-      <h2 className="text-base font-medium text-gray-700 mb-3 flex items-center gap-2">
-        <span className="inline-block w-2 h-2 rounded-full bg-blue-600"></span>
-        <i className="fas fa-chart-bar text-blue-600 text-sm"></i>
-        Grafik Mahasiswa per Angkatan
-      </h2>
+      <div className="title-wrapper">
+        <h2 className="text-base font-medium text-gray-700 flex items-center gap-2">
+          <span className="inline-block w-2 h-2 rounded-full bg-blue-600"></span>
+          <i className="fas fa-chart-bar text-blue-600 text-sm"></i>
+          Grafik Mahasiswa per Angkatan
+        </h2>
+        <span className="animated-line"></span>
+      </div>
 
       {/* CHART */}
       <div className="w-full h-56 sm:h-64 md:h-72">
@@ -90,7 +124,9 @@ export default function BarChartAngkatan({ data = [] }) {
               name="Jumlah Mahasiswa"
               fill="#2563eb"
               radius={[4, 4, 0, 0]}
-              isAnimationActive={true} // 🔥 MATIKAN ANIMASI RECHARTS
+              isAnimationActive={true}
+              animationDuration={700}
+              animationEasing="ease-out"
             />
           </BarChart>
         </ResponsiveContainer>
