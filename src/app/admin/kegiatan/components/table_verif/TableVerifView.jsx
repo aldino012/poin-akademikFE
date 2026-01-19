@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 
-import TableToolbar from "./TableToolbar";
+import TableToolbarVerif from "./TableToolbarVerif";
 import TableDesktop from "./TableDesktop";
 import TableMobile from "./TableMobile";
 import TablePagination from "@/components/Pagianation";
@@ -10,7 +10,7 @@ import DetailVerifModal from "../verif-kegiatan/VerifParent";
 import ModalExcel from "@/components/ModalExcel";
 
 export default function TableVerifView({
-  // ===== DATA & UI =====
+  // ===== DATA =====
   claims,
   loading,
   search,
@@ -21,15 +21,15 @@ export default function TableVerifView({
   // ===== MODAL DETAIL =====
   isDetailOpen,
   selectedClaim,
-  importExcel,
-  importLoading,
   openDetail,
   closeDetail,
 
   // ===== ACTIONS =====
-  updateStatus,
+  importExcel,
+  importLoading,
   exportExcel,
   exportLoading,
+  updateStatus,
 }) {
   const [isImportOpen, setIsImportOpen] = useState(false);
 
@@ -43,7 +43,7 @@ export default function TableVerifView({
     endIndex,
   } = pagination;
 
-  // 🔥 LOGIKA DISABLE EXPORT
+  // 🔥 LOGIKA DISABLE EXPORT (GLOBAL & KONSISTEN)
   const isExportDisabled = loading || exportLoading || claims.length === 0;
 
   if (loading) {
@@ -51,54 +51,25 @@ export default function TableVerifView({
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-md border p-4 overflow-y-visible">
+    <div className="bg-white rounded-xl shadow-md border overflow-hidden">
       {/* =========================
-          TOOLBAR + ACTION BUTTON
+          TOOLBAR (SEARCH + IMPORT + EXPORT)
       ========================= */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-        <TableToolbar
-          search={search}
-          setSearch={setSearch}
-          setCurrentPage={setCurrentPage}
-        />
-
-        <div className="flex gap-2">
-          {/* 🔥 EXPORT BUTTON */}
-          <button
-            onClick={exportExcel}
-            disabled={isExportDisabled}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition
-              ${
-                isExportDisabled
-                  ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                  : "bg-green-600 hover:bg-green-700 text-white"
-              }
-            `}
-          >
-            {exportLoading ? "Exporting..." : "Export Excel"}
-          </button>
-
-          {/* IMPORT BUTTON */}
-          <button
-            onClick={() => setIsImportOpen(true)}
-            disabled={importLoading}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition
-              ${
-                importLoading
-                  ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700 text-white"
-              }
-            `}
-          >
-            Import Excel
-          </button>
-        </div>
-      </div>
+      <TableToolbarVerif
+        search={search}
+        setSearch={setSearch}
+        setCurrentPage={setCurrentPage}
+        onImport={() => setIsImportOpen(true)}
+        onExport={exportExcel}
+        disableExport={isExportDisabled}
+        importLoading={importLoading}
+        exportLoading={exportLoading}
+      />
 
       {/* =========================
           TABLE
       ========================= */}
-      <div className="overflow-y-visible">
+      <div className="p-4 overflow-y-visible">
         <TableDesktop
           currentClaims={currentItems}
           startIndex={startIndex}
