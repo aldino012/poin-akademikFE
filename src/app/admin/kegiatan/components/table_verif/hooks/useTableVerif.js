@@ -157,6 +157,9 @@ export default function useTableVerif() {
 
       await fetchVerif();
 
+      // 🔥 PENTING: reset search agar data langsung tampil
+      setSearch("");
+
       if (onFinish && typeof onFinish === "function") {
         onFinish();
       }
