@@ -28,8 +28,8 @@ export default function TableVerifView({
 
   // ===== ACTIONS =====
   updateStatus,
-  exportExcel, // 🔥 NEW
-  exportLoading, // 🔥 NEW
+  exportExcel,
+  exportLoading,
 }) {
   const [isImportOpen, setIsImportOpen] = useState(false);
 
@@ -42,6 +42,9 @@ export default function TableVerifView({
     startIndex,
     endIndex,
   } = pagination;
+
+  // 🔥 LOGIKA DISABLE EXPORT
+  const isExportDisabled = loading || exportLoading || claims.length === 0;
 
   if (loading) {
     return <p className="text-center py-4">Loading...</p>;
@@ -63,10 +66,10 @@ export default function TableVerifView({
           {/* 🔥 EXPORT BUTTON */}
           <button
             onClick={exportExcel}
-            disabled={exportLoading}
+            disabled={isExportDisabled}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition
               ${
-                exportLoading
+                isExportDisabled
                   ? "bg-gray-300 text-gray-600 cursor-not-allowed"
                   : "bg-green-600 hover:bg-green-700 text-white"
               }
