@@ -17,11 +17,13 @@ export default function Pencapaian({ mahasiswa }) {
   const normalize = (items = []) =>
     items.map((i) => ({
       id: i.id,
-      namaKegiatan: i.nama_kegiatan,
+
+      // 🔑 FIX UTAMA
+      namaKegiatan: i.rincianAcara || i.namaKegiatan || "-",
+
       tanggal: i.tanggal,
       poin: Number(i.poin || 0),
     }));
-
   // =====================================================
   // FETCH DATA
   // =====================================================
@@ -135,7 +137,7 @@ export default function Pencapaian({ mahasiswa }) {
 
                 <div className="mt-3 text-center max-w-[160px]">
                   <p className="text-xs font-semibold text-gray-800 truncate">
-                    {item.namaKegiatan}
+                    {item.rincianAcara}
                   </p>
                   <p className="text-[11px] text-gray-500">{item.tanggal}</p>
                 </div>
