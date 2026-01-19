@@ -81,7 +81,7 @@ export default function useTableVerif() {
     [search],
   );
 
-  const pagination = usePaginationFilter(claims, search, filterFn, 7, []);
+  const pagination = usePaginationFilter(claims, search, filterFn, 7);
 
   // ==========================
   // MODAL DETAIL
