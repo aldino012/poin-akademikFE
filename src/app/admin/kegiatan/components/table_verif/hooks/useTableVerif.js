@@ -81,7 +81,7 @@ export default function useTableVerif() {
     [search],
   );
 
-  const pagination = usePaginationFilter(claims, search, filterFn, 7);
+  const pagination = usePaginationFilter(claims, search, filterFn, 7, []);
 
   // ==========================
   // MODAL DETAIL
@@ -156,9 +156,6 @@ export default function useTableVerif() {
       }
 
       await fetchVerif();
-
-      // 🔥 PENTING: reset search agar data langsung tampil
-      setSearch("");
 
       if (onFinish && typeof onFinish === "function") {
         onFinish();
