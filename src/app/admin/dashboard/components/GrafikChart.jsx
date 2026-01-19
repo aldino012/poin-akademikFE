@@ -24,27 +24,6 @@ const COLORS = [
   "#10b981",
 ];
 
-// Komponen kustom untuk label Y-Axis agar teks rapi
-const CustomYAxisTick = ({ x, y, payload }) => {
-  return (
-    <g transform={`translate(${x},${y})`}>
-      <text
-        x={-10}
-        y={0}
-        dy={4}
-        textAnchor="end"
-        fill="#4b5563"
-        fontSize="11px"
-        fontWeight="500"
-      >
-        {payload.value.length > 22
-          ? `${payload.value.substring(0, 22)}...`
-          : payload.value}
-      </text>
-    </g>
-  );
-};
-
 export default function BarChartKegiatan({ data = [] }) {
   if (!data || data.length === 0) {
     return (
@@ -53,6 +32,42 @@ export default function BarChartKegiatan({ data = [] }) {
       </div>
     );
   }
+
+  // Komponen Label Kustom untuk Nama Kegiatan & Persentase
+  const renderCustomLabel = (props) => {
+    const { x, y, width, value, name } = props;
+
+    // Tentukan apakah bar cukup panjang untuk menampung teks (misal threshold 40%)
+    const isLongEnough = width > 160;
+
+    return (
+      <g>
+        {/* Nama Kegiatan di atas Bar (Solusi agar tidak terpotong dan rapat kiri) */}
+        <text
+          x={x}
+          y={y - 8}
+          fill="#374151"
+          fontSize="11px"
+          fontWeight="600"
+          textAnchor="start"
+        >
+          {name}
+        </text>
+
+        {/* Persentase */}
+        <text
+          x={isLongEnough ? x + width - 8 : x + width + 8}
+          y={y + 16}
+          fill={isLongEnough ? "#ffffff" : "#374151"}
+          fontSize="11px"
+          fontWeight="700"
+          textAnchor={isLongEnough ? "end" : "start"}
+        >
+          {`${value}%`}
+        </text>
+      </g>
+    );
+  };
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
@@ -70,7 +85,7 @@ export default function BarChartKegiatan({ data = [] }) {
         .title-wrapper {
           position: relative;
           display: inline-block;
-          margin-bottom: 24px;
+          margin-bottom: 30px;
         }
         .animated-line {
           position: absolute;
@@ -92,17 +107,19 @@ export default function BarChartKegiatan({ data = [] }) {
         <span className="animated-line"></span>
       </div>
 
-      <div className="w-full h-80">
+      {/* Tinggi ditambah (h-96) agar jarak antar bar yang punya label atas tidak sesak */}
+      <div className="w-full h-96">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={data}
             layout="vertical"
             margin={{
-              top: 5,
-              right: 45, // Ditambah agar label persentase di ujung kanan tidak terpotong
-              left: 5,
-              bottom: 5,
+              top: 10,
+              right: 50,
+              left: 0, // Benar-benar menempel ke garis L kiri
+              bottom: 10,
             }}
+            barGap={20}
           >
             <CartesianGrid
               strokeDasharray="3 3"
@@ -110,51 +127,35 @@ export default function BarChartKegiatan({ data = [] }) {
               stroke="#f0f0f0"
             />
 
-            <XAxis
-              type="number"
-              domain={[0, 100]}
-              hide // Sembunyikan Axis X agar lebih bersih karena angka sudah ada di Bar
-            />
+            <XAxis type="number" domain={[0, 100]} hide />
 
             <YAxis
               dataKey="name"
               type="category"
-              width={130}
-              tick={<CustomYAxisTick />}
-              axisLine={false}
+              width={0} // Menghilangkan kolom label di kiri
+              axisLine={{ stroke: "#e5e7eb" }}
               tickLine={false}
             />
 
             <Tooltip
               cursor={{ fill: "#f9fafb" }}
-              formatter={(value) => [`${value}%`, "Persentase"]}
+              formatter={(val) => [`${val}%`, "Partisipasi"]}
               contentStyle={{
                 borderRadius: "8px",
                 border: "none",
-                boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
-                fontSize: "12px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
               }}
             />
 
-            <Bar
-              dataKey="value"
-              radius={[0, 4, 4, 0]}
-              barSize={24}
-              isAnimationActive={true}
-            >
-              {/* Menampilkan Persentase di dalam/ujung Bar */}
-              <LabelList
-                dataKey="value"
-                position="right"
-                formatter={(val) => `${val}%`}
-                style={{ fill: "#374151", fontSize: "11px", fontWeight: "600" }}
-                offset={10}
-              />
+            <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={28}>
+              {/* Custom Label yang menangani nama di atas dan angka di dalam/luar */}
+              <LabelList dataKey="value" content={renderCustomLabel} />
 
               {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={COLORS[index % COLORS.length]}
+                  fillOpacity={0.9}
                 />
               ))}
             </Bar>
