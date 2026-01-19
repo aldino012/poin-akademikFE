@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React from "react";
 import {
   BarChart,
   Bar,
@@ -13,24 +13,17 @@ import {
 } from "recharts";
 import { FaChalkboardTeacher } from "react-icons/fa";
 
+// WARNA SAMA DENGAN PIE CHART
+const COLORS = ["#2563eb", "#16a34a", "#f59e0b", "#dc2626", "#9333ea"];
+
 /**
- * Persentase Jenis Kegiatan Mahasiswa
- * ----------------------------------
- * - Hitung persentase otomatis
- * - Horizontal bar chart
- * - Warna konsisten per kegiatan
- * - Garis animasi sejajar grafik angkatan
+ * Grafik Bar - Persentase Jenis Kegiatan Mahasiswa
+ * -----------------------------------------------
+ * - Data langsung dari pie chart (name, value)
+ * - TANPA hitung ulang
+ * - Layout horizontal
+ * - Garis animasi judul
  */
-
-// Warna konsisten
-const COLOR_MAP = {
-  Akademik: "#2563eb",
-  Organisasi: "#16a34a",
-  Sosial: "#f59e0b",
-  Kompetisi: "#dc2626",
-  Lainnya: "#9333ea",
-};
-
 export default function BarChartKegiatan({ data = [] }) {
   // =============================
   // EMPTY STATE
@@ -43,21 +36,6 @@ export default function BarChartKegiatan({ data = [] }) {
     );
   }
 
-  // =============================
-  // HITUNG PERSENTASE (AMAN)
-  // =============================
-  const processedData = useMemo(() => {
-    const total = data.reduce((sum, d) => sum + Number(d.jumlah || 0), 0);
-
-    return data.map((item) => ({
-      ...item,
-      persentase: total ? Number(((item.jumlah / total) * 100).toFixed(1)) : 0,
-    }));
-  }, [data]);
-
-  // =============================
-  // UI
-  // =============================
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm">
       {/* STYLE GARIS ANIMASI */}
@@ -76,7 +54,7 @@ export default function BarChartKegiatan({ data = [] }) {
         .title-wrapper {
           position: relative;
           display: inline-block;
-          margin-left: 6px; /* 🔥 MUNDUR SEDIKIT (SEJAJAR) */
+          margin-left: 6px; /* 🔥 sejajar dengan grafik angkatan */
           margin-bottom: 14px;
         }
 
@@ -106,33 +84,36 @@ export default function BarChartKegiatan({ data = [] }) {
       <div className="w-full h-64 sm:h-72">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
-            data={processedData}
+            data={data}
             layout="vertical"
-            margin={{ top: 10, right: 30, left: 40, bottom: 10 }}
+            margin={{
+              top: 10,
+              right: 10, // 🔥 DIKECILKAN → grafik MUNDUR
+              left: 120, // 🔥 RAPAT KE KIRI
+              bottom: 10,
+            }}
           >
             <CartesianGrid strokeDasharray="2 2" className="stroke-gray-200" />
 
             <XAxis
               type="number"
+              domain={[0, 100]}
               tickFormatter={(v) => `${v}%`}
               fontSize="0.75rem"
               tick={{ fill: "#4b5563" }}
             />
 
             <YAxis
-              dataKey="kegiatan"
+              dataKey="name"
               type="category"
-              width={130}
               fontSize="0.75rem"
               tick={{ fill: "#4b5563" }}
+              width={110}
             />
 
             <Tooltip
               cursor={{ fill: "#f3f4f6" }}
-              formatter={(value, name, props) => [
-                `${value}% (${props.payload.jumlah} mahasiswa)`,
-                "Jumlah",
-              ]}
+              formatter={(value) => [`${value}%`, "Persentase"]}
               contentStyle={{
                 borderRadius: "6px",
                 boxShadow:
@@ -143,28 +124,22 @@ export default function BarChartKegiatan({ data = [] }) {
             />
 
             <Bar
-              dataKey="persentase"
+              dataKey="value"
               radius={[0, 6, 6, 0]}
               isAnimationActive={true}
               animationDuration={700}
               animationEasing="ease-out"
             >
-              {processedData.map((entry, index) => (
+              {data.map((_, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={COLOR_MAP[entry.kegiatan] || "#6b7280"}
+                  fill={COLORS[index % COLORS.length]}
                 />
               ))}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>
-
-      {/* FOOTNOTE */}
-      <p className="text-xs text-gray-400 mt-2 ml-1">
-        Sumber: Data Mahasiswa (n ={" "}
-        {processedData.reduce((s, d) => s + d.jumlah, 0)})
-      </p>
     </div>
   );
 }
