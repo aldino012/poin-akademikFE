@@ -27,11 +27,16 @@ export default function DetailParent({ isOpen, onClose, student }) {
   const normalizeKegiatan = (items = []) =>
     items.map((i) => ({
       id: i.id,
-      namaKegiatan: i.nama_kegiatan, // 🔑 snake_case → camelCase
+
+      // 🔑 WAJIB
+      rincianAcara: i.rincianAcara || "-",
+
+      // legacy (opsional)
+      namaKegiatan: i.namaKegiatan || "-",
+
       tanggal: i.tanggal,
       poin: Number(i.poin || 0),
 
-      // optional (biar TabsKegiatan aman)
       posisi: i.posisi || "-",
       jenis: i.jenis || "-",
       tingkat: i.tingkat || "-",
