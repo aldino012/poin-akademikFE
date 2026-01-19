@@ -18,6 +18,7 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
   const [catatan, setCatatan] = useState("");
   const [saving, setSaving] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [fileAvailable, setFileAvailable] = useState(null); // null = belum dicek
 
   const mahasiswa = claim?.mahasiswa || {};
   const master = claim?.masterPoin || {};
@@ -33,14 +34,35 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  /* =================== STATUS LOGIC =================== */
- const statusEditable = !["Disetujui", "Ditolak", "Revisi"].includes(dbStatus);
 
- // Catatan bisa diedit kalau:
- // - admin sedang memilih Revisi atau Ditolak
- // - dan status di DB belum final
- const catatanEditable =
-   statusEditable && (status === "Revisi" || status === "Ditolak");
+  useEffect(() => {
+    if (!claim?.id) return;
+
+    const checkFile = async () => {
+      const klaimId = claim.id;
+      const url = `/api/proxy/klaim/${klaimId}/bukti`;
+
+      try {
+        const res = await fetch(url, { method: "HEAD" }); // HEAD cukup untuk cek ada/tidak
+        setFileAvailable(res.ok);
+      } catch (err) {
+        setFileAvailable(false);
+      }
+    };
+
+    checkFile();
+  }, [claim]);
+
+
+
+  /* =================== STATUS LOGIC =================== */
+  const statusEditable = !["Disetujui", "Ditolak", "Revisi"].includes(dbStatus);
+
+  // Catatan bisa diedit kalau:
+  // - admin sedang memilih Revisi atau Ditolak
+  // - dan status di DB belum final
+  const catatanEditable =
+    statusEditable && (status === "Revisi" || status === "Ditolak");
   const validTransitions = {
     Diajukan: ["Revisi", "Disetujui", "Ditolak"],
     "Diajukan ulang": ["Revisi", "Disetujui", "Ditolak"],
@@ -70,7 +92,7 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
   ];
 
   const statusOptions = statusAll.filter((s) =>
-    statusAllowed.includes(s.value)
+    statusAllowed.includes(s.value),
   );
 
   const selectedColor =
@@ -95,19 +117,19 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
   }, [isOpen]);
 
   /* =================== SYNC STATUS =================== */
- useEffect(() => {
-   if (isOpen && claim) {
-     setStatus(claim.status);
+  useEffect(() => {
+    if (isOpen && claim) {
+      setStatus(claim.status);
 
-     // Hanya set catatan saat modal pertama kali dibuka
-     setCatatan(
-       claim.catatan_revisi || claim.catatan || claim.catatan_admin || ""
-     );
+      // Hanya set catatan saat modal pertama kali dibuka
+      setCatatan(
+        claim.catatan_revisi || claim.catatan || claim.catatan_admin || "",
+      );
 
-     setPdfError(false);
-     setActiveTab("informasi");
-   }
- }, [isOpen, claim]);
+      setPdfError(false);
+      setActiveTab("informasi");
+    }
+  }, [isOpen, claim]);
 
   if (!isOpen || !claim) return null;
 
@@ -160,6 +182,7 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
   const renderBuktiKegiatan = () => {
     const klaimId = kegiatan.id;
 
+    // ===== CASE: KLAIM TIDAK ADA =====
     if (!klaimId) {
       return (
         <div className="bg-gray-50 border rounded-lg p-6 text-center">
@@ -168,6 +191,25 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
       );
     }
 
+    // ===== CASE: FILE SEDANG DICEK =====
+    if (fileAvailable === null) {
+      return (
+        <div className="bg-gray-50 border rounded-lg p-6 text-center">
+          <p className="text-sm text-gray-500">Memeriksa bukti kegiatan...</p>
+        </div>
+      );
+    }
+
+    // ===== CASE: FILE TIDAK ADA =====
+    if (fileAvailable === false) {
+      return (
+        <div className="bg-gray-50 border rounded-lg p-6 text-center">
+          <p className="text-sm text-gray-500">Tidak ada bukti kegiatan</p>
+        </div>
+      );
+    }
+
+    // ===== CASE: FILE ADA =====
     const base = process.env.NEXT_PUBLIC_API_URL;
     const url = `/api/proxy/klaim/${klaimId}/bukti`;
 
@@ -209,6 +251,14 @@ export default function VerifParent({ isOpen, onClose, claim, onSaveStatus }) {
             >
               <i className="fas fa-external-link-alt mr-2"></i>
               Buka
+            </button>
+
+            <button
+              onClick={handleDownload}
+              className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg text-sm"
+            >
+              <i className="fas fa-download mr-2"></i>
+              Unduh
             </button>
           </div>
         </div>
