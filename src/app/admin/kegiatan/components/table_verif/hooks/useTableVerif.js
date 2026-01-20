@@ -41,6 +41,7 @@ export default function useTableVerif() {
   const fetchVerif = async () => {
     try {
       setLoading(true);
+
       const res = await api.get("/klaim");
       let data = res.data.data || [];
 
@@ -80,7 +81,21 @@ export default function useTableVerif() {
     [search],
   );
 
+  // ==========================
+  // PAGINATION
+  // ==========================
   const pagination = usePaginationFilter(claims, search, filterFn, 7, []);
+  const { setCurrentPage } = pagination;
+
+  // 🔥 RESET PAGE JIKA DATA BERUBAH (IMPORT / FETCH ULANG)
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [claims, setCurrentPage]);
+
+  // 🔥 RESET PAGE JIKA SEARCH BERUBAH
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, setCurrentPage]);
 
   // ==========================
   // MODAL DETAIL
@@ -120,7 +135,6 @@ export default function useTableVerif() {
     }
   };
 
-
   // ==========================
   // IMPORT EXCEL
   // ==========================
@@ -159,10 +173,10 @@ export default function useTableVerif() {
         });
       }
 
-      // 🔄 Refresh data otomatis
+      // 🔄 FETCH ULANG DATA
       await fetchVerif();
 
-      // ✅ Callback dari parent jika ada (misal untuk menutup modal)
+      // ✅ Tutup modal jika ada callback
       if (onFinish && typeof onFinish === "function") {
         onFinish();
       }
