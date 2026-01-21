@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
-const BACKEND_URL = "https://poin-akademikbe-production.up.railway.app";
+// 🔥 UPDATE: Mengarah ke Backend cPanel Jagoan Hosting
+const BACKEND_URL = "https://api.poin-mhs-stikom.my.id";
 
 // ==============================
 // CORS PREFLIGHT
@@ -17,7 +18,7 @@ export async function OPTIONS() {
 async function proxy(req, method, params) {
   const path = params.path.join("/");
 
-  // 🔥 KUNCI UTAMA: SELALU /api
+  // 🔥 URL akan menjadi: https://api.poin-mhs-stikom.my.id/api/auth/login, dsb.
   const url = `${BACKEND_URL}/api/${path}`;
 
   const headers = new Headers();
@@ -33,7 +34,7 @@ async function proxy(req, method, params) {
   const options = {
     method,
     headers,
-    credentials: "include",
+    credentials: "include", // Penting agar cookie bisa dikirim/diterima
   };
 
   // ==============================
@@ -42,6 +43,7 @@ async function proxy(req, method, params) {
   if (method !== "GET" && method !== "HEAD") {
     if (contentType.includes("multipart/form-data")) {
       // 🔥 FILE UPLOAD
+      // Kita forward content-type asli (termasuk boundary)
       headers.set("content-type", contentType);
       options.body = await req.arrayBuffer();
     } else {
@@ -51,23 +53,33 @@ async function proxy(req, method, params) {
     }
   }
 
-  // ==============================
-  // FETCH TO BACKEND
-  // ==============================
-  const backendRes = await fetch(url, options);
-  const body = await backendRes.arrayBuffer();
+  try {
+    // ==============================
+    // FETCH TO BACKEND
+    // ==============================
+    const backendRes = await fetch(url, options);
+    const body = await backendRes.arrayBuffer();
 
-  const res = new NextResponse(body, {
-    status: backendRes.status,
-  });
+    const res = new NextResponse(body, {
+      status: backendRes.status,
+      statusText: backendRes.statusText,
+    });
 
-  // 🔐 forward set-cookie dari backend
-  const setCookie = backendRes.headers.get("set-cookie");
-  if (setCookie) {
-    res.headers.set("set-cookie", setCookie);
+    // 🔐 forward set-cookie dari backend ke browser
+    // Supaya login session tersimpan di browser user
+    const setCookie = backendRes.headers.get("set-cookie");
+    if (setCookie) {
+      res.headers.set("set-cookie", setCookie);
+    }
+
+    return res;
+  } catch (error) {
+    console.error("❌ Proxy Error:", error);
+    return NextResponse.json(
+      { message: "Backend connection failed" },
+      { status: 502 },
+    );
   }
-
-  return res;
 }
 
 // ==============================
