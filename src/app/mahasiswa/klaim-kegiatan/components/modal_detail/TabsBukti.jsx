@@ -1,26 +1,45 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
 export default function TabsBukti({ kegiatan }) {
   const [pdfError, setPdfError] = useState(false);
+  const [fileExists, setFileExists] = useState(true);
 
   // =====================================================
   // URL STREAM BUKTI (PRIVATE DRIVE VIA BACKEND)
   // =====================================================
- const getStreamUrl = () => {
-   if (!kegiatan?.id) return null;
+  const getStreamUrl = () => {
+    if (!kegiatan?.id || !kegiatan?.bukti_file_id) return null;
+    return `/api/proxy/klaim/${kegiatan.id}/bukti`;
+  };
 
-   return `/api/proxy/klaim/${kegiatan.id}/bukti`;
- };
+  // =====================================================
+  // CEK FILE ADA ATAU TIDAK
+  // =====================================================
+  const checkFileExistence = async () => {
+    const url = getStreamUrl();
+    if (!url) return setFileExists(false);
+
+    try {
+      const res = await fetch(url, { method: "HEAD" });
+      setFileExists(res.ok);
+    } catch (err) {
+      setFileExists(false);
+    }
+  };
+
+  useEffect(() => {
+    checkFileExistence();
+    setPdfError(false);
+  }, [kegiatan?.id, kegiatan?.bukti_file_id]);
 
   const handleOpenFile = (e) => {
     e.preventDefault();
     const url = getStreamUrl();
-    if (url) {
-      window.open(url, "_blank");
-    }
+    if (!url || !fileExists) return;
+    window.open(url, "_blank");
   };
 
   const handlePdfError = () => {
@@ -31,7 +50,7 @@ export default function TabsBukti({ kegiatan }) {
   // RENDER BUKTI KEGIATAN
   // =====================================================
   const renderBuktiKegiatan = () => {
-    if (!kegiatan?.bukti_file_id) {
+    if (!kegiatan?.bukti_file_id || !fileExists) {
       return (
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
           <i className="fas fa-file-exclamation text-gray-300 text-3xl mb-3"></i>
@@ -64,7 +83,7 @@ export default function TabsBukti({ kegiatan }) {
                 Preview tidak dapat ditampilkan
               </p>
               <p className="text-xs text-gray-500">
-                Silakan buka file di tab baru
+                File mungkin tidak ditemukan. Silakan buka di tab baru.
               </p>
             </div>
           )}
@@ -84,17 +103,29 @@ export default function TabsBukti({ kegiatan }) {
           <div className="flex gap-2">
             <button
               onClick={handleOpenFile}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-lg hover:from-blue-700 hover:to-indigo-800 transition-colors text-sm font-medium"
+              disabled={!streamUrl || !fileExists}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                streamUrl && fileExists
+                  ? "bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800"
+                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
+              }`}
             >
               <i className="fas fa-external-link-alt"></i>
               Buka File
             </button>
 
             <a
-              href={streamUrl}
+              href={streamUrl || "#"}
               download
-              className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium border border-gray-300"
-              onClick={(e) => e.stopPropagation()}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                streamUrl && fileExists
+                  ? "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
+                  : "bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed"
+              }`}
+              onClick={(e) => {
+                if (!streamUrl || !fileExists) e.preventDefault();
+                e.stopPropagation();
+              }}
             >
               <i className="fas fa-download"></i>
               Download

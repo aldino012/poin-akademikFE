@@ -8,7 +8,6 @@ import Biodata from "./components/Biodata";
 import Pencapaian from "./components/Pencaipan";
 import Greeting from "./components/Greeting";
 
-
 export default function MahasiswaPage() {
   const { mahasiswa, loading } = useMahasiswa();
 
@@ -28,9 +27,13 @@ export default function MahasiswaPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="flex justify-center items-center min-h-screen text-lg font-medium text-gray-600"
+          className="flex flex-col justify-center items-center min-h-screen text-gray-600 gap-3"
         >
-          Memuat dashboard mahasiswa...
+          {/* Spinner muter sesuai theme */}
+          <i className="fas fa-spinner fa-spin text-4xl text-blue-500"></i>
+          <span className="text-sm font-medium text-gray-700">
+            Memuat dashboard mahasiswa...
+          </span>
         </motion.div>
       ) : (
         <motion.div

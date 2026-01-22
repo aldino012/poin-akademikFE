@@ -2,61 +2,60 @@ import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
-// 🔥 UPDATE: Mengarah ke Backend cPanel Jagoan Hosting
-const BACKEND_URL = "https://api.poin-mhs-stikom.my.id";
+// =============================================================
+// BACKEND URL
+// =============================================================
+const BACKEND_URL = process.env.BACKEND_BASE_URL;
 
-// ==============================
+console.log("🔎 BACKEND_URL =", BACKEND_URL);
+
+if (!BACKEND_URL) {
+  throw new Error(
+    "❌ BACKEND_BASE_URL belum diset. Pastikan ada di .env.local / .env.production",
+  );
+}
+
+// =============================================================
 // CORS PREFLIGHT
-// ==============================
+// =============================================================
 export async function OPTIONS() {
   return new NextResponse(null, { status: 204 });
 }
 
-// ==============================
+// =============================================================
 // PROXY CORE
-// ==============================
-async function proxy(req, method, params) {
-  const path = params.path.join("/");
+// =============================================================
+async function proxy(req, method, ctx) {
+  // 🔥 WAJIB AWAIT
+  const { path } = await ctx.params;
+  const joinedPath = path.join("/");
 
-  // 🔥 URL akan menjadi: https://api.poin-mhs-stikom.my.id/api/auth/login, dsb.
-  const url = `${BACKEND_URL}/api/${path}`;
+  const url = `${BACKEND_URL}/api/${joinedPath}`;
 
   const headers = new Headers();
 
-  // 🔐 forward cookie (login session)
   const cookie = req.headers.get("cookie");
-  if (cookie) {
-    headers.set("cookie", cookie);
-  }
+  if (cookie) headers.set("cookie", cookie);
 
   const contentType = req.headers.get("content-type") || "";
 
   const options = {
     method,
     headers,
-    credentials: "include", // Penting agar cookie bisa dikirim/diterima
+    credentials: "include",
   };
 
-  // ==============================
-  // BODY HANDLING
-  // ==============================
   if (method !== "GET" && method !== "HEAD") {
     if (contentType.includes("multipart/form-data")) {
-      // 🔥 FILE UPLOAD
-      // Kita forward content-type asli (termasuk boundary)
       headers.set("content-type", contentType);
       options.body = await req.arrayBuffer();
     } else {
-      // 🔥 JSON / LOGIN / NORMAL POST
       headers.set("content-type", contentType);
       options.body = await req.text();
     }
   }
 
   try {
-    // ==============================
-    // FETCH TO BACKEND
-    // ==============================
     const backendRes = await fetch(url, options);
     const body = await backendRes.arrayBuffer();
 
@@ -65,12 +64,8 @@ async function proxy(req, method, params) {
       statusText: backendRes.statusText,
     });
 
-    // 🔐 forward set-cookie dari backend ke browser
-    // Supaya login session tersimpan di browser user
     const setCookie = backendRes.headers.get("set-cookie");
-    if (setCookie) {
-      res.headers.set("set-cookie", setCookie);
-    }
+    if (setCookie) res.headers.set("set-cookie", setCookie);
 
     return res;
   } catch (error) {
@@ -82,21 +77,21 @@ async function proxy(req, method, params) {
   }
 }
 
-// ==============================
+// =============================================================
 // HTTP METHODS
-// ==============================
+// =============================================================
 export async function GET(req, ctx) {
-  return proxy(req, "GET", ctx.params);
+  return proxy(req, "GET", ctx);
 }
 export async function POST(req, ctx) {
-  return proxy(req, "POST", ctx.params);
+  return proxy(req, "POST", ctx);
 }
 export async function PUT(req, ctx) {
-  return proxy(req, "PUT", ctx.params);
+  return proxy(req, "PUT", ctx);
 }
 export async function PATCH(req, ctx) {
-  return proxy(req, "PATCH", ctx.params);
+  return proxy(req, "PATCH", ctx);
 }
 export async function DELETE(req, ctx) {
-  return proxy(req, "DELETE", ctx.params);
+  return proxy(req, "DELETE", ctx);
 }

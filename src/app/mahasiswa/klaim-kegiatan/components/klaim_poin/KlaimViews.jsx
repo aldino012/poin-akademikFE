@@ -15,6 +15,7 @@ import EditKegiatanModal from "../edit/EditParent";
 export default function KlaimViews({
   // data
   claims,
+  loading,
 
   // search
   searchTerm,
@@ -153,35 +154,46 @@ export default function KlaimViews({
       {/* ==========================
           TABLE
       ========================== */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <TableDesktop
-          currentClaims={currentItems}
-          startIndex={startIndex}
-          statusColors={statusColors}
-          openDetailModalDesktop={openDetail}
-          openEditModalDesktop={openEdit}
-        />
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-h-[300px]">
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-24 text-gray-500">
+            <i className="fas fa-spinner fa-spin text-3xl text-blue-600 mb-3"></i>
+            <span className="text-sm">Memuat data klaim kegiatan...</span>
+          </div>
+        ) : (
+          <>
+            <TableDesktop
+              currentClaims={currentItems}
+              startIndex={startIndex}
+              statusColors={statusColors}
+              openDetailModalDesktop={openDetail}
+              openEditModalDesktop={openEdit}
+            />
 
-        <TableMobile
-          currentClaims={currentItems}
-          statusColors={statusColors}
-          openDetailModal={openDetail}
-        />
+            <TableMobile
+              currentClaims={currentItems}
+              statusColors={statusColors}
+              openDetailModal={openDetail}
+            />
+          </>
+        )}
       </div>
 
       {/* ==========================
           PAGINATION
       ========================== */}
-      <div className="mt-4 md:mt-5">
-        <TablePagination
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          totalPages={totalPages}
-          startIndex={startIndex}
-          endIndex={endIndex}
-          filteredCount={filtered.length}
-        />
-      </div>
+      {!loading && (
+        <div className="mt-4 md:mt-5">
+          <TablePagination
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            totalPages={totalPages}
+            startIndex={startIndex}
+            endIndex={endIndex}
+            filteredCount={filtered.length}
+          />
+        </div>
+      )}
 
       {/* ==========================
           MODALS
@@ -196,14 +208,14 @@ export default function KlaimViews({
             claim={selectedClaim}
             role="mahasiswa"
           />,
-          document.body
+          document.body,
         )}
 
       {mounted &&
         isPoinOpen &&
         createPortal(
           <ModalPoin isOpen={isPoinOpen} onClose={closePoin} />,
-          document.body
+          document.body,
         )}
 
       {mounted &&
@@ -216,7 +228,7 @@ export default function KlaimViews({
             claim={editClaim}
             onUpdated={() => {}}
           />,
-          document.body
+          document.body,
         )}
 
       {/* ==========================

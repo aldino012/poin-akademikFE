@@ -15,6 +15,7 @@ export default function useKlaimKegiatan() {
   // ==========================
   const [selectedClaim, setSelectedClaim] = useState(null);
   const [editClaim, setEditClaim] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isPoinOpen, setIsPoinOpen] = useState(false);
@@ -42,6 +43,7 @@ export default function useKlaimKegiatan() {
   // ==========================
   const fetchClaims = async () => {
     try {
+      setLoading(true); // <--- mulai loading
       const res = await api.get("/klaim");
       const serverData = Array.isArray(res.data)
         ? res.data
@@ -77,6 +79,8 @@ export default function useKlaimKegiatan() {
       setClaims(sorted);
     } catch (err) {
       console.error("ERROR FETCH KLAIM:", err);
+    } finally {
+      setLoading(false); // <--- selesai loading
     }
   };
 
@@ -158,6 +162,7 @@ export default function useKlaimKegiatan() {
   return {
     // data
     claims,
+    loading,
 
     // ui state
     searchTerm,

@@ -21,6 +21,7 @@ export default function KegiatanMhs() {
     <KlaimViews
       /* data */
       claims={klaim.claims}
+      loading={klaim.claims.length === 0} // <-- tambahkan loading state
       /* search */
       searchTerm={klaim.searchTerm}
       setSearchTerm={klaim.setSearchTerm}

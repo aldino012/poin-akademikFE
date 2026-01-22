@@ -20,7 +20,6 @@ export default function DetailParent({
   const { addToast } = useToast();
   const modalRef = useRef(null);
 
-  const [pdfError, setPdfError] = useState(false);
   const [activeTab, setActiveTab] = useState("informasi");
 
   const mahasiswa = claim?.mahasiswa || {};
@@ -56,7 +55,6 @@ export default function DetailParent({
   useEffect(() => {
     setStatus(claim?.status || "Diajukan");
     setCatatanRevisi(claim?.catatan_revisi || "");
-    setPdfError(false);
   }, [claim]);
 
   if (!isOpen || !claim) return null;
@@ -184,7 +182,9 @@ export default function DetailParent({
             />
           )}
 
-          {activeTab === "bukti" && <TabsBukti kegiatan={kegiatan} />}
+          {activeTab === "bukti" && (
+            <TabsBukti key={kegiatan.id} kegiatan={kegiatan} />
+          )}
 
           {activeTab === "status" && (
             <TabsStatus

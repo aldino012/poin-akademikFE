@@ -21,13 +21,18 @@ export default function MasterPoint({ role = "mahasiswa" }) {
     <MasterPointView
       /* role */
       isAdmin={masterPoint.isAdmin}
+
       /* data */
       kegiatan={masterPoint.kegiatan}
+      loading={masterPoint.loading}  
+
       /* search */
       searchTerm={masterPoint.searchTerm}
       setSearchTerm={masterPoint.setSearchTerm}
+
       /* pagination */
       pagination={masterPoint.pagination}
+
       /* ui state */
       isModalOpen={masterPoint.isModalOpen}
       setIsModalOpen={masterPoint.setIsModalOpen}
@@ -39,6 +44,7 @@ export default function MasterPoint({ role = "mahasiswa" }) {
       importConfig={masterPoint.importConfig}
       setImportConfig={masterPoint.setImportConfig}
       loadingExport={masterPoint.loadingExport}
+
       /* actions */
       getBadgeClass={masterPoint.getBadgeClass}
       handleExportExcel={masterPoint.handleExportExcel}

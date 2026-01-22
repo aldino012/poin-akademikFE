@@ -22,6 +22,7 @@ export default function TableMhs() {
       /* data */
       studentsData={tableMhs.studentsData}
       selectedStudent={tableMhs.selectedStudent}
+      loading={tableMhs.loading}
       /* filter */
       search={tableMhs.search}
       setSearch={tableMhs.setSearch}

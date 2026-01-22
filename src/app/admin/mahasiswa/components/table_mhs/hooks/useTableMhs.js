@@ -13,6 +13,7 @@ export default function useTableMhs() {
   // ==========================
   const [studentsData, setStudentsData] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // ==========================
   // STATE MODAL
@@ -41,6 +42,7 @@ export default function useTableMhs() {
   // FETCH DATA
   // ==========================
   const fetchMahasiswa = async () => {
+    setLoading(true);
     try {
       const res = await api.get("/mahasiswa");
       setStudentsData(res.data);
@@ -50,6 +52,8 @@ export default function useTableMhs() {
         message: "Gagal memuat data mahasiswa",
         type: "error",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -264,6 +268,8 @@ export default function useTableMhs() {
     // data
     studentsData,
     selectedStudent,
+    loading,
+
 
     // filter
     search,

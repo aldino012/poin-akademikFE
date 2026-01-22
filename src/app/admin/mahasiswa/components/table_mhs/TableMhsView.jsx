@@ -16,6 +16,7 @@ export default function TableMhsView({
   // data
   studentsData,
   selectedStudent,
+  loading,
 
   // filter
   search,
@@ -84,34 +85,50 @@ export default function TableMhsView({
         onAdd={openTambah}
         onImport={openImportExcel}
         onExport={handleExportExcel}
-        disableExport={studentsData.length === 0}
+        disableExport={loading || studentsData.length === 0}
       />
 
       {/* ==========================
           TABLE (DESKTOP & MOBILE)
       ========================== */}
-      <div className="overflow-y-visible">
-        <TableDesktop
-          students={currentItems}
-          startIndex={startIndex}
-          openDetail={openDetail}
-          openCetak={openCetak}
-          onEdit={openEdit}
-          onDelete={handleDelete}
-        />
+      <div className="overflow-y-visible min-h-[300px]">
+      {loading ? (
+        // ==========================
+        // LOADING STATE
+        // ==========================
+        <div className="flex flex-col items-center justify-center py-24 text-gray-500">
+          <i className="fas fa-spinner fa-spin text-3xl text-blue-600 mb-3"></i>
+          <span className="text-sm">Memuat data mahasiswa...</span>
+        </div>
+      ) : (
+        // ==========================
+        // TABLE STATE
+        // ==========================
+        <>
+          <TableDesktop
+            students={currentItems}
+            startIndex={startIndex}
+            openDetail={openDetail}
+            openCetak={openCetak}
+            onEdit={openEdit}
+            onDelete={handleDelete}
+          />
 
-        <TableMobile
-          students={currentItems}
-          openDetail={openDetail}
-          openCetak={openCetak}
-          onEdit={openEdit}
-          onDelete={handleDelete}
-        />
-      </div>
+          <TableMobile
+            students={currentItems}
+            openDetail={openDetail}
+            openCetak={openCetak}
+            onEdit={openEdit}
+            onDelete={handleDelete}
+          />
+        </>
+      )}
+    </div>
 
-      {/* ==========================
-          PAGINATION
-      ========================== */}
+    {/* ==========================
+        PAGINATION
+    ========================== */}
+    {!loading && (
       <TablePagination
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
@@ -120,46 +137,47 @@ export default function TableMhsView({
         endIndex={endIndex}
         filteredCount={filtered.length}
       />
+    )}
 
-      {/* ==========================
-          MODAL TAMBAH
-      ========================== */}
-      <ModalTambahMhs
-        isOpen={isTambahOpen}
-        onClose={closeTambah}
-        onSubmit={handleTambahSuccess}
-      />
+    {/* ==========================
+        MODAL TAMBAH
+    ========================== */}
+    <ModalTambahMhs
+      isOpen={isTambahOpen}
+      onClose={closeTambah}
+      onSubmit={handleTambahSuccess}
+    />
 
-      {/* ==========================
-          MODAL DETAIL
-      ========================== */}
-      <DetailModal
-        isOpen={isDetailOpen}
-        onClose={closeDetail}
-        student={selectedStudent}
-      />
+    {/* ==========================
+        MODAL DETAIL
+    ========================== */}
+    <DetailModal
+      isOpen={isDetailOpen}
+      onClose={closeDetail}
+      student={selectedStudent}
+    />
 
-      {/* ==========================
-          MODAL EDIT
-      ========================== */}
-      <ModalEdit
-        isOpen={isEditOpen}
-        onClose={closeEdit}
-        student={selectedStudent}
-        onSubmit={handleUpdate}
-      />
+    {/* ==========================
+        MODAL EDIT
+    ========================== */}
+    <ModalEdit
+      isOpen={isEditOpen}
+      onClose={closeEdit}
+      student={selectedStudent}
+      onSubmit={handleUpdate}
+    />
 
-      {/* ==========================
-          MODAL EXCEL
-      ========================== */}
-      <ModalExcel
-        isOpen={isExcelOpen}
-        onClose={() => setIsExcelOpen(false)}
-        title={excelConfig.title}
-        importUrl={excelConfig.importUrl}
-        exportUrl={excelConfig.exportUrl}
-        onImported={handleImportSuccess} 
-      />
-    </div>
+    {/* ==========================
+        MODAL EXCEL
+    ========================== */}
+    <ModalExcel
+      isOpen={isExcelOpen}
+      onClose={() => setIsExcelOpen(false)}
+      title={excelConfig.title}
+      importUrl={excelConfig.importUrl}
+      exportUrl={excelConfig.exportUrl}
+      onImported={handleImportSuccess}
+    />
+  </div>
   );
 }

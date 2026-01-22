@@ -18,6 +18,7 @@ export default function MasterPointView({
 
   // data
   kegiatan,
+  loading,
 
   // search
   searchTerm,
@@ -156,34 +157,44 @@ export default function MasterPointView({
           TABLE & CARD
       ========================== */}
       <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
-        <TableMasterPoints
-          currentItems={currentItems}
-          isAdmin={isAdmin}
-          getBadgeClass={getBadgeClass}
-          onEdit={handleEditTrigger}
-          onDelete={handleDelete}
-        />
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-24 text-gray-500">
+            <i className="fas fa-spinner fa-spin text-3xl text-blue-600 mb-3"></i>
+            <span className="text-sm">Memuat data master poin...</span>
+          </div>
+        ) : (
+          <>
+            <TableMasterPoints
+              currentItems={currentItems}
+              isAdmin={isAdmin}
+              getBadgeClass={getBadgeClass}
+              onEdit={handleEditTrigger}
+              onDelete={handleDelete}
+            />
 
-        <CardMaster
-          currentItems={currentItems}
-          isAdmin={isAdmin}
-          getBadgeClass={getBadgeClass}
-          onEdit={handleEditTrigger}
-          onDelete={handleDelete}
-        />
+            <CardMaster
+              currentItems={currentItems}
+              isAdmin={isAdmin}
+              getBadgeClass={getBadgeClass}
+              onEdit={handleEditTrigger}
+              onDelete={handleDelete}
+            />
+          </>
+        )}
       </div>
-
       {/* ==========================
           PAGINATION
       ========================== */}
-      <Pagination
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-        totalPages={totalPages}
-        startIndex={startIndex}
-        endIndex={endIndex}
-        filteredCount={filtered.length}
-      />
+      {!loading && (
+        <Pagination
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          totalPages={totalPages}
+          startIndex={startIndex}
+          endIndex={endIndex}
+          filteredCount={filtered.length}
+        />
+      )}
 
       {/* ==========================
           INFO BOBOT

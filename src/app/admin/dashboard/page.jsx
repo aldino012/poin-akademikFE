@@ -30,17 +30,12 @@ export default function AdminPage() {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        // ================================
         // FETCH MAHASISWA
-        // ================================
         const resMhs = await api.get("/mahasiswa");
         const mahasiswa = resMhs.data || [];
-
         const totalMahasiswa = mahasiswa.length;
 
-        // ================================
         // GRAFIK ANGKATAN
-        // ================================
         const angkatanMap = {};
         mahasiswa.forEach((mhs) => {
           const angkatan = mhs.angkatan || "Tidak diketahui";
@@ -53,25 +48,18 @@ export default function AdminPage() {
 
         setGrafikAngkatan(grafik);
 
-        // ================================
-        // FETCH KLAIM
-        // ================================
+        // FETCH KLAIM KEGIATAN
         const resKegiatan = await api.get("/klaim");
         const kegiatan = resKegiatan.data?.data || [];
-
         const totalKegiatan = kegiatan.length;
 
-        // Menunggu verifikasi
         const pendingKegiatan = kegiatan.filter(
           (item) =>
-            item.status === "Diajukan" || item.status === "Diajukan ulang"
+            item.status === "Diajukan" || item.status === "Diajukan ulang",
         ).length;
 
-        // ================================
-        // PIE CHART (JENIS KEGIATAN)
-        // ================================
+        // PIE CHART
         const mapKegiatan = {};
-
         kegiatan.forEach((item) => {
           const jenis = item.masterPoin?.jenis_kegiatan || "Lain-lain";
           mapKegiatan[jenis] = (mapKegiatan[jenis] || 0) + 1;
@@ -87,9 +75,7 @@ export default function AdminPage() {
 
         setPieKegiatan(pieData);
 
-        // ================================
         // SET STATS
-        // ================================
         setStats({
           totalMahasiswa,
           totalKegiatan,
@@ -116,9 +102,13 @@ export default function AdminPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="flex justify-center items-center h-screen text-lg font-medium text-gray-600"
+          className="flex flex-col justify-center items-center h-screen text-gray-600 gap-3"
         >
-          Memuat data dashboard...
+          {/* Spinner muter selaras theme table */}
+          <i className="fas fa-spinner fa-spin text-4xl text-blue-500"></i>
+          <span className="text-sm font-medium text-gray-700">
+            Memuat data dashboard...
+          </span>
         </motion.div>
       ) : (
         <motion.div

@@ -31,6 +31,7 @@ export default function UseMasterPoint({ role = "mahasiswa" } = {}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editData, setEditData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [loadingExport, setLoadingExport] = useState(false);
@@ -46,6 +47,8 @@ export default function UseMasterPoint({ role = "mahasiswa" } = {}) {
   // ==========================
   const fetchData = async () => {
     try {
+      setLoading(true);
+
       const res = await api.get("/masterpoin");
 
       const mapped = res.data.map((item) =>
@@ -55,7 +58,7 @@ export default function UseMasterPoint({ role = "mahasiswa" } = {}) {
           jenis: item.jenis_kegiatan,
           peran: item.posisi,
           poin: item.bobot_poin,
-        })
+        }),
       );
 
       setKegiatan(mapped);
@@ -64,6 +67,8 @@ export default function UseMasterPoint({ role = "mahasiswa" } = {}) {
         message: error.response?.data?.message || error.message,
         type: "danger",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -275,6 +280,7 @@ export default function UseMasterPoint({ role = "mahasiswa" } = {}) {
 
     // data
     kegiatan,
+    loading,
 
     // search
     searchTerm,
