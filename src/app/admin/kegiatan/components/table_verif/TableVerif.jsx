@@ -26,7 +26,7 @@ export default function TableVerif() {
       /* ===== IMPORT ===== */
       importExcel={verif.importExcel}
       importLoading={verif.importLoading}
-      /* ===== EXPORT 🔥 ===== */
+      /* ===== EXPORT  ===== */
       exportExcel={verif.exportExcel}
       exportLoading={verif.exportLoading}
     />
