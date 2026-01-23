@@ -90,7 +90,6 @@ export default function TableVerifView({
           // ==========================
           <>
             <TableDesktop
-              key={currentItems.length}
               currentClaims={currentItems}
               startIndex={startIndex}
               statusColors={statusColors}
@@ -98,7 +97,6 @@ export default function TableVerifView({
             />
 
             <TableMobile
-              key={currentItems.length}
               currentClaims={currentItems}
               statusColors={statusColors}
               openDetailModal={openDetail}
@@ -139,12 +137,7 @@ export default function TableVerifView({
         onClose={() => setIsImportOpen(false)}
         title="Import Klaim Excel"
         importUrl="/klaim/import-excel"
-        onImported={(file) =>
-          importExcel(file, () => {
-            setCurrentPage(1);
-            setIsImportOpen(false);
-          })
-        }
+        onImported={(file) => importExcel(file, () => setIsImportOpen(false))}
       />
     </div>
   );

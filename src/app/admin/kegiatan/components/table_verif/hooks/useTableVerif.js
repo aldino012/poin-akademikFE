@@ -38,29 +38,21 @@ export default function useTableVerif() {
   // ==========================
   // FETCH DATA
   // ==========================
-  const fetchVerif = useCallback(async () => {
+  const fetchVerif = async () => {
     try {
       setLoading(true);
       const res = await api.get("/klaim");
-      const data = res.data.data || [];
+      let data = res.data.data || [];
 
-      const sorted = [...data].sort((a, b) => {
-        // 1️⃣ PRIORITAS STATUS
+      data.sort((a, b) => {
         const pa = statusPriority[a.status] ?? 999;
         const pb = statusPriority[b.status] ?? 999;
-
-        if (pa !== pb) {
-          return pa - pb;
-        }
-
-        // 2️⃣ JIKA STATUS SAMA → DATA TERBARU DI ATAS
-        // pakai id (paling aman & cepat)
-        return (b.id ?? 0) - (a.id ?? 0);
+        return pa - pb;
       });
 
-
-      setClaims(sorted);
+      setClaims(data);
     } catch (err) {
+      console.error(err);
       addToast({
         message: "Gagal mengambil data verifikasi!",
         type: "danger",
@@ -68,11 +60,11 @@ export default function useTableVerif() {
     } finally {
       setLoading(false);
     }
-  }, [addToast]);
+  };
 
   useEffect(() => {
     fetchVerif();
-  }, [fetchVerif]);
+  }, []);
 
   // ==========================
   // FILTER
@@ -113,7 +105,7 @@ export default function useTableVerif() {
       // ✅ update data lokal TANPA reload / fetch ulang
       setClaims((prev) =>
         prev.map((c) =>
-          c.id === id
+          c.id_klaim === id
             ? {
                 ...c,
                 status,
