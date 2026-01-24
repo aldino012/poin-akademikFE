@@ -130,13 +130,14 @@ export default function TableVerifView({
       />
 
       {/* ==========================
-          IMPORT MODAL
+          IMPORT MODAL (FIXED)
       ========================== */}
       <ModalExcel
         isOpen={isImportOpen}
         onClose={() => setIsImportOpen(false)}
         title="Import Klaim Excel"
-        importUrl="/klaim/import-excel"
+        // ❌ importUrl DIHAPUS agar Modal tidak upload sendiri
+        // ✅ File dikirim ke parent (hooks) untuk di-handle custom
         onImported={(file) => importExcel(file, () => setIsImportOpen(false))}
       />
     </div>

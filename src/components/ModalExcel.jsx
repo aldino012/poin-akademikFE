@@ -10,7 +10,7 @@ export default function ModalImportExcel({
   onClose,
   onImported,
   title = "Import Excel",
-  importUrl, // ⬅️ FIX: HARUS DARI PARENT, TANPA DEFAULT
+  importUrl, // Bisa undefined (jika handle via parent)
   acceptTypes = ".xlsx, .xls",
   maxSizeMB = 5,
 }) {
@@ -42,6 +42,10 @@ export default function ModalImportExcel({
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
+    validateAndSetFile(selectedFile);
+  };
+
+  const validateAndSetFile = (selectedFile) => {
     if (selectedFile) {
       const sizeInMB = selectedFile.size / 1024 / 1024;
 
@@ -75,6 +79,9 @@ export default function ModalImportExcel({
     }
   };
 
+  // ============================================
+  // 🔥 PERBAIKAN UTAMA ADA DI SINI 🔥
+  // ============================================
   const handleImport = async () => {
     if (!file) {
       addToast({
@@ -84,6 +91,21 @@ export default function ModalImportExcel({
       return;
     }
 
+    // ✅ MODE 1: FILE PICKER (Delegasi ke Parent)
+    // Jika tidak ada URL import, kita serahkan file ke Parent.
+    // Parent (Hook) yang akan melakukan api.post dan refresh data.
+    if (!importUrl) {
+      if (onImported) {
+        // Kirim file mentah ke parent
+        onImported(file);
+        // Opsional: set loading lokal agar tombol disable sebentar
+        setLoading(true);
+      }
+      return; // 🛑 BERHENTI DI SINI, jangan jalankan api.post di bawah
+    }
+
+    // ✅ MODE 2: INTERNAL UPLOAD (Logic Lama)
+    // Hanya jalan jika importUrl disediakan
     try {
       setLoading(true);
 
@@ -101,7 +123,7 @@ export default function ModalImportExcel({
         type: "success",
       });
 
-      onImported();
+      if (onImported) onImported(); // Panggil tanpa argumen file
       onClose();
     } catch (error) {
       console.error("Import error:", error);
@@ -130,37 +152,8 @@ export default function ModalImportExcel({
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
-
     const droppedFile = e.dataTransfer.files?.[0];
-    if (!droppedFile) return;
-
-    // Validasi ukuran
-    const sizeInMB = droppedFile.size / 1024 / 1024;
-    if (sizeInMB > maxSizeMB) {
-      addToast({
-        message: `File terlalu besar. Maksimal ${maxSizeMB}MB`,
-        type: "error",
-      });
-      return;
-    }
-
-    // Validasi ekstensi
-    const fileExtension = droppedFile.name.split(".").pop().toLowerCase();
-    const acceptedTypesArray = acceptTypes
-      .split(",")
-      .map((t) => t.trim().replace(".", ""));
-
-    if (!acceptedTypesArray.includes(fileExtension)) {
-      addToast({
-        message: `Format file tidak didukung. Gunakan ${acceptTypes}`,
-        type: "error",
-      });
-      return;
-    }
-
-    setFile(droppedFile);
-    setFileName(droppedFile.name);
-    setFileSize(sizeInMB.toFixed(2) + " MB");
+    validateAndSetFile(droppedFile);
   };
 
   if (!isOpen) return null;
@@ -204,10 +197,10 @@ export default function ModalImportExcel({
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
                 className="
-        border-2 border-dashed border-gray-300 rounded-xl p-6
-        text-center hover:border-blue-500 transition-colors
-        cursor-pointer bg-gray-50/50
-      "
+                  border-2 border-dashed border-gray-300 rounded-xl p-6
+                  text-center hover:border-blue-500 transition-colors
+                  cursor-pointer bg-gray-50/50
+                "
               >
                 <input
                   type="file"
@@ -224,15 +217,12 @@ export default function ModalImportExcel({
                         <i className="fas fa-file-excel text-blue-600 text-2xl"></i>
                       </div>
                     </div>
-
                     <p className="text-sm font-medium text-gray-700 mb-1">
                       Klik untuk upload file
                     </p>
-
                     <p className="text-xs text-gray-500">
                       atau drag & drop file di sini
                     </p>
-
                     <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-300 rounded-lg text-xs text-gray-600">
                       <i className="fas fa-file text-gray-400"></i>
                       {acceptTypes}
@@ -252,7 +242,6 @@ export default function ModalImportExcel({
                         <i className="fas fa-check text-white text-[10px]"></i>
                       </div>
                     </div>
-
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-800 truncate">
                         {fileName}
@@ -267,7 +256,6 @@ export default function ModalImportExcel({
                       </div>
                     </div>
                   </div>
-
                   <button
                     onClick={handleRemoveFile}
                     className="text-gray-400 hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-lg"
@@ -280,7 +268,6 @@ export default function ModalImportExcel({
             )}
           </div>
 
-          {/* Info */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div className="flex items-start gap-3">
               <i className="fas fa-info-circle text-blue-500 text-lg"></i>
@@ -327,6 +314,6 @@ export default function ModalImportExcel({
         </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }

@@ -8,6 +8,9 @@ import usePaginationFilter from "@/app/hooks/usePaginationFilter";
 export default function useTableVerif() {
   const { addToast } = useToast();
 
+  // ==========================
+  // STATE
+  // ==========================
   const [claims, setClaims] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -17,7 +20,9 @@ export default function useTableVerif() {
 
   const [importLoading, setImportLoading] = useState(false);
 
-  // 🎨 WARNA STATUS
+  // ==========================
+  // CONFIG (Warna & Prioritas)
+  // ==========================
   const statusColors = {
     Diajukan: "bg-gray-100 text-gray-700",
     Revisi: "bg-yellow-100 text-yellow-700",
@@ -26,7 +31,6 @@ export default function useTableVerif() {
     Disetujui: "bg-blue-100 text-blue-700",
   };
 
-  // 🎯 PRIORITAS SORT
   const statusPriority = {
     Diajukan: 1,
     Revisi: 2,
@@ -36,14 +40,15 @@ export default function useTableVerif() {
   };
 
   // ==========================
-  // FETCH DATA
+  // 1. FETCH DATA
   // ==========================
-  const fetchVerif = async () => {
+  const fetchVerif = useCallback(async () => {
     try {
       setLoading(true);
       const res = await api.get("/klaim");
       let data = res.data.data || [];
 
+      // Sort berdasarkan prioritas status
       data.sort((a, b) => {
         const pa = statusPriority[a.status] ?? 999;
         const pb = statusPriority[b.status] ?? 999;
@@ -52,7 +57,8 @@ export default function useTableVerif() {
 
       setClaims(data);
     } catch (err) {
-      console.error(err);
+      console.error("Fetch Error:", err);
+      // Opsional: Error fetch bisa tetap ditampilkan atau di-silent juga jika mau
       addToast({
         message: "Gagal mengambil data verifikasi!",
         type: "danger",
@@ -60,14 +66,15 @@ export default function useTableVerif() {
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchVerif();
   }, []);
 
+  // Load data saat komponen pertama kali di-mount
+  useEffect(() => {
+    fetchVerif();
+  }, [fetchVerif]);
+
   // ==========================
-  // FILTER
+  // 2. FILTER & PAGINATION
   // ==========================
   const filterFn = useCallback(
     (c) => {
@@ -83,7 +90,7 @@ export default function useTableVerif() {
   const pagination = usePaginationFilter(claims, search, filterFn, 7, []);
 
   // ==========================
-  // MODAL DETAIL
+  // 3. MODAL HANDLER
   // ==========================
   const openDetail = (claim) => {
     setSelectedClaim(claim);
@@ -96,33 +103,32 @@ export default function useTableVerif() {
   };
 
   // ==========================
-  // UPDATE STATUS
+  // 4. ACTION: UPDATE STATUS
   // ==========================
   const updateStatus = async (id, status, catatan) => {
     try {
       await api.patch(`/klaim/${id}/status`, { status, catatan });
 
-      // ✅ update data lokal TANPA reload / fetch ulang
       setClaims((prev) =>
-        prev.map((c) =>
-          c.id_klaim === id
-            ? {
-                ...c,
-                status,
-                catatan,
-              }
-            : c,
-        ),
+        prev.map((c) => (c.id_klaim === id ? { ...c, status, catatan } : c)),
       );
+
+      addToast({
+        message: "Status berhasil diperbarui",
+        type: "success",
+      });
     } catch (err) {
       console.error(err);
-      throw err;
+      addToast({
+        message: "Gagal memperbarui status",
+        type: "danger",
+      });
+      fetchVerif();
     }
   };
 
-
   // ==========================
-  // IMPORT EXCEL
+  // 5. ACTION: IMPORT EXCEL (CLEAN VERSION)
   // ==========================
   const importExcel = async (file, onFinish) => {
     if (!file) return;
@@ -134,74 +140,57 @@ export default function useTableVerif() {
       setImportLoading(true);
 
       const res = await api.post("/klaim/import-excel", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
-      const { inserted = 0, skipped = 0, failed = 0, errors = [] } = res.data;
-
-      // ✅ TOAST RINGKAS
+      // ✅ Tetap tampilkan Toast Sukses (Ringkas) agar user tahu proses selesai
+      // (Bisa dihapus juga jika benar-benar ingin silent total)
+      const { inserted = 0, skipped = 0 } = res.data;
       addToast({
-        message: `Import selesai → ${inserted} berhasil, ${skipped} duplikat, ${failed} gagal`,
-        type: failed > 0 ? "warning" : "success",
-        duration: 6000,
+        message: `Import Selesai: ${inserted} Masuk, ${skipped} Skip.`,
+        type: "success",
+        duration: 4000,
       });
 
-      // ❌ DETAIL ERROR (JIKA ADA)
-      if (failed > 0 && errors.length > 0) {
-        errors.slice(0, 3).forEach((e) => {
-          addToast({
-            message: `Row ${e.row} (${e.nim || "-"}) → ${e.error}`,
-            type: "danger",
-            duration: 7000,
-          });
-        });
-      }
+      // 🔥 LOGIKA ERROR DETAIL & MESSAGE ERROR DIHILANGKAN DI SINI 🔥
 
-      // 🔄 Refresh data otomatis
+      // ✅ REFRESH DATA (Wajib agar tabel update)
       await fetchVerif();
 
-      // ✅ Callback dari parent jika ada (misal untuk menutup modal)
+      // Callback tutup modal
       if (onFinish && typeof onFinish === "function") {
         onFinish();
       }
     } catch (err) {
-      console.error(err);
-      addToast({
-        message: err.response?.data?.message || "Gagal melakukan import Excel!",
-        type: "danger",
-      });
-      throw err;
+      // ❌ Tidak menampilkan toast error ke user, hanya log di console
+      console.error("Import Error (Silent):", err);
     } finally {
       setImportLoading(false);
     }
   };
 
   return {
-    // data
+    // Data
     claims,
     loading,
     selectedClaim,
 
-    // ui
+    // UI State
     search,
     setSearch,
     statusColors,
 
-    // pagination
+    // Pagination
     pagination,
 
-    // modal
+    // Modal Controls
     isDetailOpen,
     openDetail,
     closeDetail,
 
-    // actions
+    // Actions
     updateStatus,
     importExcel,
-
-    // state
     importLoading,
   };
 }
