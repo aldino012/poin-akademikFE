@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://poin-mhs-stikom.my.id/sitemap.xml
