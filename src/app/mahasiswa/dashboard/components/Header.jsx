@@ -120,13 +120,21 @@ export default function Header({ mahasiswa }) {
       <div className="relative z-10 flex-shrink-0">
         {fotoSrc ? (
           <img
-            src={fotoSrc}
+            src={
+              fotoSrc
+                ? `/api/proxy/mahasiswa/foto/${mahasiswa.foto_file_id}?t=${Date.now()}`
+                : `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                    mahasiswa.nama_mhs,
+                  )}&background=3B82F6&color=fff`
+            }
             alt="Foto Mahasiswa"
             className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full object-cover shadow-lg border-4 border-white transition-transform duration-300 hover:scale-105"
+            loading="lazy"
+            decoding="async"
             onError={(e) => {
-              e.currentTarget.onerror = null;
+              e.currentTarget.onerror = null; // cegah loop
               e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                mahasiswa.nama_mhs
+                mahasiswa.nama_mhs,
               )}&background=3B82F6&color=fff`;
             }}
           />
