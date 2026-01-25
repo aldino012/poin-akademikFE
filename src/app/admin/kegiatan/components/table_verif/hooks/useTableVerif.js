@@ -113,10 +113,7 @@ export default function useTableVerif() {
         prev.map((c) => (c.id_klaim === id ? { ...c, status, catatan } : c)),
       );
 
-      addToast({
-        message: "Status berhasil diperbarui",
-        type: "success",
-      });
+    
     } catch (err) {
       console.error(err);
       addToast({

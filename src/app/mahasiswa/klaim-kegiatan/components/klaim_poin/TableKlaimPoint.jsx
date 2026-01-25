@@ -21,7 +21,9 @@ export default function KegiatanMhs() {
     <KlaimViews
       /* data */
       claims={klaim.claims}
-      loading={klaim.claims.length === 0} // <-- tambahkan loading state
+      // 🔥 FIX UTAMA: Pakai state loading asli dari hook.
+      // JANGAN pakai length === 0, nanti kalau data kosong malah loading selamanya.
+      loading={klaim.loading}
       /* search */
       searchTerm={klaim.searchTerm}
       setSearchTerm={klaim.setSearchTerm}
