@@ -16,6 +16,7 @@ export default function KlaimViews({
   // data
   claims,
   loading,
+  error,
 
   // search
   searchTerm,
@@ -60,6 +61,10 @@ export default function KlaimViews({
     startIndex,
     endIndex,
   } = pagination;
+
+  // Logic Empty State: Tidak loading, tidak error, dan data kosong
+  const isDataEmpty =
+    !loading && !error && (!currentItems || currentItems.length === 0);
 
   return (
     <div className="p-2 md:p-3">
@@ -152,37 +157,67 @@ export default function KlaimViews({
       </div>
 
       {/* ==========================
-          TABLE
+          CONTENT AREA (TABLE / LOADING / ERROR)
       ========================== */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-h-[300px]">
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-24 text-gray-500">
-            <i className="fas fa-spinner fa-spin text-3xl text-blue-600 mb-3"></i>
-            <span className="text-sm">Memuat data klaim kegiatan...</span>
-          </div>
-        ) : (
-          <>
-            <TableDesktop
-              currentClaims={currentItems}
-              startIndex={startIndex}
-              statusColors={statusColors}
-              openDetailModalDesktop={openDetail}
-              openEditModalDesktop={openEdit}
-            />
 
-            <TableMobile
-              currentClaims={currentItems}
-              statusColors={statusColors}
-              openDetailModal={openDetail}
-            />
-          </>
-        )}
-      </div>
+      {/* 🔥 PERUBAHAN UTAMA DI SINI:
+          Saya menghapus <div className="bg-white ... shadow ..."> 
+          yang membungkus tabel. Sekarang tabel langsung dirender.
+          Loading & Error state saya buatkan container sendiri.
+      */}
+
+      {/* KONDISI 1: LOADING */}
+      {loading && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col items-center justify-center py-24 text-gray-500">
+          <i className="fas fa-spinner fa-spin text-3xl text-blue-600 mb-4"></i>
+          <span className="text-sm font-medium animate-pulse">
+            Memuat data klaim kegiatan...
+          </span>
+        </div>
+      )}
+
+      {/* KONDISI 2: ERROR */}
+      {!loading && error && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col items-center justify-center py-20 text-red-500">
+          <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-4">
+            <i className="fas fa-exclamation-triangle text-2xl text-red-500"></i>
+          </div>
+          <span className="text-lg font-semibold">Gagal memuat data</span>
+          <span className="text-sm text-gray-500 mt-1 max-w-xs text-center">
+            {error}
+          </span>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 text-sm text-blue-600 hover:underline"
+          >
+            Coba Refresh Halaman
+          </button>
+        </div>
+      )}
+
+      {/* KONDISI 3: TAMPILKAN TABEL (DATA ADA / KOSONG DITANGANI TABEL) */}
+      {!loading && !error && (
+        <>
+          <TableDesktop
+            currentClaims={currentItems}
+            startIndex={startIndex}
+            statusColors={statusColors}
+            openDetailModalDesktop={openDetail}
+            openEditModalDesktop={openEdit}
+          />
+
+          <TableMobile
+            currentClaims={currentItems}
+            statusColors={statusColors}
+            openDetailModal={openDetail}
+          />
+        </>
+      )}
 
       {/* ==========================
           PAGINATION
       ========================== */}
-      {!loading && (
+      {!loading && !error && !isDataEmpty && (
         <div className="mt-4 md:mt-5">
           <TablePagination
             currentPage={currentPage}
